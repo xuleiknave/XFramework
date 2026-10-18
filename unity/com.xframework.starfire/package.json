@@ -1,0 +1,10 @@
+{
+  "name": "com.xframework.starfire",
+  "version": "0.1.0",
+  "displayName": "XFramework Starfire",
+  "description": "星火远征：确定性战斗内核与 P0 战斗原型。",
+  "unity": "6000.3",
+  "dependencies": {
+    "com.unity.inputsystem": "1.11.2"
+  }
+}

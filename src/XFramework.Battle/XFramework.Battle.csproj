@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Builds the battle core outside Unity for tests and batch simulation.
+    The source lives in the Unity package so Unity and .NET compile the same files.
+    netstandard2.1 + C# 9 matches what Unity 6 supports.
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../unity/com.xframework.starfire/Runtime/Battle/**/*.cs" />
+  </ItemGroup>
+
+</Project>
