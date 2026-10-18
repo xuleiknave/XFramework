@@ -1,6 +1,6 @@
 # XFramework
 
-科幻太空舰队快速对战游戏（项目代号）：收集和改装宇宙舰船，组建舰队，与其他玩家进行 3 分钟一局的实时对战，局内考虑补给与威慑，可快速框选舰船下达指令。
+单机科幻战略游戏（项目代号，暂名《星火远征》）：指挥人类舰队从保卫地球开始，逐级突破“地球级 → 太阳系级 → 宇宙级”。关卡战役加剧情，随机远征加收集养成，可暂停的即时战斗中运用补给与威慑取胜。
 
 - 游戏设计文档：[docs/game-design.md](docs/game-design.md)
-- 推演内核架构参考（确定性仿真内核设计）：[docs/architecture.md](docs/architecture.md)
+- 确定性仿真内核架构参考：[docs/architecture.md](docs/architecture.md)
