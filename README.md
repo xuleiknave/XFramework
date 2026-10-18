@@ -1,5 +1,6 @@
 # XFramework
 
-战场仿真推演系统：综合战术、机动、侦察、火力、补给等因素，对特定作战想定进行推演并给出结果分析，Unity 作为三维战场显示端。
+科幻太空舰队快速对战游戏（项目代号）：收集和改装宇宙舰船，组建舰队，与其他玩家进行 3 分钟一局的实时对战，局内考虑补给与威慑，可快速框选舰船下达指令。
 
-- 总体架构设计：[docs/architecture.md](docs/architecture.md)
+- 游戏设计文档：[docs/game-design.md](docs/game-design.md)
+- 推演内核架构参考（确定性仿真内核设计）：[docs/architecture.md](docs/architecture.md)
