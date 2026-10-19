@@ -67,5 +67,13 @@ namespace Starline.Battle
         public bool IsStructure => Role == UnitRole.Structure;
         public bool IsCraft => Role == UnitRole.Craft;
         public bool IsStatic => Speed == Fix.Zero;
+
+        public const int MaxStar = 3;
+
+        /// <summary>Durability multiplier for a star level (hull, shield and shield regeneration).</summary>
+        public static Fix HpScale(int star) => star >= 3 ? Fix.FromRatio(25, 10) : star == 2 ? Fix.FromRatio(16, 10) : Fix.One;
+
+        /// <summary>Damage multiplier for a star level.</summary>
+        public static Fix DamageScale(int star) => star >= 3 ? Fix.FromRatio(22, 10) : star == 2 ? Fix.FromRatio(15, 10) : Fix.One;
     }
 }

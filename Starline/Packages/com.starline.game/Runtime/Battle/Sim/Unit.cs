@@ -6,6 +6,11 @@ namespace Starline.Battle
         public int Id;
         public int Side;
         public UnitDef Def;
+        public int Star = 1;
+        /// <summary>Star-scaled maximums and damage (see <see cref="UnitDef.HpScale"/>).</summary>
+        public Fix MaxHp;
+        public Fix MaxShield;
+        public Fix Damage;
 
         public FixVec2 Position;
         public Fix Hp;

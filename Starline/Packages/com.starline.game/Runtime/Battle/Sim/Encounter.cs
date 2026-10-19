@@ -21,6 +21,8 @@ namespace Starline.Battle
     public sealed class Encounter
     {
         public string Name;
+        /// <summary>One or two sentences shown before deployment.</summary>
+        public string Briefing;
         public Formation Enemy;
         public List<RosterEntry> Roster = new List<RosterEntry>();
         public int CommandLimit = 22;

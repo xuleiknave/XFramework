@@ -226,12 +226,16 @@ namespace Starline.Battle
                     Id = _allUnits.Count + 1,
                     Side = side,
                     Def = def,
+                    Star = p.Star,
+                    MaxHp = def.MaxHp * UnitDef.HpScale(p.Star),
+                    MaxShield = def.MaxShield * UnitDef.HpScale(p.Star),
+                    Damage = def.Damage * UnitDef.DamageScale(p.Star),
                     Position = position,
-                    Hp = def.MaxHp,
-                    Shield = def.MaxShield,
                     Ammo = def.MaxAmmo,
                     Supplied = true,
                 };
+                unit.Hp = unit.MaxHp;
+                unit.Shield = unit.MaxShield;
                 _units.Add(unit);
                 _allUnits.Add(unit);
                 _unitsById.Add(unit.Id, unit);
@@ -285,7 +289,7 @@ namespace Starline.Battle
                         {
                             if (unit.Side == command.Side)
                             {
-                                unit.Shield = Fix.Min(unit.Def.MaxShield, unit.Shield + unit.Def.MaxShield * Fix.Half);
+                                unit.Shield = Fix.Min(unit.MaxShield, unit.Shield + unit.MaxShield * Fix.Half);
                             }
                         }
                         break;
@@ -518,7 +522,7 @@ namespace Starline.Battle
 
                 unit.ShotsFired++;
                 bool critical = unit.Def.HeavySalvoEvery > 0 && unit.ShotsFired % unit.Def.HeavySalvoEvery == 0;
-                Fix damage = unit.Def.Damage * CounterTable.Get(unit.Def.Role, target.Def.Role);
+                Fix damage = unit.Damage * CounterTable.Get(unit.Def.Role, target.Def.Role);
                 damage = damage * (DamageVarianceMin + DamageVarianceSpan * _random.NextFix());
                 if (critical)
                 {
@@ -587,7 +591,7 @@ namespace Starline.Battle
                 }
                 if (Tick - unit.LastDamagedTick >= ShieldRegenDelayTicks)
                 {
-                    unit.Shield = Fix.Min(unit.Def.MaxShield, unit.Shield + unit.Def.ShieldRegenPerSecond * TickDuration);
+                    unit.Shield = Fix.Min(unit.MaxShield, unit.Shield + unit.Def.ShieldRegenPerSecond * UnitDef.HpScale(unit.Star) * TickDuration);
                 }
                 if (unit.Def.MaxAmmo > 0 && unit.Ammo < unit.Def.MaxAmmo)
                 {

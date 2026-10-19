@@ -10,18 +10,24 @@ namespace Starline.Battle
         public int Depth;
         /// <summary>Cell row for units; row line for relays.</summary>
         public int Row;
+        /// <summary>Star level 1..3 (merging three copies raises it, GDD 4.5).</summary>
+        public int Star = 1;
+        /// <summary>The owned ship this placement deploys during an expedition (0 = none).</summary>
+        public int ShipId;
 
-        public Placement(string unitId, int depth, int row)
+        public Placement(string unitId, int depth, int row, int star = 1, int shipId = 0)
         {
             UnitId = unitId;
             Depth = depth;
             Row = row;
+            Star = star;
+            ShipId = shipId;
         }
 
         public UnitDef Def => UnitCatalog.Get(UnitId);
         public bool IsRelay => Def.IsRelay;
 
-        public Placement Clone() => new Placement(UnitId, Depth, Row);
+        public Placement Clone() => new Placement(UnitId, Depth, Row, Star, ShipId);
     }
 
     /// <summary>One side's deployment: every unit and relay node with its board position.</summary>
@@ -29,10 +35,35 @@ namespace Starline.Battle
     {
         public readonly List<Placement> Placements = new List<Placement>();
 
-        public Formation Add(string unitId, int depth, int row)
+        public Formation Add(string unitId, int depth, int row, int star = 1)
         {
-            Placements.Add(new Placement(unitId, depth, row));
+            Placements.Add(new Placement(unitId, depth, row, star));
             return this;
+        }
+
+        public Placement FindShip(int shipId)
+        {
+            foreach (Placement p in Placements)
+            {
+                if (p.ShipId == shipId)
+                {
+                    return p;
+                }
+            }
+            return null;
+        }
+
+        public int CountRelays()
+        {
+            int n = 0;
+            foreach (Placement p in Placements)
+            {
+                if (p.IsRelay)
+                {
+                    n++;
+                }
+            }
+            return n;
         }
 
         public Formation Clone()

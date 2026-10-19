@@ -121,10 +121,19 @@ namespace Starline.Battle
             HeavySalvoEvery = 4,
         };
 
+        /// <summary>Act 1 boss: a fortress the Swarm grew out of old Starline wreckage. Static, with a heavy salvo.</summary>
+        public static readonly UnitDef WreckFortress = new UnitDef
+        {
+            Id = "wreck_fortress", DisplayName = "残骸要塞", Role = UnitRole.Heavy, Size = 2,
+            MaxHp = 2000, MaxShield = 400, ShieldRegenPerSecond = 12,
+            Damage = 34, FireIntervalSeconds = R(12, 10), Range = 9, Radius = R(18, 10),
+            HeavySalvoEvery = 3,
+        };
+
         public static readonly IReadOnlyList<UnitDef> All = new[]
         {
             SupplyShip, Relay, Battleship, Frigate, PointDefenseShip, MissileShip, StrikeCraft,
-            Hive, HiveNode, Ripper, Crawler, Locust, AcidTurret, BroodMother,
+            Hive, HiveNode, Ripper, Crawler, Locust, AcidTurret, BroodMother, WreckFortress,
         };
 
         public static UnitDef Get(string id)

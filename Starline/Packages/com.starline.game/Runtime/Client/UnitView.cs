@@ -20,6 +20,7 @@ namespace Starline.Client
         public int UnitId { get; private set; }
         public int Side { get; private set; }
         public UnitDef Def { get; private set; }
+        public int Star { get; private set; } = 1;
 
         // Latest state for the HUD.
         public float HpFraction { get; private set; } = 1f;
@@ -34,7 +35,7 @@ namespace Starline.Client
 
         private float Height { get; set; } = 1f;
 
-        public static UnitView Create(UnitDef def, int side, int unitId, Vector3 position, Transform parent)
+        public static UnitView Create(UnitDef def, int side, int unitId, Vector3 position, Transform parent, int star = 1)
         {
             var root = new GameObject(def.DisplayName + " #" + unitId);
             root.transform.SetParent(parent, false);
@@ -42,8 +43,10 @@ namespace Starline.Client
             view.UnitId = unitId;
             view.Side = side;
             view.Def = def;
+            view.Star = star;
             view.Ammo = def.MaxAmmo;
             view._baseColor = def.Id == "brood_mother" ? ViewUtil.HiddenColor
+                : def.Id == "wreck_fortress" ? new Color(0.62f, 0.55f, 0.48f)
                 : def.IsStructure ? (side == BoardLayout.PlayerSide ? ViewUtil.SupplyColor : ViewUtil.EnemyColor * 0.85f)
                 : ViewUtil.SideColor(side);
             view.BuildBody();
@@ -54,6 +57,8 @@ namespace Starline.Client
             view._previous = view._current = position;
             root.transform.position = position;
             root.transform.rotation = Quaternion.LookRotation(side == BoardLayout.PlayerSide ? Vector3.right : Vector3.left);
+            // Higher stars read as slightly bigger ships.
+            root.transform.localScale = Vector3.one * (1f + 0.12f * (star - 1));
             view._renderers = root.GetComponentsInChildren<Renderer>();
             foreach (Renderer r in view._renderers)
             {
@@ -67,8 +72,8 @@ namespace Starline.Client
         {
             _previous = _current;
             _current = ViewUtil.ToWorld(unit.Position) + (Def.IsCraft ? Vector3.up * CraftHeight : Vector3.zero);
-            HpFraction = unit.Hp.ToFloat() / Def.MaxHp.ToFloat();
-            ShieldFraction = Def.MaxShield > Fix.Zero ? unit.Shield.ToFloat() / Def.MaxShield.ToFloat() : 0f;
+            HpFraction = unit.Hp.ToFloat() / unit.MaxHp.ToFloat();
+            ShieldFraction = unit.MaxShield > Fix.Zero ? unit.Shield.ToFloat() / unit.MaxShield.ToFloat() : 0f;
             Ammo = unit.Ammo;
             Supplied = unit.Supplied;
             InGrace = unit.Supplied && !unit.InCoverage && !Def.IsStructure;

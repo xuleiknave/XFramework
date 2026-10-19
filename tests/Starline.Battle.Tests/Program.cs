@@ -6,7 +6,7 @@ using Starline.Battle;
 namespace Starline.Battle.Tests
 {
     /// <summary>Minimal test runner so the project needs no NuGet packages.</summary>
-    internal static class Program
+    internal static partial class Program
     {
         private static int _failures;
 
@@ -28,6 +28,14 @@ namespace Starline.Battle.Tests
             Run("战斗在时间限制内结束", BattlesEndInTime);
             Run("战前推演：100 场在 5 秒内完成，胜率在合理区间", ForecastIsFastAndBalanced);
             Run("补给网络影响胜负：去掉中继信标后胜率下降", SupplyMatters);
+            Run("星级：★2 / ★3 提升耐久和伤害", StarScaling);
+            Run("合成：3 艘同星舰船合成高一星，并保留上阵位置", MergeKeepsPlacement);
+            Run("合成：连锁合成到 ★3", ChainMerge);
+            Run("星图：结构完整，每个节点都能到达 Boss", StarMapIsConnected);
+            Run("远征：失败扣耐久，Boss 失败扣 2，归零结束", DurabilityRules);
+            Run("远征：胜利后三选一，舰船自动上阵", RewardsAndAutoDeploy);
+            Run("敌方阵容都合法", EncountersAreValid);
+            Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
 
             Console.WriteLine();
             Console.WriteLine(_failures == 0 ? "全部通过" : _failures + " 项失败");
