@@ -1,0 +1,105 @@
+# 客户端架构
+
+Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md) 为准，这里只讲代码怎么组织。
+
+## 1. 分层
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│ Unity 客户端  Starline.Client（Runtime/Client）               │
+│                                                              │
+│  App/       GameApp：入口、界面切换、持有当前远征              │
+│  Screens/   每个界面一个类 + 一个 UXML 布局                    │
+│  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
+│  Stage/     BattleStage：3D 棋盘、舰船模型、特效、镜头         │
+│  UI/        UiRoot（UI Toolkit 根）、主题、字体、舰船头顶标签   │
+└───────────────┬──────────────────────────────────────────────┘
+                │ 只调用，不反向依赖
+┌───────────────▼──────────────────────────────────────────────┐
+│ 内核  Starline.Battle（Runtime/Battle，纯 C#，不依赖 Unity）   │
+│  Data/       JSON 解析、GameData、单位表、克制表               │
+│  Board/      棋盘坐标、布阵规则、补给网络                      │
+│  Sim/        确定性战斗模拟、指挥官技能                        │
+│  Analysis/   战前推演                                         │
+│  Expedition/ 远征：星图、舰队与合成、奖励、自动布阵、远征配置   │
+└───────────────┬──────────────────────────────────────────────┘
+                │ 读取
+┌───────────────▼──────────────────────────────────────────────┐
+│ 配置表  Runtime/Resources/StarlineData/*.json                 │
+│  units · counters · skills · encounters · expedition         │
+└──────────────────────────────────────────────────────────────┘
+```
+
+规则：
+
+- 游戏规则和数值只放在内核和配置表里。客户端只负责显示和输入，不做任何会影响战斗结果的计算。
+- 内核同时被 Unity 和 .NET 测试项目编译（`src/Starline.Battle`），所以改内核后跑 `dotnet run --project tests/Starline.Battle.Tests` 就能验证。
+- 内核必须保持确定性：只用定点数 `Fix` 和 `DeterministicRandom`，不用 float、`System.Random`，也不依赖字典的遍历顺序。
+
+## 2. 配置表
+
+| 文件 | 内容 |
+|---|---|
+| `units.json` | 舰船和敌方单位的固有属性（结构、护盾、伤害、射程、弹药、索敌偏好等） |
+| `counters.json` | 克制表：攻击方定位对目标定位的伤害倍率 |
+| `skills.json` | 指挥官技能；星级倍率 |
+| `encounters.json` | 敌方阵容：共用的母巢底座 + 各自的单位 |
+| `expedition.json` | 远征规则（耐久、指挥点、信标上限）、每一幕的开局舰队、星图层、敌人分档、奖池和剧情文本 |
+
+- 数值写成十进制小数（最多 4 位），内核按分数精确转换成定点数，同样的数据在任何电脑上算出同样的结果。
+- 数据出错时会报告文件名、行号和字段路径，例如 `units.json 第 12 行：应为 '}'`、`$.units[3].hp：缺少字段`。
+- Unity 通过 `Resources.Load<TextAsset>` 读取，测试项目直接读同一批文件，不存在两份数据。
+- 以后可以加一个从 Excel 导出 JSON 的脚本，格式不用改。
+
+## 3. 界面（UI Toolkit）
+
+- 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：舰船头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
+- 每个界面是 `UiScreen` 的子类，布局在 `Resources/StarlineUI/<名字>.uxml`，样式统一在 `Theme.uss`。可以用 Unity 的 UI Builder 直接打开 UXML 调整。
+- 设计分辨率 1600 × 900，按屏幕高度缩放。
+- 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
+- 中文字体：优先使用任意 Resources 文件夹里名为 `StarlineUIFont` 的字体文件，没有就用玩家系统里的中文字体。正式发布前要放入一个可商用的开源字体（例如 Noto Sans SC，SIL OFL 协议）。
+- UI Toolkit 通过 EventSystem + Input System 接收输入，`GameApp` 会在场景里没有 EventSystem 时自动创建。
+
+### 界面流程
+
+```
+MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy ──开战──▶ Battle ──结果弹窗──┐
+   ▲                  │  ▲                                                    │
+   │                  │  └──────────── 返回星图 / 选完奖励 ◀── Reward ◀──胜利──┤
+   │                  └─选补给站：弹窗二选一（留在 Map）                         │
+   │                                                Boss 战失败且有耐久 ──▶ Deploy
+   └──────────────── RunEnd ◀──── 通关 / 耐久归零 ────────────────────────────┘
+```
+
+| 界面 | 类 | 布局 |
+|---|---|---|
+| 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
+| 星图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
+| 布阵 | `DeployScreen` + `DeployController` | `Deploy.uxml` |
+| 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
+| 战利品 | `RewardScreen` | `Reward.uxml` |
+| 远征结束 | `RunEndScreen` | `RunEnd.uxml` |
+
+### 新增一个界面
+
+1. 在 `Resources/StarlineUI/` 新建 `Xxx.uxml`，根元素加 `class="screen"` 和 `picking-mode="Ignore"`。
+2. 新建 `XxxScreen : UiScreen`，构造函数里 `base(app, "Xxx")`，用 `Find<T>("name")` 和 `Button("name", 回调)` 绑定元素。名字写错会在第一次打开界面时直接报错。
+3. 在 `GameApp` 里加一个 `ShowXxx()`，调用 `Show(new XxxScreen(this))`。
+
+## 4. 场景与工程初始化
+
+- 菜单 `Starline > 初始化工程（场景与界面配置）`：
+  - 生成 `Assets/Resources/StarlinePanelSettings.asset`（界面缩放设置 + Unity 默认运行时主题 `Assets/UI/StarlineRuntimeTheme.tss`）。
+  - 生成 `Assets/Scenes/Main.unity`（只有相机和 `GameApp`），并设为构建列表里唯一的场景。
+- 界面配置在第一次打开工程时也会自动生成；缺少它时游戏会用临时设置运行，并在 Console 提示。
+- URP 的安装和配置沿用原来的 `UrpInstaller` / `UrpSetup`。
+
+## 5. 里程碑
+
+| 里程碑 | 内容 | 状态 |
+|---|---|---|
+| M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
+| M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
+| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
+| M4 | 美术：舰船模型、星空背景、特效、界面美术 | |
+| M5 | 设计文档的 P3：扩展组件、商店、事件、剧情对话系统 | |

@@ -42,24 +42,14 @@ namespace Starline.Expedition
 
         public MapNode Boss => Layers[Layers.Count - 1][0];
 
-        /// <summary>Node types per layer before shuffling; the last layer is the boss.</summary>
-        private static readonly NodeType[][] LayerPlan =
-        {
-            new[] { NodeType.Battle, NodeType.Battle },
-            new[] { NodeType.Battle, NodeType.Battle, NodeType.Supply },
-            new[] { NodeType.Battle, NodeType.Elite, NodeType.Supply },
-            new[] { NodeType.Battle, NodeType.Battle, NodeType.Elite },
-            new[] { NodeType.Supply, NodeType.Battle },
-            new[] { NodeType.Boss },
-        };
-
-        public static StarMap GenerateAct1(ulong seed)
+        /// <summary>Generates an act's map from its layer plan (expedition.json); the last layer is the boss.</summary>
+        public static StarMap Generate(ActConfig act, ulong seed)
         {
             var random = new DeterministicRandom(seed);
             var map = new StarMap();
-            for (int layer = 0; layer < LayerPlan.Length; layer++)
+            for (int layer = 0; layer < act.Layers.Count; layer++)
             {
-                NodeType[] types = (NodeType[])LayerPlan[layer].Clone();
+                NodeType[] types = (NodeType[])act.Layers[layer].Clone();
                 Shuffle(types, random);
                 var nodes = new List<MapNode>();
                 for (int i = 0; i < types.Length; i++)
@@ -72,7 +62,7 @@ namespace Starline.Expedition
                         LayerSize = types.Length,
                         Type = types[i],
                     };
-                    node.EncounterKey = PickEncounter(node, random);
+                    node.EncounterKey = PickEncounter(act, node, random);
                     nodes.Add(node);
                     map.Nodes.Add(node);
                 }
@@ -85,18 +75,20 @@ namespace Starline.Expedition
             return map;
         }
 
-        private static string PickEncounter(MapNode node, DeterministicRandom random)
+        public static StarMap GenerateAct1(ulong seed) => Generate(ExpeditionConfig.Current.Acts[0], seed);
+
+        private static string PickEncounter(ActConfig act, MapNode node, DeterministicRandom random)
         {
             string[] pool;
             switch (node.Type)
             {
                 case NodeType.Boss:
-                    return EncounterLibrary.Boss;
+                    return act.Boss;
                 case NodeType.Elite:
-                    pool = EncounterLibrary.EliteTiers[node.Layer <= 2 ? 0 : 1];
+                    pool = act.ElitePool(node.Layer);
                     break;
                 case NodeType.Battle:
-                    pool = EncounterLibrary.NormalTiers[node.Layer == 0 ? 0 : node.Layer <= 2 ? 1 : 2];
+                    pool = act.NormalPool(node.Layer);
                     break;
                 default:
                     return null;

@@ -25,6 +25,8 @@ namespace Starline.Battle
     {
         public string Id;
         public string DisplayName;
+        /// <summary>One-line flavour text for cards and tooltips.</summary>
+        public string Description = "";
         public UnitRole Role;
 
         /// <summary>Footprint on the board: 1 = one cell, 2 = 2x2 cells, 0 = a grid intersection (relays).</summary>
@@ -70,10 +72,12 @@ namespace Starline.Battle
 
         public const int MaxStar = 3;
 
-        /// <summary>Durability multiplier for a star level (hull, shield and shield regeneration).</summary>
-        public static Fix HpScale(int star) => star >= 3 ? Fix.FromRatio(25, 10) : star == 2 ? Fix.FromRatio(16, 10) : Fix.One;
+        /// <summary>Durability multiplier for a star level (hull, shield and shield regeneration); from skills.json.</summary>
+        public static Fix HpScale(int star) => CommanderSkillDef.StarHpScale[Clamp(star) - 1];
 
-        /// <summary>Damage multiplier for a star level.</summary>
-        public static Fix DamageScale(int star) => star >= 3 ? Fix.FromRatio(22, 10) : star == 2 ? Fix.FromRatio(15, 10) : Fix.One;
+        /// <summary>Damage multiplier for a star level; from skills.json.</summary>
+        public static Fix DamageScale(int star) => CommanderSkillDef.StarDamageScale[Clamp(star) - 1];
+
+        private static int Clamp(int star) => star < 1 ? 1 : star > MaxStar ? MaxStar : star;
     }
 }

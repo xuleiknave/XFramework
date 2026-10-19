@@ -12,6 +12,8 @@ namespace Starline.Battle.Tests
 
         private static int Main()
         {
+            Fixtures.LoadGameData();
+            Run("配置表：JSON 解析与定点数精确转换", JsonParsing);
             Run("定点数基础运算", FixMath);
             Run("棋盘坐标：格子中心与补给口", BoardGeometry);
             Run("布阵规则：重叠、越界、指挥点、补给源", FormationValidation);
@@ -90,14 +92,14 @@ namespace Starline.Battle.Tests
 
         private static void FormationValidation()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             Assert(FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit).Count == 0,
                 "默认阵型应合法：" + string.Join("；", FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit)));
             Assert(FormationRules.Validate(e.Enemy, 99).Count == 0, "敌方阵型应合法");
 
             Formation f = e.SuggestedPlayer;
             Assert(!FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 3), "战列舰占用的格子不能再放");
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.Battleship, 5, 7), "2x2 越界");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Get("battleship"), 5, 7), "2x2 越界");
             Assert(FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 0), "空格可以放");
             Assert(!FormationRules.CanPlace(f, UnitCatalog.Relay, 2, 4), "交叉点已有中继信标");
             Assert(FormationRules.CanPlace(f, UnitCatalog.Relay, 0, 4), "空交叉点可以放中继信标");
@@ -110,7 +112,7 @@ namespace Starline.Battle.Tests
 
         private static void SuggestedFormationCoverage()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             SupplyNetwork net = SupplyNetwork.ForFormation(e.SuggestedPlayer, 0);
             int covered = 0, total = 0;
             foreach (Placement p in e.SuggestedPlayer.Placements)
@@ -163,7 +165,7 @@ namespace Starline.Battle.Tests
 
         private static void SameSeedSameResult()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             var a = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 42));
             var b = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 42));
             while (!a.IsOver)
@@ -274,7 +276,7 @@ namespace Starline.Battle.Tests
 
         private static void OrbitalStrike()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             var battle = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 5));
             // Wait until 4 supply points have accumulated.
             while (!battle.CanCast(0, CommanderSkill.OrbitalStrike))
@@ -305,7 +307,7 @@ namespace Starline.Battle.Tests
 
         private static void SkillNeedsSupplyPoints()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             var battle = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 5));
             Assert(!battle.CanCast(0, CommanderSkill.OrbitalStrike), "开局 2 点补给不足以释放轨道打击");
             battle.Issue(Command.Cast(0, CommanderSkill.OrbitalStrike, new FixVec2(4, 0)));
@@ -318,7 +320,7 @@ namespace Starline.Battle.Tests
 
         private static void BattlesEndInTime()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             int min = int.MaxValue, max = 0;
             for (ulong seed = 1; seed <= 20; seed++)
             {
@@ -334,7 +336,7 @@ namespace Starline.Battle.Tests
 
         private static void ForecastIsFastAndBalanced()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             var sw = Stopwatch.StartNew();
             ForecastResult r = BattleForecast.Run(e, e.SuggestedPlayer);
             sw.Stop();
@@ -351,7 +353,7 @@ namespace Starline.Battle.Tests
 
         private static void SupplyMatters()
         {
-            Encounter e = Encounter.CreateWreckFieldAmbush();
+            Encounter e = Fixtures.WreckFieldAmbush();
             Formation noRelays = e.SuggestedPlayer.Clone();
             noRelays.Placements.RemoveAll(p => p.IsRelay);
             double with = BattleForecast.Run(e, e.SuggestedPlayer).WinRate;

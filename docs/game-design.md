@@ -441,14 +441,18 @@
 
 ```
 Unity 客户端（Starline/Packages/com.starline.game）
-├── Runtime/Client   表现层：棋盘、舰船、特效、界面、镜头
-└── Runtime/Battle   战斗内核（纯 C#，不依赖 Unity）
-    ├── Board        棋盘坐标、布阵规则、补给网络
-    ├── Sim          战斗模拟、指挥官技能、遭遇战
-    ├── Analysis     战前推演
-    ├── Data         舰船数据、克制表
-    └── Math         定点数、确定性随机数
+├── Runtime/Client     表现层：GameApp 入口、各界面（UI Toolkit）、布阵与战斗控制、3D 舞台
+├── Runtime/Resources  配置表（JSON）、界面布局（UXML）与主题（USS）
+└── Runtime/Battle     战斗内核（纯 C#，不依赖 Unity）
+    ├── Data           配置读取、舰船数据、克制表
+    ├── Board          棋盘坐标、布阵规则、补给网络
+    ├── Sim            战斗模拟、指挥官技能
+    ├── Analysis       战前推演
+    ├── Expedition     远征：星图、舰队与合成、奖励、自动布阵
+    └── Math           定点数、确定性随机数
 ```
+
+详细说明见 [client-architecture.md](client-architecture.md)。
 
 ### 14.2 关键决策
 
@@ -456,7 +460,7 @@ Unity 客户端（Starline/Packages/com.starline.game）
 |---|---|
 | 内核与 Unity 分离 | 可以写自动化测试；推演能在后台批量模拟 |
 | 定点数 + 固定种子 | 结果在任何电脑上一致：推演、回放、在线对战都依赖它 |
-| 数据驱动 | 舰船、组件、节点、楼层全部配置化（目前还写在代码里，后续迁到数据文件） |
+| 数据驱动 | 舰船、敌人、技能、星图、奖池、剧情文本都在 JSON 配置表里，内核和测试读同一份 |
 | 本地存档 + Steam 云存档 | 换电脑可继续 |
 
 ### 14.3 仓库结构
