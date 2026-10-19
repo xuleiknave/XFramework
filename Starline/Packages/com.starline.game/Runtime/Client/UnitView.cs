@@ -55,6 +55,10 @@ namespace Starline.Client
             root.transform.position = position;
             root.transform.rotation = Quaternion.LookRotation(side == BoardLayout.PlayerSide ? Vector3.right : Vector3.left);
             view._renderers = root.GetComponentsInChildren<Renderer>();
+            foreach (Renderer r in view._renderers)
+            {
+                SceneLook.SetGlow(r.material, view._baseColor, def.IsStructure ? 0.35f : 0.2f);
+            }
             return view;
         }
 

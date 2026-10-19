@@ -119,22 +119,12 @@ namespace Starline.Client
                 var camGo = new GameObject("Main Camera") { tag = "MainCamera" };
                 _camera = camGo.AddComponent<Camera>();
             }
-            _camera.clearFlags = CameraClearFlags.SolidColor;
-            _camera.backgroundColor = new Color(0.03f, 0.05f, 0.08f);
             _camera.fieldOfView = 50f;
+            SceneLook.Apply(_camera);
             _rig = _camera.GetComponent<CameraRig>();
             if (_rig == null)
             {
                 _rig = _camera.gameObject.AddComponent<CameraRig>();
-            }
-
-            if (Object.FindFirstObjectByType<Light>() == null)
-            {
-                var lightGo = new GameObject("Sun");
-                var light = lightGo.AddComponent<Light>();
-                light.type = LightType.Directional;
-                light.intensity = 1.1f;
-                lightGo.transform.rotation = Quaternion.Euler(55f, -25f, 0f);
             }
 
             _board = BoardView.Create(transform);
@@ -593,7 +583,7 @@ namespace Starline.Client
             line.gameObject.SetActive(true);
             Color c = critical ? Color.yellow : (source.Side == BoardLayout.PlayerSide ? new Color(0.6f, 0.85f, 1f) : new Color(1f, 0.65f, 0.4f));
             float width = critical ? 0.3f : source.Def.Role == UnitRole.Artillery ? 0.18f : 0.08f;
-            ViewUtil.SetLine(line, source.transform.position + Vector3.up * 0.6f, target.transform.position + Vector3.up * 0.6f, c, width);
+            ViewUtil.SetLine(line, source.transform.position + Vector3.up * 0.6f, target.transform.position + Vector3.up * 0.6f, c, width, critical ? 5f : 3f);
             _shots.Add(new Shot { Line = line, Until = Time.time + ShotSeconds });
         }
 
@@ -614,7 +604,7 @@ namespace Starline.Client
         {
             GameObject sphere = ViewUtil.Primitive(PrimitiveType.Sphere, transform, position, Vector3.zero, color);
             sphere.GetComponent<Renderer>().material = ViewUtil.Unlit;
-            sphere.GetComponent<Renderer>().material.color = color;
+            sphere.GetComponent<Renderer>().material.color = color * 4f;
             _flashes.Add(new Flash { Sphere = sphere, Start = Time.time, Duration = duration, MaxScale = size });
         }
 

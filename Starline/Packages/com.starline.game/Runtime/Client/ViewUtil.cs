@@ -20,7 +20,7 @@ namespace Starline.Client
 
         public static Color SideColor(int side) => side == BoardLayout.PlayerSide ? PlayerColor : EnemyColor;
 
-        /// <summary>Unlit material for lines and flat markers.</summary>
+        /// <summary>Unlit material for lines and glow effects (tinted per instance, HDR-capable).</summary>
         public static Material Unlit
         {
             get
@@ -62,11 +62,17 @@ namespace Starline.Client
             return line;
         }
 
-        public static void SetLine(LineRenderer line, Vector3 a, Vector3 b, Color color, float width)
+        /// <summary>
+        /// Positions and colours a line. Glow above 1 pushes the colour into HDR so bloom
+        /// picks it up; the tint lives on the line's own material because vertex colours are
+        /// clamped to the 0..1 range.
+        /// </summary>
+        public static void SetLine(LineRenderer line, Vector3 a, Vector3 b, Color color, float width, float glow = 1f)
         {
             line.SetPosition(0, a);
             line.SetPosition(1, b);
-            line.startColor = line.endColor = color;
+            line.startColor = line.endColor = Color.white;
+            line.material.color = color * glow;
             line.startWidth = line.endWidth = width;
         }
     }

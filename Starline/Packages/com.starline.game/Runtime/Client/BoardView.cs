@@ -128,13 +128,15 @@ namespace Starline.Client
                     ViewUtil.SetLine(line,
                         ViewUtil.ToWorld(a.Position) + Vector3.up * 0.08f,
                         ViewUtil.ToWorld(b.Position) + Vector3.up * 0.08f,
-                        ok ? live : ViewUtil.CutColor, ok ? 0.22f : 0.12f);
+                        ok ? live : ViewUtil.CutColor, ok ? 0.22f : 0.12f, ok ? 2f : 2.5f);
                 }
 
                 GameObject marker = NextNode();
                 marker.transform.position = ViewUtil.ToWorld(a.Position) + Vector3.up * 0.15f;
-                marker.GetComponent<Renderer>().material.color = !a.IsAlive ? new Color(0.25f, 0.25f, 0.25f)
-                    : a.Connected ? live : ViewUtil.CutColor;
+                Color markerColor = !a.IsAlive ? new Color(0.25f, 0.25f, 0.25f) : a.Connected ? live : ViewUtil.CutColor;
+                Material markerMaterial = marker.GetComponent<Renderer>().material;
+                markerMaterial.color = markerColor;
+                SceneLook.SetGlow(markerMaterial, markerColor, a.IsAlive ? 1.5f : 0f);
             }
         }
 

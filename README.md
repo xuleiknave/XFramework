@@ -30,9 +30,15 @@ docs/                              设计文档与原型图
 2. Unity Hub 里点 **Add → Add project from disk**，选择仓库里的 `Starline` 文件夹。
    - 如果 Hub 提示编辑器版本不一致，选择你安装的 Unity 6 版本打开即可。
 3. 第一次打开时如果提示启用新输入系统（Input System），选 **Yes**，编辑器会重启。
-4. 菜单栏点 `Starline > 创建可玩原型场景`，然后点 **Play**。
+4. **等待 URP 自动配置**：第一次打开时会自动安装 URP（通用渲染管线）包，并在 `Assets/Settings/` 下生成渲染配置，Console 里会依次出现“正在安装 URP”和“已启用 URP 渲染管线”。整个过程需要一两分钟。
+5. 菜单栏点 `Starline > 创建可玩原型场景`，然后点 **Play**。
 
-工程使用 Unity 内置渲染管线，不需要另外安装 URP。
+### 渲染
+
+- 使用 **URP**，开启 HDR、4 倍抗锯齿、软阴影和后处理：泛光（激光、补给线、爆炸会发光）、ACES 色调映射、暗角、对比度微调。
+- 如果自动配置没有生效（画面是粉红色，或者没有发光效果）：
+  1. 菜单点 `Starline > 重新配置 URP 渲染`；
+  2. 仍然不行的话手动设置：在 Project 窗口右键 `Create > Rendering > URP Asset (with Universal Renderer)`，然后在 `Project Settings > Graphics` 和 `Project Settings > Quality` 里把它设为渲染管线。
 
 ### 布阵
 
