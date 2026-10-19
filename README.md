@@ -5,6 +5,8 @@
 - 游戏设计文档：[docs/game-design.md](docs/game-design.md)
 - 界面原型图：[docs/prototype/](docs/prototype/)
 - 确定性仿真内核架构参考：[docs/architecture.md](docs/architecture.md)
+- 决策记录（定了什么、为什么）：[docs/decisions.md](docs/decisions.md)
+- 完整开发对话：[docs/conversation-log.md](docs/conversation-log.md)
 
 ## 目录结构
 
