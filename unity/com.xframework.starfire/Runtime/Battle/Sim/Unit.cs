@@ -1,17 +1,5 @@
 namespace XFramework.Battle
 {
-    public enum OrderType
-    {
-        /// <summary>No order: engage enemies that come within sight.</summary>
-        None,
-        /// <summary>Move to a point, firing at anything in range on the way without stopping.</summary>
-        Move,
-        /// <summary>Move to a point, but stop to fight enemies that come within sight.</summary>
-        AttackMove,
-        /// <summary>Chase and attack a specific enemy unit.</summary>
-        Attack,
-    }
-
     /// <summary>Runtime state of one unit in a battle.</summary>
     public sealed class Unit
     {
@@ -23,17 +11,29 @@ namespace XFramework.Battle
         public Fix Hp;
         public Fix Shield;
 
-        public OrderType Order;
-        public FixVec2 OrderPoint;
-        public int OrderTargetId;
-
-        /// <summary>Enemy currently being shot at (-1 for none).</summary>
-        public int CurrentTargetId = -1;
+        /// <summary>Enemy currently targeted (-1 for none).</summary>
+        public int TargetId = -1;
+        public int RetargetTicks;
         public int CooldownTicks;
         public int ShotsFired;
         /// <summary>Tick of the last damage taken, used to delay shield regeneration.</summary>
         public int LastDamagedTick = int.MinValue / 2;
 
+        public int Ammo;
+        public int AmmoRefillTicks;
+
+        /// <summary>Inside a connected node's coverage this tick.</summary>
+        public bool InCoverage;
+        /// <summary>Counts as supplied: in coverage, or a mobile unit still within its grace period.</summary>
+        public bool Supplied;
+        /// <summary>Consecutive ticks spent outside coverage.</summary>
+        public int OffGridTicks;
+        /// <summary>Total ticks spent unsupplied (battle statistics).</summary>
+        public int UnsuppliedTicksTotal;
+        /// <summary>Set once the unit has run out of ammunition at least once.</summary>
+        public bool RanDry;
+
         public bool IsAlive => Hp > Fix.Zero;
+        public bool HasAmmo => Def.MaxAmmo == 0 || Ammo > 0;
     }
 }

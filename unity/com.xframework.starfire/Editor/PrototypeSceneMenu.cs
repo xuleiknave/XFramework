@@ -8,9 +8,9 @@ namespace XFramework.Editor
 {
     public static class PrototypeSceneMenu
     {
-        private const string ScenePath = "Assets/Scenes/P0Battle.unity";
+        private const string ScenePath = "Assets/Scenes/PlayablePrototype.unity";
 
-        [MenuItem("XFramework/创建 P0 战斗原型场景")]
+        [MenuItem("XFramework/创建可玩原型场景")]
         private static void CreatePrototypeScene()
         {
             if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
@@ -19,7 +19,7 @@ namespace XFramework.Editor
             }
 
             var scene = EditorSceneManager.NewScene(NewSceneSetup.DefaultGameObjects, NewSceneMode.Single);
-            new GameObject("BattleView").AddComponent<BattleView>();
+            new GameObject("Game").AddComponent<GameController>();
 
             Directory.CreateDirectory(Path.GetDirectoryName(ScenePath));
             EditorSceneManager.SaveScene(scene, ScenePath);

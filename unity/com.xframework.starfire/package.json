@@ -1,8 +1,8 @@
 {
   "name": "com.xframework.starfire",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "XFramework Starfire",
-  "description": "星火远征：确定性战斗内核与 P0 战斗原型。",
+  "description": "星火远征：确定性战斗内核与可玩原型（布阵、补给网络、战前推演、自动战斗）。",
   "unity": "6000.3",
   "dependencies": {
     "com.unity.inputsystem": "1.11.2"
