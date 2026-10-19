@@ -2529,8 +2529,6 @@ The log is missing the three choices you made in the question dialog last time (
 
 I'm also adding the export script to the repo, so a future session can update the log itself.
 
----
-### **开发者** · 2026-10-19 17:39
+The output has a bug: the script's own source code, echoed in a command's output, got mistaken for a choice-dialog answer. I'll limit the match to results of the choice dialog only.
 
-> （在选择框中回答）
-> - ]+) → ([^
+现在记录正确了。我刚才这一轮的进度说明误用了英文，下面恢复用中文；提交修正后的记录。

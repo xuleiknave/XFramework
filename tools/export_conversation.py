@@ -24,6 +24,8 @@ HEADER = [
 
 def read_session(p):
     out = []
+    # tool_use ids of the choice dialog, so only its results count as the developer's answers
+    question_ids = set()
     for line in open(p, encoding="utf-8"):
         d=json.loads(line)
         t=d.get('type')
@@ -34,7 +36,9 @@ def read_session(p):
         elif isinstance(content,list):
             for b in content:
                 if b.get('type')=='text': texts.append(b['text'])
-                elif b.get('type')=='tool_result':
+                elif b.get('type')=='tool_use' and b.get('name')=='AskUserQuestion':
+                    question_ids.add(b.get('id'))
+                elif b.get('type')=='tool_result' and b.get('tool_use_id') in question_ids:
                     c=b.get('content'); c=c if isinstance(c,str) else ' '.join(x.get('text','') for x in (c or []) if isinstance(x,dict))
                     if 'Your questions have been answered' in c:
                         pairs=re.findall(r'"([^"]+)"="([^"]+)"', c)
