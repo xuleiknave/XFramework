@@ -1,8 +1,8 @@
 # 开发对话记录
 
 > 这是 Starline 立项和开发过程中，开发者与 Claude（Claude Code 云端会话）的对话整理。
-> 只保留双方的文字内容，省略了工具调用（读写文件、运行命令等）的细节。时间为 UTC。
-> 会话中途因上下文过长做过一次自动压缩，压缩前后的对话都已包含。
+> 只保留双方的文字内容，省略了工具调用（读写文件、运行命令等）的细节；开发者在选择框里的回答也已列出。时间为 UTC。
+> 会话中途因上下文过长做过自动压缩，压缩前后的对话都已包含。
 > 关键决策和理由的摘要见 [decisions.md](decisions.md)。
 
 ---
@@ -1426,9 +1426,6 @@ Sources:
 
 另外原来的天梯和实时对战，可以作为独立模式继续保留，也可以只靠局内的“玩家阵容”节点。你倾向哪种？看完流程图有想法随时说，定下来以后我再改设计文档和界面原型。
 
-
-**Claude**：
-
 流程图在画布上，等你看完回复。顺便说一下：这个会话没能订阅这张画布的更新，所以你在画布上改动或留评论不会通知到我，有想法请直接在这里告诉我。
 
 ---
@@ -2403,3 +2400,137 @@ README 和设计文档（新增 4.7 节“第一幕的实现”，路线图更�
 **Claude**：
 
 I'll extract the readable dialogue (your messages and my text replies, without tool calls) from the session record.
+
+The full dialogue log is generated (about 150 KB). Next I'm writing the decision record and a CLAUDE.md that future sessions will read automatically.
+
+我把这次对话迁移进了项目，已提交并推送到 `main`。新增了三个文件：
+
+1. **`docs/conversation-log.md`：完整对话记录**
+   - 从你第一句“我想做个软件可以吗”到现在，共 54 条你的消息和我的全部文字回复，按时间排列（UTC）。
+   - 只保留对话文字，读写文件、运行命令这些操作细节没有放进去。
+   - 中途对话太长做过一次自动压缩，前后两段都包含在内。
+
+2. **`docs/decisions.md`：决策记录**
+   - 26 条关键决定，每条写明“定了什么”和“为什么”。
+   - 例如：为什么不做仿真平台而做游戏，为什么从养成改成 Roguelite，为什么棋盘改成 8×6 横向，为什么从地球背景改成“重建星线”，为什么指挥点不论输赢都涨。
+
+3. **`CLAUDE.md`：给以后开发会话看的项目说明**
+   - 以后在这个仓库开新会话时，Claude 会自动读取它，知道项目背景、该先看哪些文档、怎么跑测试、代码约定，以及要用中文回复。
+   - 即使换了会话，也能接着现在的进度继续做，不用重新解释。
+
+README 里也加了这两份文档的链接。
+
+在线原型画布还是只在 claude.ai 上，仓库里已经有它导出的 PNG（`docs/prototype/`）。
+
+---
+### **开发者** · 2026-10-19 15:50
+
+> 我运行了一下，基本上的逻辑没啥问题，那么现在我们开始从零搭建项目了
+
+---
+### **开发者** · 2026-10-19 15:51
+
+> （在选择框中回答）
+> - “从零搭建”具体指什么范围？现在的战斗内核（定点数、补给网络、推演、远征逻辑）有 20 多项测试和平衡模拟，Unity 客户端是 IMGUI + 几何体的原型。 → 保留内核，重建客户端 (Recommended)
+> - 正式 UI 用哪套技术？ → UI Toolkit (Recommended)
+> - 舰船、敌人、关卡这些数值配置放在哪里？ → JSON 配置表 (Recommended)
+
+
+**Claude**：
+
+Got it: keep the core, rebuild the client properly, use UI Toolkit for the UI, and move numbers into JSON config tables. I'll start by reading the parts I haven't looked at recently.
+
+Baseline recorded. Next the JSON parser, written in the core with no dependencies; decimals convert to fixed-point exactly.
+
+The JSON files are written: ships, counters, skills, encounters, expedition rules, and the story text. Next I'll switch the core over to read them.
+
+Next, StarMap and ExpeditionRun read the config.
+
+Next is the UI layer: UiRoot, font loading, helper functions, and the world labels above units.
+
+Next the deploy and battle controllers. The logic ports over from the old GameController, minus the drawing code.
+
+Now the GameApp entry point and the screen base class.
+
+Next the star map screen, including the intro, supply-station and abandon-expedition dialogs.
+
+Next the deploy screen.
+
+Now the UXML layout for each screen.
+
+Code is written. Now type-checking: I need to add UI Toolkit and related APIs to the stubs.
+
+Code is done. Next the docs: a client architecture doc, plus updates to README, CLAUDE.md, the decision record and the design doc.
+
+正式工程的第一步做完了，已推送到 `main`。按你选的方案：保留战斗内核，重建 Unity 客户端，界面用 UI Toolkit，数值放进 JSON 配置表。内核测试全部通过，客户端代码通过了类型检查，但新界面还没在真正的 Unity 里跑过，需要你本地验证。
+
+**M1：数值迁移到配置表**
+- 所有数值和剧情文本都移到了 `Runtime/Resources/StarlineData/` 下的 5 个 JSON 文件：舰船单位、克制表、指挥官技能和星级倍率、敌方阵容、远征规则（开局舰队、星图层、敌人分档、奖池、剧情文本）。
+- 以后改数值只需编辑 JSON，不用碰代码。小数会精确换算成定点数，不影响“任何电脑结果一致”。
+- 数据写错时会报出文件名、行号和字段，例如 `units.json 第 12 行：…`。
+- 迁移后测试和平衡模拟的输出与迁移前逐字一致，所以数值没有被改动。
+
+**M2：客户端重建**
+- 原来那个一千多行、用 IMGUI 画界面的原型控制器已删除，拆成了几层：
+  - `GameApp`：入口，负责界面切换，持有当前这局远征。
+  - `Screens/`：6 个界面（主菜单、星图、布阵、战斗、战利品、远征结束），每个对应一个 UXML 布局文件。
+  - `Gameplay/`：布阵和战斗的逻辑，和界面分开。
+  - `Stage/`：3D 棋盘、舰船、特效、镜头。
+  - `UI/`：界面根节点、主题样式、字体、舰船头顶的血条和标签。
+- 新增了主菜单（开始远征 / 退出；“继续远征”“设置”先显示为灰色）。
+- 星图上加了“放弃远征”。
+- 战斗结果、补给站、开场剧情都改成弹窗。
+
+**你本地要做的**
+1. 拉取最新代码后打开工程。这次加了 UGUI 包（UI Toolkit 接收新输入系统的操作需要它），Unity 会自动安装。
+2. 点菜单 `Starline > 初始化工程（场景与界面配置）`，会生成并打开新场景 `Main.unity`，然后点 Play。
+3. 旧的 `PlayablePrototype.unity` 已经不能用了（里面的脚本被删了），可以删掉。
+
+**最可能出问题的地方**
+- **中文字体**：现在默认用系统里的微软雅黑或苹方。如果中文显示成方块，到 Google Fonts 下载 Noto Sans SC（开源，可商用），改名为 `StarlineUIFont.ttf` 放进 `Assets/Resources/` 就行。正式发布前也必须这样做，因为系统字体不能随游戏分发。云端环境下载不了字体，所以这次没法帮你放进去。
+- **界面样式和布局**：UI Toolkit 的样式是我按文档手写的，没有在编辑器里看过，间距或对齐可能需要微调。截图给我就能改，你也可以直接用 UI Builder 打开 UXML 调整。
+- **鼠标点击**：布阵时点棋盘、战斗中选轨道打击落点，要靠“鼠标是否在面板上”的判断。如果出现点不到棋盘、或者点面板时误放了舰船，告诉我。
+
+新增 `docs/client-architecture.md`，写了分层、配置表格式、界面流程图、怎么新增一个界面，以及后续里程碑。README、CLAUDE.md 和设计文档也同步了；决策记录补了 4 条：保留内核重建客户端、选 UI Toolkit、用 JSON 配置、字体方案。
+
+下一个里程碑 M3 是存档和继续远征、设置界面（音量、画质）、音频框架。建议你先跑一遍这版，把问题或截图发我，修好再往下做。
+
+---
+### **开发者** · 2026-10-19 17:24
+
+> 下载字体文件
+
+
+**Claude**：
+
+The proxy now reaches `raw.githubusercontent.com` (Google's official font repo) and the npm registry. I'll look for a static Regular weight file first.
+
+字体已经下载并放进工程，推送到了 `main`。拉取最新代码后不用做任何设置，界面会自动用它显示中文。
+
+- **字体**：Noto Sans SC Regular（Google 版思源黑体简体中文），约 10 MB，放在 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineUIFont.ttf`。这次 GitHub 还是访问不了，是通过 npm 包 `@expo-google-fonts/noto-sans-sc` 取到的 Google Fonts 官方静态版本。
+- **许可证**：SIL Open Font License 1.1，可以免费用在商业游戏里并随游戏分发，只是不能单独出售字体文件。许可证原文放在包里的 `Licenses/NotoSansSC-OFL.txt`。
+- **发布时要做的**：我在包里新建了 `ThirdPartyNotices.md`，记录了这个字体的来源和协议。发布时要把这份说明和许可证一起放进游戏，例如安装目录或“设置 > 关于”页面。
+- **只放了 Regular 一个字重**：标题等粗体字由引擎合成。如果在 Unity 里看粗体效果不好，我再把 Bold 字重加进来（大约再多 10 MB）。
+- **换字体**：用新的字体文件替换 `StarlineUIFont.ttf`，文件名不变即可。万一这个文件缺失，还会退回使用系统里的中文字体。
+
+README、客户端架构文档和决策记录都已同步更新。中文显示还没在 Unity 里实际看过，你打开后如果显示仍不正常，截图给我。
+
+---
+### **开发者** · 2026-10-19 17:38
+
+> 把这个对话迁移到项目里面
+
+
+**Claude**：
+
+I'll regenerate the dialogue log with everything since the last migration.
+
+The log is missing the three choices you made in the question dialog last time (they're stored as tool results, not as dialogue text). I'm adding them so the record is complete.
+
+I'm also adding the export script to the repo, so a future session can update the log itself.
+
+---
+### **开发者** · 2026-10-19 17:39
+
+> （在选择框中回答）
+> - ]+) → ([^

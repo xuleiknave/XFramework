@@ -6,7 +6,7 @@
 
 - `docs/game-design.md`：游戏设计文档（以它为准）
 - `docs/decisions.md`：关键决策和理由，改设计前先看
-- `docs/conversation-log.md`：此前的完整开发对话
+- `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明
 
