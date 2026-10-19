@@ -4,9 +4,9 @@ using UnityEngine.UIElements;
 namespace Starline.Client
 {
     /// <summary>
-    /// Chooses a font that can show Chinese. A font file named StarlineUIFont in any
-    /// Resources folder wins (ship an open-licence font such as Noto Sans SC this way);
-    /// otherwise a CJK font installed on the player's system is used.
+    /// Chooses a font that can show Chinese: Resources/StarlineUIFont (Noto Sans SC, SIL OFL,
+    /// bundled with the package; see ThirdPartyNotices.md). To use another font, replace that
+    /// file. If it is missing, a CJK font installed on the player's system is used.
     /// </summary>
     public static class UiFont
     {
@@ -42,7 +42,7 @@ namespace Starline.Client
             }
             if (_font == null)
             {
-                Debug.LogWarning("Starline：没有找到中文字体。把 Noto Sans SC 等字体文件命名为 " + Resource + " 放进任意 Resources 文件夹即可。");
+                Debug.LogWarning("Starline：没有找到中文字体 Resources/" + Resource + "，系统里也没有可用的中文字体。");
             }
             return _font;
         }

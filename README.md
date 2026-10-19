@@ -44,7 +44,7 @@ docs/                              设计文档与原型图
 
 ### 中文字体
 
-界面默认使用系统里的中文字体（微软雅黑、苹方等）。如果中文显示成方块，或者准备发布时，到 Google Fonts 下载 **Noto Sans SC**（SIL OFL 开源协议，可商用），把字体文件改名为 `StarlineUIFont.ttf`（或 `.otf`），放进 `Assets/Resources/` 文件夹即可。
+界面字体是随工程提供的 **Noto Sans SC Regular**（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 开源协议，可免费用于商业游戏）。想换字体，用新字体文件替换它即可（文件名不变）。发布时要把 `ThirdPartyNotices.md` 和 `Licenses/` 里的许可证随游戏一起提供。
 
 ### 修改数值
 
