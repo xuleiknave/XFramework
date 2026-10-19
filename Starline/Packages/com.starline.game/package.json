@@ -1,0 +1,10 @@
+{
+  "name": "com.starline.game",
+  "version": "0.2.0",
+  "displayName": "Starline",
+  "description": "Starline（星线）：确定性战斗内核与可玩原型（布阵、补给网络、战前推演、自动战斗）。",
+  "unity": "6000.3",
+  "dependencies": {
+    "com.unity.inputsystem": "1.11.2"
+  }
+}

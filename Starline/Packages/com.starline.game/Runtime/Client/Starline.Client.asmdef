@@ -1,0 +1,17 @@
+{
+    "name": "Starline.Client",
+    "rootNamespace": "Starline.Client",
+    "references": [
+        "Starline.Battle",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

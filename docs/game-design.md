@@ -1,8 +1,8 @@
-# 游戏设计文档（GDD）—— 从地球到群星
+# Starline（星线）游戏设计文档（GDD）—— 从地球到群星
 
 > 版本：v0.9（单机版草案）
 > 日期：2026-10-19
-> 项目代号：XFramework（正式游戏名待定，暂用《星火远征》）
+> 游戏名：**Starline**（中文名《星线》）；代码仓库代号 XFramework
 > 类型：单机为主 + 在线异步对战 / 布阵自动战斗（类自走棋）/ Roguelite 远征 / 收集解锁
 > 状态：讨论稿，第 15 节列出了待确认事项
 > 变更：v0.1 为联网对战版，v0.2 改为单机版，联网对战相关内容已移除
@@ -874,13 +874,13 @@ data/
 ### 11.4 代码仓库结构
 
 ```
-XFramework/
-├── docs/                         设计文档
-├── src/
-│   ├── XFramework.Battle/        战斗内核
-│   └── XFramework.Battle.Tests/  内核测试、平衡性模拟
-├── data/                         游戏数据配置
-└── UnityClient/                  Unity 工程（含关卡编辑器）
+XFramework/（仓库）
+├── docs/                             设计文档
+├── Starline/                         Unity 工程
+│   └── Packages/com.starline.game/   游戏代码：Runtime/Battle（战斗内核）、Runtime/Client（客户端）
+├── src/Starline.Battle/              用 .NET 编译战斗内核
+├── tests/Starline.Battle.Tests/      内核测试、平衡性模拟
+└── data/                             游戏数据配置（计划）
 ```
 
 ---
@@ -943,7 +943,7 @@ XFramework/
 |---|---|---|
 | Q1 | 地球阶段的设定 | 近未来虚构兵器对抗外星入侵者，不出现真实国家和真实武器 |
 | Q2 | 突破后能否回到之前层级 | 可以回访，但层级精通专属奖励只能停级时获得 |
-| Q3 | 游戏正式名称 | 暂定《星火远征》 |
+| Q3 | 游戏正式名称 | 已确定：Starline（中文名《星线》），正式发布前需完成商标与商店重名检查 |
 | Q4 | 美术风格 | 风格化低多边形 / 卡通渲染 |
 | Q5 | 定价 | 30~70 元人民币 |
 | Q6 | 首发语言 | 中文 + 英文 |

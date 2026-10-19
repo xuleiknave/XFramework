@@ -12,3 +12,7 @@ obj/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 *.csproj.user
+# Unity-generated IDE project files
+Starline/*.csproj
+Starline/*.sln
+Starline/*.slnx

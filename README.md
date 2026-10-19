@@ -1,29 +1,38 @@
-# XFramework
+# Starline（星线）
 
-单机科幻战略游戏（项目代号，暂名《星火远征》）：指挥人类舰队从保卫地球开始，逐级突破“地球级 → 太阳系级 → 宇宙级”。关卡战役加剧情，随机远征加收集养成，可暂停的即时战斗中运用补给与威慑取胜。
+单机科幻战略游戏：指挥人类舰队从保卫地球开始，一路打进太阳系，再穿越星门征战宇宙。战前排兵布阵，用补给网络连接你的舰队，开战前先推演一百场战争，然后看自动战斗决出胜负。
 
 - 游戏设计文档：[docs/game-design.md](docs/game-design.md)
+- 界面原型图：[docs/prototype/](docs/prototype/)
 - 确定性仿真内核架构参考：[docs/architecture.md](docs/architecture.md)
 
 ## 目录结构
 
 ```
-unity/com.xframework.starfire/   Unity 包（可添加到任意 Unity 6.3 工程）
-├── Runtime/Battle/              确定性战斗内核（纯 C#，不依赖 Unity）：棋盘、补给网络、战斗、推演
-├── Runtime/Client/              Unity 显示与操作（可玩原型）
-└── Editor/                      编辑器菜单
-src/XFramework.Battle/           用 .NET 编译同一份内核源码（测试与批量模拟用）
-tests/XFramework.Battle.Tests/   内核测试
+Starline/                          Unity 工程（用 Unity Hub 直接打开这个文件夹）
+├── Assets/
+├── Packages/manifest.json
+├── Packages/com.starline.game/    游戏代码（嵌入式包）
+│   ├── Runtime/Battle/            确定性战斗内核（纯 C#，不依赖 Unity）：棋盘、补给网络、战斗、推演
+│   ├── Runtime/Client/            Unity 显示与操作（可玩原型）
+│   └── Editor/                    编辑器菜单
+└── ProjectSettings/
+src/Starline.Battle/               用 .NET 编译同一份内核源码（测试与批量模拟用）
+tests/Starline.Battle.Tests/       内核测试
+docs/                              设计文档与原型图
 ```
 
 ## 可玩原型：在 Unity 中试玩
 
 内容：一场“精英战：沙暴伏击”，完整流程是 **横向布阵 → 摆放中继站 → 战前推演 → 自动战斗（可放指挥官技能）→ 结算 → 调整布阵再打**。
 
-1. 用 Unity Hub 安装 **Unity 6.3 LTS**，新建一个 **Universal 3D** 模板工程（工程放在本仓库之外的任意位置即可）。
-2. 打开 `Window > Package Manager`，点左上角 `+` → `Install package from disk...`，选择本仓库的 `unity/com.xframework.starfire/package.json`。
-3. 如果提示是否启用新输入系统（Input System），选 **Yes** 并重启编辑器。
-4. 菜单栏点 `XFramework > 创建可玩原型场景`，然后点 **Play**。
+1. 用 Unity Hub 安装 **Unity 6.3 LTS**。
+2. Unity Hub 里点 **Add → Add project from disk**，选择仓库里的 `Starline` 文件夹。
+   - 如果 Hub 提示编辑器版本不一致，选择你安装的 6.3 LTS 版本打开即可。
+3. 第一次打开时如果提示启用新输入系统（Input System），选 **Yes**，编辑器会重启。
+4. 菜单栏点 `Starline > 创建可玩原型场景`，然后点 **Play**。
+
+工程使用 Unity 内置渲染管线，不需要另外安装 URP。
 
 ### 布阵
 
@@ -55,5 +64,5 @@ tests/XFramework.Battle.Tests/   内核测试
 需要 .NET 8 SDK：
 
 ```
-dotnet run --project tests/XFramework.Battle.Tests
+dotnet run --project tests/Starline.Battle.Tests
 ```
