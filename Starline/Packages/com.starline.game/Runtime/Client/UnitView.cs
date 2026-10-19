@@ -9,7 +9,7 @@ namespace Starline.Client
     /// </summary>
     public sealed class UnitView : MonoBehaviour
     {
-        private const float AirHeight = 2.2f;
+        private const float CraftHeight = 2.2f;
 
         private Vector3 _previous;
         private Vector3 _current;
@@ -47,9 +47,9 @@ namespace Starline.Client
                 : def.IsStructure ? (side == BoardLayout.PlayerSide ? ViewUtil.SupplyColor : ViewUtil.EnemyColor * 0.85f)
                 : ViewUtil.SideColor(side);
             view.BuildBody();
-            if (def.IsAir)
+            if (def.IsCraft)
             {
-                position += Vector3.up * AirHeight;
+                position += Vector3.up * CraftHeight;
             }
             view._previous = view._current = position;
             root.transform.position = position;
@@ -66,7 +66,7 @@ namespace Starline.Client
         public void PushState(Unit unit)
         {
             _previous = _current;
-            _current = ViewUtil.ToWorld(unit.Position) + (Def.IsAir ? Vector3.up * AirHeight : Vector3.zero);
+            _current = ViewUtil.ToWorld(unit.Position) + (Def.IsCraft ? Vector3.up * CraftHeight : Vector3.zero);
             HpFraction = unit.Hp.ToFloat() / Def.MaxHp.ToFloat();
             ShieldFraction = Def.MaxShield > Fix.Zero ? unit.Shield.ToFloat() / Def.MaxShield.ToFloat() : 0f;
             Ammo = unit.Ammo;
@@ -103,55 +103,121 @@ namespace Starline.Client
 
         public void FlashHit() => _flashUntil = Time.time + 0.06f;
 
+        /// <summary>
+        /// Placeholder models: angular hulls for the Morningstar fleet, rounded organic
+        /// shapes for the Swarm, so the two sides read differently at a glance.
+        /// </summary>
         private void BuildBody()
         {
             Transform t = transform;
             Color c = _baseColor;
+            bool swarm = Side == BoardLayout.EnemySide;
+            const float hover = 0.5f;
+
+            if (Def.IsSupplySource)
+            {
+                Height = 1.6f;
+                if (swarm)
+                {
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 1f, 0f), new Vector3(3.2f, 1.8f, 3.2f), c);
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0.9f, 1.6f, 0.6f), new Vector3(1.2f, 1.2f, 1.2f), c);
+                }
+                else
+                {
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.4f, 0f), new Vector3(1.6f, 0.8f, 3.6f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0.95f, hover + 0.3f, -0.4f), new Vector3(0.6f, 0.6f, 2.2f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(-0.95f, hover + 0.3f, -0.4f), new Vector3(0.6f, 0.6f, 2.2f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 1f, -1f), new Vector3(0.6f, 0.5f, 0.8f), c);
+                }
+                return;
+            }
+            if (Def.IsRelay)
+            {
+                Height = 1.8f;
+                ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, 0.9f, 0f), new Vector3(0.18f, 0.9f, 0.18f), c);
+                ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, 1.5f, 0f), new Vector3(0.9f, 0.04f, 0.9f), c);
+                GameObject core = ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 1.9f, 0f), Vector3.one * 0.35f, c);
+                core.name = "Beacon core";
+                return;
+            }
+
+            if (swarm)
+            {
+                BuildSwarmBody(t, c);
+                return;
+            }
+
             switch (Def.Role)
             {
-                case UnitRole.Structure:
-                    if (Def.IsSupplySource)
+                case UnitRole.Heavy: // battleship
+                    Height = 1.9f;
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.5f, 0f), new Vector3(1.6f, 0.9f, 3.6f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.4f, 2f), new Vector3(1f, 0.6f, 0.8f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 1.2f, -0.8f), new Vector3(0.7f, 0.7f, 0.9f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, hover + 1.05f, 0.7f), new Vector3(0.6f, 0.12f, 0.6f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 1.15f, 1.2f), new Vector3(0.18f, 0.18f, 1f), c);
+                    break;
+                case UnitRole.Light: // frigate
+                    Height = 1f;
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.25f, 0f), new Vector3(0.7f, 0.4f, 1.8f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.25f, 1f), new Vector3(0.4f, 0.3f, 0.5f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.55f, -0.3f), new Vector3(0.35f, 0.3f, 0.5f), c);
+                    break;
+                case UnitRole.PointDefense: // point-defence ship
+                    Height = 1.1f;
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.25f, 0f), new Vector3(0.9f, 0.4f, 1.6f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0.25f, hover + 0.6f, 0.4f), new Vector3(0.3f, 0.15f, 0.3f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(-0.25f, hover + 0.6f, 0.4f), new Vector3(0.3f, 0.15f, 0.3f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, hover + 0.6f, -0.4f), new Vector3(0.3f, 0.15f, 0.3f), c);
+                    break;
+                case UnitRole.Artillery: // missile ship
+                    Height = 1.1f;
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, hover + 0.25f, 0f), new Vector3(0.8f, 0.4f, 2f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0.45f, hover + 0.45f, 0.1f), new Vector3(0.35f, 0.35f, 1.2f), c);
+                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(-0.45f, hover + 0.45f, 0.1f), new Vector3(0.35f, 0.35f, 1.2f), c);
+                    break;
+                case UnitRole.Craft: // strike craft wing: three small fighters
+                    Height = 0.4f;
+                    foreach (Vector3 offset in new[] { new Vector3(0f, 0f, 0.4f), new Vector3(0.5f, 0f, -0.2f), new Vector3(-0.5f, 0f, -0.2f) })
                     {
-                        Height = 1.4f;
-                        ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.6f, 0f), new Vector3(3.4f, 1.2f, 3.4f), c);
-                        ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, 1.4f, 0f), new Vector3(1.2f, 0.4f, 1.2f), c);
-                    }
-                    else
-                    {
-                        Height = 1.6f;
-                        ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, 0.8f, 0f), new Vector3(0.35f, 0.8f, 0.35f), c);
-                        GameObject top = ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 1.6f, 0f), new Vector3(0.45f, 0.45f, 0.45f), c);
-                        top.transform.localRotation = Quaternion.Euler(45f, 0f, 45f);
+                        ViewUtil.Primitive(PrimitiveType.Cube, t, offset, new Vector3(0.18f, 0.1f, 0.55f), c);
+                        ViewUtil.Primitive(PrimitiveType.Cube, t, offset + new Vector3(0f, 0f, -0.1f), new Vector3(0.6f, 0.04f, 0.2f), c);
                     }
                     break;
+            }
+        }
+
+        private void BuildSwarmBody(Transform t, Color c)
+        {
+            switch (Def.Role)
+            {
                 case UnitRole.Heavy:
-                    Height = 2.2f;
-                    float s = Def.Size >= 2 ? 1f : 0.62f;
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 1.1f * s, 0f), new Vector3(2.6f, 2.2f, 2.8f) * s, c);
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 2.0f * s, 1.3f * s), new Vector3(0.4f, 0.4f, 1.6f) * s, c);
-                    Height *= s;
+                    float s = Def.Size >= 2 ? 1f : 0.6f;
+                    Height = 2.2f * s;
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 1.1f * s, 0f), new Vector3(2.4f, 1.8f, 3f) * s, c);
+                    ViewUtil.Primitive(PrimitiveType.Capsule, t, new Vector3(0.8f * s, 0.8f * s, 1.2f * s), new Vector3(0.5f, 0.6f, 0.5f) * s, c);
+                    ViewUtil.Primitive(PrimitiveType.Capsule, t, new Vector3(-0.8f * s, 0.8f * s, 1.2f * s), new Vector3(0.5f, 0.6f, 0.5f) * s, c);
                     break;
                 case UnitRole.Light:
-                    Height = 0.8f;
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.4f, 0f), new Vector3(1.1f, 0.6f, 1.5f), c);
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.8f, 0.4f), new Vector3(0.25f, 0.25f, 0.9f), c);
-                    break;
-                case UnitRole.AntiAir:
-                    Height = 1.2f;
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.35f, 0f), new Vector3(1.1f, 0.5f, 1.4f), c);
-                    GameObject barrel = ViewUtil.Primitive(PrimitiveType.Cylinder, t, new Vector3(0f, 0.9f, 0.2f), new Vector3(0.3f, 0.45f, 0.3f), c);
-                    barrel.transform.localRotation = Quaternion.Euler(-35f, 0f, 0f);
+                    Height = 0.9f;
+                    ViewUtil.Primitive(PrimitiveType.Capsule, t, new Vector3(0f, 0.6f, 0f), new Vector3(0.6f, 0.6f, 0.6f), c).transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 0.6f, 0.7f), Vector3.one * 0.4f, c);
                     break;
                 case UnitRole.Artillery:
-                    Height = 1f;
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.4f, 0f), new Vector3(1f, 0.6f, 1.8f), c);
-                    GameObject rack = ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0.95f, -0.1f), new Vector3(0.8f, 0.45f, 1.1f), c);
-                    rack.transform.localRotation = Quaternion.Euler(-20f, 0f, 0f);
+                    Height = 1.4f;
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 0.6f, 0f), new Vector3(1.6f, 1f, 1.6f), c);
+                    ViewUtil.Primitive(PrimitiveType.Capsule, t, new Vector3(0f, 1.2f, 0.3f), new Vector3(0.4f, 0.5f, 0.4f), c);
                     break;
-                case UnitRole.Air:
+                case UnitRole.Craft:
                     Height = 0.4f;
-                    ViewUtil.Primitive(PrimitiveType.Sphere, t, Vector3.zero, new Vector3(0.7f, 0.3f, 1.1f), c);
-                    ViewUtil.Primitive(PrimitiveType.Cube, t, new Vector3(0f, 0f, -0.1f), new Vector3(1.6f, 0.08f, 0.4f), c);
+                    foreach (Vector3 offset in new[] { new Vector3(0f, 0f, 0.3f), new Vector3(0.4f, 0.1f, -0.2f), new Vector3(-0.4f, -0.1f, -0.2f) })
+                    {
+                        ViewUtil.Primitive(PrimitiveType.Sphere, t, offset, new Vector3(0.3f, 0.2f, 0.45f), c);
+                    }
+                    break;
+                default:
+                    Height = 1f;
+                    ViewUtil.Primitive(PrimitiveType.Sphere, t, new Vector3(0f, 0.5f, 0f), Vector3.one, c);
                     break;
             }
         }

@@ -435,7 +435,7 @@ namespace Starline.Battle
             return best;
         }
 
-        /// <summary>Pushes overlapping units apart. Air and ground do not collide; structures never move.</summary>
+        /// <summary>Pushes overlapping units apart. Strike craft fly between ships without colliding; structures never move.</summary>
         private void ResolveOverlaps()
         {
             for (int i = 0; i < _units.Count; i++)
@@ -444,7 +444,7 @@ namespace Starline.Battle
                 for (int j = i + 1; j < _units.Count; j++)
                 {
                     Unit b = _units[j];
-                    if (a.Def.IsAir != b.Def.IsAir)
+                    if (a.Def.IsCraft != b.Def.IsCraft)
                     {
                         continue;
                     }

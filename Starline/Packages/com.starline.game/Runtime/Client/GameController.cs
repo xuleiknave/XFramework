@@ -86,7 +86,7 @@ namespace Starline.Client
         private void Start()
         {
             SetUpScene();
-            _encounter = Encounter.CreateSandstormAmbush();
+            _encounter = Encounter.CreateWreckFieldAmbush();
             _formation = _encounter.SuggestedPlayer.Clone();
             EnterDeploy(resetIntel: true);
             _rig.SnapToDeploy();
@@ -720,9 +720,9 @@ namespace Starline.Client
         private void DrawDeployTop(float w)
         {
             GUI.Box(new Rect(0, 0, w, TopBarHeight - 4), GUIContent.none);
-            GUI.Label(new Rect(16, 12, 520, 30), "第一幕 · 地球级    " + _encounter.Name, _title);
+            GUI.Label(new Rect(16, 12, 520, 30), "第一幕 · 边境星区    " + _encounter.Name, _title);
             GUI.Label(new Rect(w - 560, 16, 548, 24),
-                "左键：放置 / 拿起移动    右键：撤下 / 取消选择    选中中继站后点交叉点", _small);
+                "左键：放置 / 拿起移动    右键：撤下 / 取消选择    选中中继信标后点交叉点", _small);
         }
 
         private void DrawRoster()
@@ -1037,11 +1037,11 @@ namespace Starline.Client
         {
             switch (role)
             {
-                case UnitRole.Light: return "轻型 · 克远程";
-                case UnitRole.Heavy: return "重型 · 克轻型";
-                case UnitRole.Air: return "空中 · 克重型";
-                case UnitRole.AntiAir: return "防空 · 克空中";
-                case UnitRole.Artillery: return "远程 · 克重型";
+                case UnitRole.Light: return "轻型舰 · 克远程";
+                case UnitRole.Heavy: return "重型舰 · 克轻型";
+                case UnitRole.Craft: return "舰载机 · 克重型、远程";
+                case UnitRole.PointDefense: return "点防御 · 克舰载机";
+                case UnitRole.Artillery: return "远程舰 · 克重型";
                 default: return "补给";
             }
         }

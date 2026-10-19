@@ -18,16 +18,16 @@ namespace Starline.Battle.Tests
             Run("补给网络：默认阵型的覆盖情况", SuggestedFormationCoverage);
             Run("补给网络：中间节点被毁后两翼断开", NetworkBreaksWhenMiddleNodeDies);
             Run("确定性：同种子两次结果完全相同", SameSeedSameResult);
-            Run("断补给：导弹车打光弹药后停火", UnsuppliedUnitRunsDry);
+            Run("断补给：导弹舰打光弹药后停火", UnsuppliedUnitRunsDry);
             Run("机动单位离网 10 秒内仍算有补给", MobileGracePeriod);
-            Run("克制：2 防空车胜 4 飞蝗群", AntiAirBeatsAir);
-            Run("克制：1 重型机甲胜 3 撕裂者", HeavyBeatsLight);
-            Run("克制：3 战机胜 1 甲壳兽", AirBeatsHeavy);
+            Run("克制：2 点防御舰胜 4 飞蝗群", AntiAirBeatsAir);
+            Run("克制：1 战列舰胜 3 撕裂者", HeavyBeatsLight);
+            Run("克制：3 舰载机群胜 1 甲壳兽", AirBeatsHeavy);
             Run("指挥官技能：轨道打击消耗补给点数并造成范围伤害", OrbitalStrike);
             Run("指挥官技能：补给点数不足时无法释放", SkillNeedsSupplyPoints);
             Run("战斗在时间限制内结束", BattlesEndInTime);
             Run("战前推演：100 场在 5 秒内完成，胜率在合理区间", ForecastIsFastAndBalanced);
-            Run("补给网络影响胜负：去掉中继站后胜率下降", SupplyMatters);
+            Run("补给网络影响胜负：去掉中继信标后胜率下降", SupplyMatters);
 
             Console.WriteLine();
             Console.WriteLine(_failures == 0 ? "全部通过" : _failures + " 项失败");
@@ -82,17 +82,17 @@ namespace Starline.Battle.Tests
 
         private static void FormationValidation()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             Assert(FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit).Count == 0,
                 "默认阵型应合法：" + string.Join("；", FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit)));
             Assert(FormationRules.Validate(e.Enemy, 99).Count == 0, "敌方阵型应合法");
 
             Formation f = e.SuggestedPlayer;
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.HoverTank, 1, 3), "重型机甲占用的格子不能再放");
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.HeavyMech, 5, 7), "2x2 越界");
-            Assert(FormationRules.CanPlace(f, UnitCatalog.HoverTank, 1, 0), "空格可以放");
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.Relay, 2, 4), "交叉点已有中继站");
-            Assert(FormationRules.CanPlace(f, UnitCatalog.Relay, 0, 4), "空交叉点可以放中继站");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 3), "战列舰占用的格子不能再放");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Battleship, 5, 7), "2x2 越界");
+            Assert(FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 0), "空格可以放");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Relay, 2, 4), "交叉点已有中继信标");
+            Assert(FormationRules.CanPlace(f, UnitCatalog.Relay, 0, 4), "空交叉点可以放中继信标");
 
             Formation noSource = f.Clone();
             noSource.Placements.RemoveAll(p => p.Def.IsSupplySource);
@@ -102,7 +102,7 @@ namespace Starline.Battle.Tests
 
         private static void SuggestedFormationCoverage()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             SupplyNetwork net = SupplyNetwork.ForFormation(e.SuggestedPlayer, 0);
             int covered = 0, total = 0;
             foreach (Placement p in e.SuggestedPlayer.Placements)
@@ -117,13 +117,13 @@ namespace Starline.Battle.Tests
                 {
                     covered++;
                 }
-                if (p.UnitId == "missile_car" && p.Depth == 5 && p.Row == 0)
+                if (p.UnitId == "missile_ship" && p.Depth == 5 && p.Row == 0)
                 {
-                    Assert(!c, "左下角导弹车应未接入");
+                    Assert(!c, "左下角导弹舰应未接入");
                 }
-                if (p.UnitId == "heavy_mech")
+                if (p.UnitId == "battleship")
                 {
-                    Assert(c, "重型机甲应已接入");
+                    Assert(c, "战列舰应已接入");
                 }
             }
             Info("默认阵型：" + covered + " / " + total + " 个兵器接入补给");
@@ -155,7 +155,7 @@ namespace Starline.Battle.Tests
 
         private static void SameSeedSameResult()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             var a = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 42));
             var b = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 42));
             while (!a.IsOver)
@@ -178,14 +178,14 @@ namespace Starline.Battle.Tests
 
         private static void UnsuppliedUnitRunsDry()
         {
-            // A missile car outside coverage, starting with only 3 rounds, facing a tough target.
-            Formation player = WithSource(0).Add("missile_car", 0, 0);
+            // A missile ship outside coverage, starting with only 3 rounds, facing a tough target.
+            Formation player = WithSource(0).Add("missile_ship", 0, 0);
             Formation enemy = WithSource(1).Add("brood_mother", 0, 0);
             var setup = new BattleSetup { Player = player, Enemy = enemy, Seed = 3, TimeLimitSeconds = 60 };
             var battle = new BattleSim(setup);
             Unit car = battle.Units[1];
-            Assert(car.Def.Id == "missile_car", "测试单位");
-            Assert(!car.Supplied, "导弹车开局应未接入补给");
+            Assert(car.Def.Id == "missile_ship", "测试单位");
+            Assert(!car.Supplied, "导弹舰开局应未接入补给");
             const int carried = 3;
             car.Ammo = carried;
 
@@ -205,12 +205,12 @@ namespace Starline.Battle.Tests
             }
             Assert(shots == carried, "断补给时只能打出携带的 " + carried + " 发，实际 " + shots);
             Assert(car.RanDry, "应记录弹药耗尽");
-            Info("导弹车最后一发在第 " + lastShotTick / BattleSim.TicksPerSecond + " 秒，之后停火");
+            Info("导弹舰最后一发在第 " + lastShotTick / BattleSim.TicksPerSecond + " 秒，之后停火");
         }
 
         private static void MobileGracePeriod()
         {
-            Formation player = WithSource(0).Add("fighter", 0, 0);
+            Formation player = WithSource(0).Add("strike_craft", 0, 0);
             Formation enemy = WithSource(1).Add("crawler", 5, 7);
             var battle = new BattleSim(new BattleSetup { Player = player, Enemy = enemy, Seed = 1 });
             Unit fighter = battle.Units[1];
@@ -218,7 +218,7 @@ namespace Starline.Battle.Tests
             {
                 battle.Step();
             }
-            Assert(fighter.OffGridTicks > 0, "战机应已离开覆盖范围");
+            Assert(fighter.OffGridTicks > 0, "舰载机群应已离开覆盖范围");
             Assert(fighter.Supplied, "离网 9 秒内仍算有补给");
             for (int i = 0; i < 3 * BattleSim.TicksPerSecond && !battle.IsOver; i++)
             {
@@ -258,15 +258,15 @@ namespace Starline.Battle.Tests
             Assert(wins >= 18, "胜场不足 18");
         }
 
-        private static void AntiAirBeatsAir() => AssertWinsAcrossSeeds("aa_vehicle", 2, "locust", 4);
+        private static void AntiAirBeatsAir() => AssertWinsAcrossSeeds("pd_ship", 2, "locust", 4);
 
-        private static void HeavyBeatsLight() => AssertWinsAcrossSeeds("heavy_mech", 1, "ripper", 3);
+        private static void HeavyBeatsLight() => AssertWinsAcrossSeeds("battleship", 1, "ripper", 3);
 
-        private static void AirBeatsHeavy() => AssertWinsAcrossSeeds("fighter", 3, "crawler", 1);
+        private static void AirBeatsHeavy() => AssertWinsAcrossSeeds("strike_craft", 3, "crawler", 1);
 
         private static void OrbitalStrike()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             var battle = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 5));
             // Wait until 4 supply points have accumulated.
             while (!battle.CanCast(0, CommanderSkill.OrbitalStrike))
@@ -297,7 +297,7 @@ namespace Starline.Battle.Tests
 
         private static void SkillNeedsSupplyPoints()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             var battle = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 5));
             Assert(!battle.CanCast(0, CommanderSkill.OrbitalStrike), "开局 2 点补给不足以释放轨道打击");
             battle.Issue(Command.Cast(0, CommanderSkill.OrbitalStrike, new FixVec2(4, 0)));
@@ -310,7 +310,7 @@ namespace Starline.Battle.Tests
 
         private static void BattlesEndInTime()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             int min = int.MaxValue, max = 0;
             for (ulong seed = 1; seed <= 20; seed++)
             {
@@ -321,12 +321,12 @@ namespace Starline.Battle.Tests
                 min = Math.Min(min, s);
                 max = Math.Max(max, s);
             }
-            Info("默认阵型对沙暴伏击：每局 " + min + "~" + max + " 秒");
+            Info("默认阵型对残骸带伏击：每局 " + min + "~" + max + " 秒");
         }
 
         private static void ForecastIsFastAndBalanced()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             var sw = Stopwatch.StartNew();
             ForecastResult r = BattleForecast.Run(e, e.SuggestedPlayer);
             sw.Stop();
@@ -343,13 +343,13 @@ namespace Starline.Battle.Tests
 
         private static void SupplyMatters()
         {
-            Encounter e = Encounter.CreateSandstormAmbush();
+            Encounter e = Encounter.CreateWreckFieldAmbush();
             Formation noRelays = e.SuggestedPlayer.Clone();
             noRelays.Placements.RemoveAll(p => p.IsRelay);
             double with = BattleForecast.Run(e, e.SuggestedPlayer).WinRate;
             double without = BattleForecast.Run(e, noRelays).WinRate;
-            Info("有中继站 " + Math.Round(with * 100) + "%，没有中继站 " + Math.Round(without * 100) + "%");
-            Assert(without < with - 0.1, "去掉中继站后胜率应明显下降");
+            Info("有中继信标 " + Math.Round(with * 100) + "%，没有中继信标 " + Math.Round(without * 100) + "%");
+            Assert(without < with - 0.1, "去掉中继信标后胜率应明显下降");
         }
     }
 }

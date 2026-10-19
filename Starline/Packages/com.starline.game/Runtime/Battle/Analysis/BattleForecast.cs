@@ -126,7 +126,7 @@ namespace Starline.Battle
                 {
                     Share = (double)dry[worstDry] / defeats,
                     Text = UnitCatalog.Get(worstDry).DisplayName + " 弹药耗尽停火",
-                    Advice = "让 " + UnitCatalog.Get(worstDry).DisplayName + " 待在补给覆盖范围内，或者在它附近加一个中继站。",
+                    Advice = "让 " + UnitCatalog.Get(worstDry).DisplayName + " 待在补给覆盖范围内，或者在它附近加一个中继信标。",
                 });
             }
             if (relayLost > 0)
@@ -135,7 +135,7 @@ namespace Starline.Battle
                 {
                     Share = (double)relayLost / defeats,
                     Text = "补给节点被摧毁",
-                    Advice = "在中继站附近放一辆防空车，挡住来切补给线的飞蝗群。",
+                    Advice = "在中继信标附近放一艘点防御舰，挡住来切补给线的飞蝗群。",
                 });
             }
             if (unsupplied > 0)
@@ -181,12 +181,12 @@ namespace Starline.Battle
             switch (def.Role)
             {
                 case UnitRole.Artillery:
-                    return "把 " + def.DisplayName + " 往后放，前面用重型或战车挡住突进的敌人。";
-                case UnitRole.Air:
-                    return def.DisplayName + " 怕防空，避开敌方防空单位所在的一翼。";
+                    return "把 " + def.DisplayName + " 往后放，前面用战列舰或护卫舰挡住突进的敌人。";
+                case UnitRole.Craft:
+                    return def.DisplayName + " 怕点防御，避开敌方点防御单位所在的一翼。";
                 case UnitRole.Heavy:
-                    return "敌方炮台和空中单位克制重型，先用战机或战车解决它们。";
-                case UnitRole.AntiAir:
+                    return "敌方炮巢和飞蝗群克制重型舰，先用舰载机群或护卫舰解决它们。";
+                case UnitRole.PointDefense:
                     return def.DisplayName + " 很脆，放在第二排，让前排替它挡伤害。";
                 default:
                     return "前排太薄，考虑多放一个耐打的单位。";

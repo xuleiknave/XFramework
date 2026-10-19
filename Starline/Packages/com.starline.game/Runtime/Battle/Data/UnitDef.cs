@@ -3,10 +3,15 @@ namespace Starline.Battle
     /// <summary>Unit role. Drives the counter relationships and targeting preferences.</summary>
     public enum UnitRole
     {
+        /// <summary>Frigates and other fast escorts.</summary>
         Light,
+        /// <summary>Battleships and other armoured capital ships.</summary>
         Heavy,
-        Air,
-        AntiAir,
+        /// <summary>Strike craft: small, fast, fly between the big ships.</summary>
+        Craft,
+        /// <summary>Point-defence ships that shred strike craft.</summary>
+        PointDefense,
+        /// <summary>Long-range missile and siege ships.</summary>
         Artillery,
         /// <summary>Supply sources and relay nodes: no weapon, never move.</summary>
         Structure,
@@ -60,7 +65,7 @@ namespace Starline.Battle
 
         public bool HasWeapon => Damage > Fix.Zero;
         public bool IsStructure => Role == UnitRole.Structure;
-        public bool IsAir => Role == UnitRole.Air;
+        public bool IsCraft => Role == UnitRole.Craft;
         public bool IsStatic => Speed == Fix.Zero;
     }
 }
