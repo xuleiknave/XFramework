@@ -135,7 +135,7 @@ namespace Starline.Battle
                 {
                     Share = (double)relayLost / defeats,
                     Text = "魔网节点被摧毁",
-                    Advice = "在法力水晶附近放一支弩手，挡住来切魔网连线的怨灵群。",
+                    Advice = "在法力水晶附近放一名弩手，挡住来切魔网连线的怨灵。",
                 });
             }
             if (unsupplied > 0)
@@ -143,8 +143,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)unsupplied / defeats,
-                    Text = "部队长时间断开魔网",
-                    Advice = "检查红框的“未接入”部队，把它们移进绿色覆盖区。",
+                    Text = "角色长时间断开魔网",
+                    Advice = "检查红框的“未接入”角色，把它们移进绿色覆盖区。",
                 });
             }
 
@@ -185,7 +185,7 @@ namespace Starline.Battle
                 case UnitRole.Craft:
                     return def.DisplayName + " 怕点防御，避开敌方点防御单位所在的一翼。";
                 case UnitRole.Heavy:
-                    return "敌方骨塔和怨灵群克制重装单位，先用狮鹫骑队或游侠解决它们。";
+                    return "敌方骨塔和怨灵克制重装单位，先用狮鹫骑士或游侠解决它们。";
                 case UnitRole.PointDefense:
                     return def.DisplayName + " 很脆，放在第二排，让前排替它挡伤害。";
                 default:

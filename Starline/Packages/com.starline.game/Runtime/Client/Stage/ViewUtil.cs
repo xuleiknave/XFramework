@@ -8,9 +8,11 @@ namespace Starline.Client
     {
         public static readonly Color PlayerColor = new Color(0.35f, 0.72f, 1f);
         public static readonly Color EnemyColor = new Color(1f, 0.56f, 0.29f);
-        public static readonly Color SupplyColor = new Color(0.44f, 0.82f, 0.55f);
+        public static readonly Color SupplyColor = new Color(0.44f, 0.82f, 0.71f); // #6FD0B4, same as the UI
         public static readonly Color CutColor = new Color(1f, 0.3f, 0.3f);
         public static readonly Color GraceColor = new Color(0.91f, 0.76f, 0.35f);
+        /// <summary>Glow of undead models (ghostly green); the UI keeps orange as the enemy colour.</summary>
+        public static readonly Color UndeadGlowColor = new Color(0.56f, 0.88f, 0.42f);
         public static readonly Color HiddenColor = new Color(0.77f, 0.55f, 1f);
 
         private static Material _unlit;

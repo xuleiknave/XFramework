@@ -71,7 +71,7 @@ namespace Starline.Client
             BuildRoster();
 
             Label supply = Find<Label>("supply");
-            supply.text = "魔网：" + _deploy.SuppliedShips + " / " + _deploy.DeployedShips + " 支部队已接入";
+            supply.text = "魔网：" + _deploy.SuppliedShips + " / " + _deploy.DeployedShips + " 名角色已接入";
             supply.EnableInClassList("warn", _deploy.SuppliedShips < _deploy.DeployedShips);
             supply.EnableInClassList("good", _deploy.SuppliedShips >= _deploy.DeployedShips);
             Label notice = Find<Label>("notice");
@@ -156,7 +156,7 @@ namespace Starline.Client
             {
                 Find<Label>("win-rate").text = UnityEngine.Mathf.RoundToInt((float)f.WinRate * 100f) + "%";
                 Find<Label>("win-detail").text = "胜率（±" + UnityEngine.Mathf.RoundToInt((float)f.Margin * 100f) + "%）    平均 "
-                    + UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds) + " 秒    平均损失 " + f.AverageLosses.ToString("0.0") + " 支";
+                    + UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds) + " 秒    平均损失 " + f.AverageLosses.ToString("0.0") + " 名";
                 VisualElement reasons = Find<VisualElement>("reasons");
                 reasons.Clear();
                 if (f.LossReasons.Count > 0)

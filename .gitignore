@@ -16,3 +16,4 @@ obj/
 Starline/*.csproj
 Starline/*.sln
 Starline/*.slnx
+__pycache__/

@@ -22,9 +22,9 @@ namespace Starline.Battle.Tests
             Run("确定性：同种子两次结果完全相同", SameSeedSameResult);
             Run("断魔网：奥术法师用光法力后停手", UnsuppliedUnitRunsDry);
             Run("机动单位离网 10 秒内仍算有魔网", MobileGracePeriod);
-            Run("克制：2 弩手胜 4 怨灵群", AntiAirBeatsAir);
+            Run("克制：2 弩手胜 4 怨灵", AntiAirBeatsAir);
             Run("克制：1 重甲骑士胜 3 食尸鬼", HeavyBeatsLight);
-            Run("克制：3 狮鹫骑队胜 1 憎恶", AirBeatsHeavy);
+            Run("克制：3 狮鹫骑士胜 1 憎恶", AirBeatsHeavy);
             Run("指挥官技能：陨星术消耗法术点数并造成范围伤害", OrbitalStrike);
             Run("指挥官技能：法术点数不足时无法释放", SkillNeedsSupplyPoints);
             Run("战斗在时间限制内结束", BattlesEndInTime);
@@ -228,7 +228,7 @@ namespace Starline.Battle.Tests
             {
                 battle.Step();
             }
-            Assert(fighter.OffGridTicks > 0, "狮鹫骑队应已离开覆盖范围");
+            Assert(fighter.OffGridTicks > 0, "狮鹫骑士应已离开覆盖范围");
             Assert(fighter.Supplied, "离网 9 秒内仍算有魔网");
             for (int i = 0; i < 3 * BattleSim.TicksPerSecond && !battle.IsOver; i++)
             {

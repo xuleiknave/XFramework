@@ -106,7 +106,7 @@ namespace Starline.Client
             }
             _infoTitle.text = TypeName(node.Type) + " · " + _names[node.Id];
             _infoBody.text = _briefings[node.Id];
-            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一个 ★★ 部队"
+            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一名 ★★ 角色"
                 : node.Type == NodeType.Boss ? "胜利：通关本幕    失败：耐久 −" + ExpeditionConfig.Current.BossLoss + "，可以重打"
                 : node.Type == NodeType.Supply ? ""
                 : "胜利：三选一    失败：耐久 −" + ExpeditionConfig.Current.NormalLoss;
@@ -184,12 +184,13 @@ namespace Starline.Client
     /// <summary>Draws the star map: route lines with the vector API, nodes as absolutely placed buttons.</summary>
     public sealed class StarMapView : VisualElement
     {
-        private const float NodeWidth = 132f;
-        private const float NodeHeight = 56f;
+        private const float NodeWidth = 317f;
+        private const float NodeHeight = 134f;
 
-        private static readonly Color LineIdle = new Color(0.3f, 0.36f, 0.45f);
-        private static readonly Color LineOpen = new Color(0.55f, 0.8f, 1f);
-        private static readonly Color LineTravelled = new Color(0.45f, 0.9f, 0.6f);
+        // 星夜金边: unvisited roads dim, open roads gold, travelled roads lit in mana teal.
+        private static readonly Color LineIdle = new Color(0.23f, 0.28f, 0.4f);
+        private static readonly Color LineOpen = new Color(0.91f, 0.78f, 0.48f);
+        private static readonly Color LineTravelled = new Color(0.44f, 0.82f, 0.71f);
 
         private readonly ExpeditionRun _run;
         private readonly Dictionary<int, Button> _buttons = new Dictionary<int, Button>();
@@ -263,7 +264,7 @@ namespace Starline.Client
                     bool travelled = node.Visited && next.Visited;
                     bool open = node == _run.Current && reachable.Contains(next);
                     painter.strokeColor = travelled ? LineTravelled : open ? LineOpen : LineIdle;
-                    painter.lineWidth = travelled || open ? 3f : 1.5f;
+                    painter.lineWidth = travelled || open ? 7f : 3.6f;
                     painter.BeginPath();
                     painter.MoveTo(_centers[node.Id]);
                     painter.LineTo(_centers[nextId]);

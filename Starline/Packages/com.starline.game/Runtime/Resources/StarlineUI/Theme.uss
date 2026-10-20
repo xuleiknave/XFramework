@@ -1,17 +1,23 @@
 /*
- * Starline UI theme. Every screen uses these classes; layouts are designed for 1600 x 900
+ * Starline UI theme. Every screen uses these classes; layouts are designed for 3840 x 2160 (4K)
  * and scaled to the screen height (see Ui.ConfigurePanel).
+ * Style "星夜金边" (docs/art-direction.md): night-blue panels with thin gold borders, gold titles,
+ * gold primary buttons, and the mana teal for selection and progress.
  */
 
 :root, .starline {
-    --bg: #0B111B;
-    --bg-dim: rgba(5, 8, 14, 0.72);
-    --panel: rgba(18, 26, 39, 0.94);
-    --panel-solid: #121A27;
-    --panel-raised: #1A2536;
-    --border: #2C3A50;
-    --text: #E3E9F2;
-    --muted: #93A1B5;
+    --bg: #0A1020;
+    --bg-dim: rgba(5, 8, 16, 0.75);
+    --panel: rgba(17, 26, 46, 0.94);
+    --panel-solid: #111A2E;
+    --panel-raised: #18233B;
+    --border: #26314A;
+    --gold: #B8954F;
+    --gold-bright: #E8C77A;
+    --gold-button: #D9B46A;
+    --gold-ink: #1A1408;
+    --text: #EDE6D6;
+    --muted: #9AA5B8;
     --primary: #5AB8FF;
     --primary-dark: #13243A;
     --good: #6FD08C;
@@ -26,7 +32,7 @@
 
 .starline {
     color: var(--text);
-    font-size: 15px;
+    font-size: 36px;
 }
 
 .layer {
@@ -70,19 +76,19 @@
 
 .spacer {
     flex-grow: 1;
-    min-height: 8px;
+    min-height: 19px;
 }
 
 .section {
-    margin-top: 14px;
+    margin-top: 34px;
 }
 
 .panel {
     background-color: var(--panel);
-    border-width: 1px;
-    border-color: var(--border);
-    border-radius: 6px;
-    padding: 14px 16px;
+    border-width: 2px;
+    border-color: var(--gold);
+    border-radius: 5px;
+    padding: 34px 38px;
 }
 
 /* ---- Text ---------------------------------------------------------------- */
@@ -92,43 +98,46 @@ Label {
 }
 
 .h1 {
-    font-size: 28px;
+    font-size: 67px;
     -unity-font-style: bold;
-    margin-bottom: 6px;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin-bottom: 14px;
 }
 
 .h2 {
-    font-size: 20px;
+    font-size: 48px;
     -unity-font-style: bold;
-    margin-bottom: 4px;
+    color: var(--gold-bright);
+    margin-bottom: 10px;
 }
 
 .h3 {
-    font-size: 16px;
+    font-size: 38px;
     -unity-font-style: bold;
-    margin-bottom: 4px;
+    margin-bottom: 10px;
 }
 
 .body {
-    font-size: 14px;
-    margin-bottom: 4px;
+    font-size: 34px;
+    margin-bottom: 10px;
 }
 
 .small {
-    font-size: 12px;
-    margin-bottom: 2px;
+    font-size: 29px;
+    margin-bottom: 5px;
 }
 
 .big {
-    font-size: 48px;
+    font-size: 115px;
     -unity-font-style: bold;
-    color: var(--primary);
+    color: var(--text);
 }
 
 .stat {
-    font-size: 16px;
+    font-size: 38px;
     -unity-font-style: bold;
-    margin: 4px 0;
+    margin: 10px 0;
 }
 
 .muted { color: var(--muted); }
@@ -140,26 +149,26 @@ Label {
 
 .btn {
     background-color: var(--panel-raised);
-    border-width: 1px;
+    border-width: 2px;
     border-color: var(--border);
     border-radius: 5px;
     color: var(--text);
-    font-size: 14px;
-    padding: 6px 12px;
-    margin: 4px 0;
-    min-height: 34px;
+    font-size: 34px;
+    padding: 14px 29px;
+    margin: 10px 0;
+    min-height: 82px;
     -unity-text-align: middle-center;
     white-space: normal;
     transition-duration: 0.12s;
 }
 
 .btn:hover {
-    border-color: var(--primary);
-    background-color: #22324A;
+    border-color: var(--gold-bright);
+    background-color: #202D48;
 }
 
 .btn:active {
-    background-color: var(--primary-dark);
+    background-color: #0E1628;
 }
 
 .btn:disabled {
@@ -167,86 +176,97 @@ Label {
 }
 
 .btn-primary {
-    background-color: #1D4E7A;
-    border-color: var(--primary);
+    background-color: var(--gold-button);
+    border-color: #F3DDA0;
+    color: var(--gold-ink);
     -unity-font-style: bold;
+    letter-spacing: 5px;
 }
 
 .btn-primary:hover {
-    background-color: #2A649A;
+    background-color: var(--gold-bright);
+    border-color: #FFF0C8;
+}
+
+.btn-primary:active {
+    background-color: #B8954F;
 }
 
 .btn-secondary {
     background-color: transparent;
+    border-color: var(--gold);
+    color: var(--gold-bright);
 }
 
 .btn-large {
-    min-height: 52px;
-    font-size: 18px;
+    min-height: 125px;
+    font-size: 43px;
 }
 
 .btn-small {
-    min-height: 30px;
-    padding: 2px 10px;
-    margin: 0 0 0 6px;
+    min-height: 72px;
+    padding: 5px 24px;
+    margin: 0 0 0 14px;
 }
 
 .btn-toggled {
-    background-color: var(--primary-dark);
-    border-color: var(--primary);
-    color: var(--primary);
+    background-color: #0E1628;
+    border-color: var(--gold-bright);
+    color: var(--gold-bright);
 }
 
 /* ---- Main menu ----------------------------------------------------------- */
 
 .menu-card {
-    width: 460px;
-    padding: 36px 40px;
+    width: 1104px;
+    padding: 86px 96px;
 }
 
 .logo {
-    font-size: 56px;
+    font-size: 134px;
     -unity-font-style: bold;
-    color: var(--primary);
+    color: var(--gold-bright);
     -unity-text-align: middle-center;
-    letter-spacing: 12px;
+    letter-spacing: 29px;
 }
 
 .logo-sub {
-    font-size: 22px;
-    color: var(--muted);
-    -unity-text-align: middle-center;
-    margin-bottom: 10px;
-}
-
-.tagline {
-    font-size: 14px;
-    color: var(--muted);
+    font-size: 53px;
+    -unity-font-style: bold;
+    color: var(--text);
+    letter-spacing: 38px;
     -unity-text-align: middle-center;
     margin-bottom: 24px;
 }
 
+.tagline {
+    font-size: 34px;
+    color: var(--muted);
+    -unity-text-align: middle-center;
+    margin-bottom: 58px;
+}
+
 .version {
     position: absolute;
-    right: 20px;
-    bottom: 14px;
+    right: 48px;
+    bottom: 34px;
 }
 
 /* ---- Star map ------------------------------------------------------------ */
 
 .sidebar {
-    width: 320px;
-    margin: 16px;
+    width: 768px;
+    margin: 38px;
 }
 
 .map-area {
     flex-grow: 1;
-    padding: 28px 40px 40px 24px;
+    padding: 67px 96px 96px 58px;
 }
 
 .map-canvas {
     flex-grow: 1;
-    margin-top: 24px;
+    margin-top: 58px;
 }
 
 .star-map {
@@ -256,18 +276,19 @@ Label {
 .node {
     position: absolute;
     margin: 0;
-    font-size: 13px;
-    border-width: 2px;
-    border-radius: 8px;
+    font-size: 31px;
+    border-width: 5px;
+    border-radius: 19px;
 }
 
-.node--battle { border-color: var(--primary); }
+.node--battle { border-color: var(--gold); }
 .node--elite { border-color: var(--elite); }
 .node--supply { border-color: var(--supply); }
 .node--boss { border-color: var(--enemy); background-color: #3A1F17; }
 
 .node--open {
-    background-color: #1D3550;
+    background-color: #2A2410;
+    border-color: var(--gold-bright);
 }
 
 .node--closed {
@@ -280,25 +301,27 @@ Label {
 
 .node--visited {
     opacity: 0.8;
-    background-color: #1C3326;
-    border-color: var(--good);
+    background-color: #0F2A28;
+    border-color: var(--supply);
 }
 
 .node--current {
     opacity: 1;
-    border-color: var(--good);
-    background-color: #24503A;
+    border-color: var(--supply);
+    background-color: #164038;
 }
 
 .info-box {
     background-color: var(--panel-raised);
-    border-radius: 5px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
+    border-left-width: 5px;
+    border-color: var(--gold);
+    border-radius: 2px;
+    padding: 24px 29px;
+    margin-bottom: 19px;
 }
 
 .messages {
-    margin-top: 10px;
+    margin-top: 24px;
 }
 
 /* ---- Deployment and battle bars ---------------------------------------- */
@@ -306,11 +329,11 @@ Label {
 .topbar {
     flex-direction: row;
     align-items: center;
-    height: 52px;
-    padding: 0 16px;
+    height: 125px;
+    padding: 0 38px;
     background-color: var(--panel);
-    border-bottom-width: 1px;
-    border-color: var(--border);
+    border-bottom-width: 2px;
+    border-color: var(--gold);
 }
 
 .topbar .h2 {
@@ -318,29 +341,29 @@ Label {
 }
 
 .hint {
-    margin-left: 24px;
+    margin-left: 58px;
 }
 
 .side-left {
-    width: 250px;
-    margin: 8px;
+    width: 600px;
+    margin: 19px;
 }
 
 .side-right {
-    width: 340px;
-    margin: 8px;
+    width: 816px;
+    margin: 19px;
 }
 
 .roster {
-    margin: 6px 0;
+    margin: 14px 0;
 }
 
 .roster-card {
     flex-direction: column;
     align-items: stretch;
     -unity-text-align: upper-left;
-    padding: 6px 10px;
-    margin: 0 0 6px 0;
+    padding: 14px 24px;
+    margin: 0 0 14px 0;
 }
 
 .roster-card-head {
@@ -349,12 +372,12 @@ Label {
 }
 
 .roster-card-title {
-    font-size: 14px;
+    font-size: 34px;
     -unity-font-style: bold;
 }
 
 .roster-card-state {
-    font-size: 12px;
+    font-size: 29px;
     color: var(--muted);
 }
 
@@ -364,68 +387,68 @@ Label {
 }
 
 .roster-card--selected {
-    border-color: var(--primary);
-    background-color: var(--primary-dark);
+    border-color: var(--supply);
+    background-color: #102A2A;
 }
 
 .count {
-    min-width: 140px;
+    min-width: 336px;
 }
 
 .speeds {
-    margin-left: 24px;
+    margin-left: 58px;
 }
 
 .feed {
-    width: 300px;
-    margin: 8px 12px;
+    width: 720px;
+    margin: 19px 29px;
 }
 
 .bottombar {
     flex-direction: row;
     align-items: center;
-    height: 112px;
-    padding: 10px 16px;
+    height: 269px;
+    padding: 24px 38px;
     background-color: var(--panel);
-    border-top-width: 1px;
-    border-color: var(--border);
+    border-top-width: 2px;
+    border-color: var(--gold);
 }
 
 .supply-box {
-    width: 360px;
+    width: 864px;
 }
 
 .pips {
-    margin: 6px 0;
+    margin: 14px 0;
 }
 
 .pip {
-    width: 26px;
-    height: 12px;
-    margin-right: 4px;
+    width: 62px;
+    height: 29px;
+    margin-right: 10px;
     background-color: #202838;
-    border-radius: 2px;
+    border-radius: 5px;
 }
 
 .pip--full {
-    background-color: var(--good);
+    background-color: var(--supply);
 }
 
 .net-box {
-    width: 300px;
-    margin-left: 24px;
+    width: 720px;
+    margin-left: 58px;
 }
 
 .skill {
-    width: 170px;
-    height: 86px;
-    margin: 0 0 0 10px;
+    width: 408px;
+    height: 206px;
+    margin: 0 0 0 24px;
     flex-direction: column;
     justify-content: center;
 }
 
 .skill-name {
-    font-size: 16px;
+    font-size: 38px;
     -unity-font-style: bold;
 }
 
@@ -437,17 +460,17 @@ Label {
 /* ---- Rewards ------------------------------------------------------------- */
 
 .cards {
-    margin: 24px 0;
+    margin: 58px 0;
 }
 
 .reward-card {
-    width: 280px;
-    height: 380px;
-    margin: 0 14px;
+    width: 672px;
+    height: 912px;
+    margin: 0 34px;
 }
 
 .stats {
-    margin-top: 8px;
+    margin-top: 19px;
 }
 
 /* ---- Dialogs ------------------------------------------------------------- */
@@ -464,12 +487,12 @@ Label {
 }
 
 .dialog {
-    width: 600px;
-    padding: 24px 28px;
+    width: 1440px;
+    padding: 58px 67px;
 }
 
 .dialog-body {
-    margin: 10px 0 16px 0;
+    margin: 24px 0 38px 0;
 }
 
 .dialog-buttons {
@@ -488,31 +511,31 @@ Label {
 }
 
 .unit-tag-status {
-    font-size: 11px;
+    font-size: 26px;
     color: var(--text);
     margin: 0;
 }
 
 .unit-tag-name {
-    font-size: 11px;
+    font-size: 26px;
     color: var(--muted);
     margin: 0;
 }
 
 .unit-bars {
-    height: 6px;
+    height: 14px;
     background-color: rgba(0, 0, 0, 0.6);
-    margin: 1px 0;
+    margin: 2px 0;
 }
 
-.unit-bars--small { width: 34px; }
-.unit-bars--large { width: 52px; }
+.unit-bars--small { width: 82px; }
+.unit-bars--large { width: 125px; }
 
 .unit-bar-hp {
     position: absolute;
     left: 0;
     top: 0;
-    height: 3px;
+    height: 7px;
 }
 
 .unit-bar-hp--player { background-color: #66E680; }
@@ -521,7 +544,7 @@ Label {
 .unit-bar-shield {
     position: absolute;
     left: 0;
-    top: 3px;
-    height: 2px;
+    top: 7px;
+    height: 5px;
     background-color: #73CCFF;
 }

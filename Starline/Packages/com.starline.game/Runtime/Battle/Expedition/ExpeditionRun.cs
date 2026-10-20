@@ -244,7 +244,7 @@ namespace Starline.Expedition
             Messages.Add("获得 " + UnitCatalog.Get(unitId).DisplayName + " " + RewardOption.Stars(star));
             foreach (int merged in added.MergedTo)
             {
-                Messages.Add("3 支合成 → " + name + " " + RewardOption.Stars(merged));
+                Messages.Add("3 名合成 → " + name + " " + RewardOption.Stars(merged));
             }
             if (!Fleet.IsDeployed(added.Ship.Id))
             {

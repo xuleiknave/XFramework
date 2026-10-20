@@ -7,6 +7,8 @@
 - `docs/game-design.md`：游戏设计文档（以它为准）
 - `docs/decisions.md`：关键决策和理由，改设计前先看
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
+- `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
+- `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明
 
@@ -18,6 +20,7 @@
   - `Runtime/Resources/StarlineUI/`：UI Toolkit 布局（UXML）和主题（Theme.uss）
   - `Runtime/Client/`：Unity 客户端。`App/GameApp` 入口与界面切换；`Screens/` 每个界面一个类；`Gameplay/` 布阵和战斗逻辑；`Stage/` 3D 棋盘、模型、特效；`UI/` UiRoot、字体、头顶标签
   - `Editor/`：菜单 `Starline > 初始化工程（场景与界面配置）`、URP 自动配置
+- `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟
 

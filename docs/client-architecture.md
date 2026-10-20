@@ -11,8 +11,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  App/       GameApp：入口、界面切换、持有当前远征              │
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
-│  Stage/     BattleStage：3D 棋盘、部队模型、特效、镜头         │
-│  UI/        UiRoot（UI Toolkit 根）、主题、字体、部队头顶标签   │
+│  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
+│  UI/        UiRoot（UI Toolkit 根）、主题、字体、角色头顶标签   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
 ┌───────────────▼──────────────────────────────────────────────┐
@@ -40,7 +40,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 | 文件 | 内容 |
 |---|---|
-| `units.json` | 部队和敌方单位的固有属性（生命、护盾、伤害、射程、法力、索敌偏好等） |
+| `units.json` | 角色和敌方单位的固有属性（生命、护盾、伤害、射程、法力、索敌偏好等） |
 | `counters.json` | 克制表：攻击方定位对目标定位的伤害倍率 |
 | `skills.json` | 指挥官技能；星级倍率 |
 | `encounters.json` | 敌方阵容：共用的亡灵祭坛底座 + 各自的单位 |
@@ -53,9 +53,10 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 ## 3. 界面（UI Toolkit）
 
-- 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：部队头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
+- 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：角色头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
 - 每个界面是 `UiScreen` 的子类，布局在 `Resources/StarlineUI/<名字>.uxml`，样式统一在 `Theme.uss`。可以用 Unity 的 UI Builder 直接打开 UXML 调整。
-- 设计分辨率 1600 × 900，按屏幕高度缩放。
+- 设计分辨率 3840 × 2160（4K），按屏幕高度缩放：Theme.uss 和代码里的像素值都是 4K 像素，1080p 屏幕上整体缩小一半。界面图片素材按 4K 尺寸出图。
+- 清晰度（渲染分辨率，如 1080p / 1440p / 4K）将在设置界面（M3）里选择；界面跟随屏幕自动缩放，不需要为每档分辨率单独调整。
 - 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
 - 中文字体：随包提供 Noto Sans SC Regular（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 协议，见包里的 `ThirdPartyNotices.md`）；万一缺失，退回玩家系统里的中文字体。
 - UI Toolkit 通过 EventSystem + Input System 接收输入，`GameApp` 会在场景里没有 EventSystem 时自动创建。
@@ -94,6 +95,8 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 - 界面配置在第一次打开工程时也会自动生成；缺少它时游戏会用临时设置运行，并在 Console 提示。
 - URP 的安装和配置沿用原来的 `UrpInstaller` / `UrpSetup`。
 
+- 角色模型在 `Resources/StarlineModels/<单位 id>.fbx`，由 `tools/models/build_models.py` 生成（见 [art-direction.md](art-direction.md)）。`ModelLibrary` 按单位 id 加载并换上运行时材质，`UnitView` 按魔网接入状态设置发光颜色；没有模型的单位退回几何体占位。
+
 ## 5. 里程碑
 
 | 里程碑 | 内容 | 状态 |
@@ -101,5 +104,5 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 | M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
 | M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
-| M4 | 美术：舰船模型、星空背景、特效、界面美术 | |
+| M4 | 美术：角色模型（第一幕 15 个单位已由脚本生成并接入）、场景背景、特效、界面美术 | 进行中 |
 | M5 | 设计文档的 P3：符文、商店、事件、剧情对话系统 | |

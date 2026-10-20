@@ -69,7 +69,7 @@ namespace Starline.Battle
             }
             if (combatants == 0)
             {
-                errors.Add("至少需要上阵 1 个作战部队");
+                errors.Add("至少需要上阵 1 名作战角色");
             }
             int used = formation.CommandPointsUsed();
             if (used > commandLimit)
