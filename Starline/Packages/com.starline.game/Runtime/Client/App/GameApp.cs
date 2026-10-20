@@ -20,7 +20,7 @@ namespace Starline.Client
         public UnitOverlay Overlay { get; private set; }
         /// <summary>The expedition in progress, or null on the main menu.</summary>
         public ExpeditionRun Run { get; private set; }
-        /// <summary>The save slot in use, or null on the login screen.</summary>
+        /// <summary>The save slot in use, or null before the first commander is created.</summary>
         public CommanderProfile Profile { get; private set; }
 
         private void Awake()
@@ -42,7 +42,7 @@ namespace Starline.Client
             Overlay = new UnitOverlay(Ui, Stage);
         }
 
-        private void Start() => ShowLogin();
+        private void Start() => ShowMainMenu();
 
         private void Update()
         {
@@ -101,26 +101,58 @@ namespace Starline.Client
             screen.Enter();
         }
 
-        /// <summary>The save-slot screen shown at launch and from the main menu.</summary>
-        public void ShowLogin()
+        /// <summary>The save slots, opened from the main menu.</summary>
+        public void ShowSaveSlots()
         {
             SaveProfile();
-            Profile = null;
             Run = null;
             Stage.Clear();
             Stage.SetVisible(false);
-            Show(new LoginScreen(this));
+            Show(new SaveSlotsScreen(this));
         }
 
+        /// <summary>Switches to a save slot (saving the one in use first).</summary>
         public void SignIn(CommanderProfile profile)
         {
+            SaveProfile();
             Profile = profile;
             SaveProfile();
-            ShowMainMenu();
         }
 
+        /// <summary>Drops the current profile without saving it, e.g. when its slot is being deleted.</summary>
+        public void SignOut() => Profile = null;
+
+        /// <summary>
+        /// Starts an expedition; without a commander yet, first names one in the first empty slot
+        /// (or opens the save slots when all are taken but none could be read).
+        /// </summary>
+        public void StartRunOrCreateCommander()
+        {
+            if (Profile != null)
+            {
+                StartRun();
+                return;
+            }
+            int slot = ProfileStore.FirstEmptySlot();
+            if (slot < 0)
+            {
+                ShowSaveSlots();
+                return;
+            }
+            NewCommanderDialog.Show(this, slot, profile =>
+            {
+                SignIn(profile);
+                StartRun();
+            });
+        }
+
+        /// <summary>The home screen; picks up the most recently played save when none is in use.</summary>
         public void ShowMainMenu()
         {
+            if (Profile == null)
+            {
+                Profile = ProfileStore.LoadLastPlayed();
+            }
             SaveProfile();
             Run = null;
             Stage.Clear();

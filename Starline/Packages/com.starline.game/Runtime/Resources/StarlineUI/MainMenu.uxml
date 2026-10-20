@@ -4,13 +4,13 @@
             <ui:Label text="STARLINE" class="logo" />
             <ui:Label text="星 线" class="logo-sub" />
             <ui:Label text="亡灵吸干了连接人类城邦的星线。重新点亮它。" class="tagline" />
-            <ui:Label name="commander" class="commander" />
             <ui:Button name="start" text="开始远征" class="btn btn-primary btn-large" />
             <ui:Button name="continue" text="继续远征（下一阶段：存档）" class="btn btn-large" />
             <ui:Button name="settings" text="设置（下一阶段）" class="btn btn-large" />
-            <ui:Button name="switch" text="切换存档" class="btn btn-large btn-secondary" />
+            <ui:Button name="saves" text="存档" class="btn btn-large btn-secondary" />
             <ui:Button name="quit" text="退出游戏" class="btn btn-large btn-secondary" />
         </ui:VisualElement>
+        <ui:Label name="commander" class="commander" picking-mode="Ignore" />
         <ui:Label name="version" class="version small muted" picking-mode="Ignore" />
     </ui:VisualElement>
 </ui:UXML>

@@ -1,13 +1,12 @@
-using UnityEngine;
 using UnityEngine.UIElements;
 
 namespace Starline.Client
 {
     /// <summary>
-    /// First screen after launch: pick one of the save slots (click to select, double-click or
-    /// the enter button to play), create a commander in an empty slot, or delete a save.
+    /// Save slots, opened from the main menu: pick a slot (click to select, double-click or the
+    /// use button to switch to it), create a commander in an empty slot, or delete a save.
     /// </summary>
-    public sealed class LoginScreen : UiScreen
+    public sealed class SaveSlotsScreen : UiScreen
     {
         private readonly CommanderProfile[] _profiles = new CommanderProfile[ProfileStore.SlotCount];
         private readonly VisualElement[] _cards = new VisualElement[ProfileStore.SlotCount];
@@ -15,13 +14,12 @@ namespace Starline.Client
         private readonly Button _enter;
         private int _selected = -1;
 
-        public LoginScreen(GameApp app) : base(app, "Login")
+        public SaveSlotsScreen(GameApp app) : base(app, "SaveSlots")
         {
             _slots = Find<VisualElement>("slots");
             _enter = Button("enter", () => Enter(_selected));
-            Find<Button>("settings").SetEnabled(false);
-            Button("quit", App.Quit);
-            Find<Label>("version").text = "版本 " + Application.version + " · 第一幕试玩";
+            Button("back", App.ShowMainMenu);
+            _selected = App.Profile != null ? App.Profile.slot : -1;
             Reload();
         }
 
@@ -100,7 +98,11 @@ namespace Starline.Client
             card.Add(Ui.Label("+", "slot-plus"));
             card.Add(Ui.Label("新的指挥官", "slot-new"));
             card.Add(Ui.Label("从灯塔城出发，重新点亮星线", "small", "muted"));
-            card.RegisterCallback<ClickEvent>(_ => ShowNewCommander(slot));
+            card.RegisterCallback<ClickEvent>(_ => NewCommanderDialog.Show(App, slot, profile =>
+            {
+                App.SignIn(profile);
+                App.ShowMainMenu();
+            }));
             return card;
         }
 
@@ -119,49 +121,7 @@ namespace Starline.Client
                 return;
             }
             App.SignIn(_profiles[slot]);
-        }
-
-        private void ShowNewCommander(int slot)
-        {
-            VisualElement dialog = Ui.Load("NewCommander");
-            TextField field = dialog.Find<TextField>("name");
-            Label count = dialog.Find<Label>("count");
-            Label error = dialog.Find<Label>("error");
-            dialog.Find<Label>("slot-label").text = "存档 " + (slot + 1);
-            count.text = "0 / " + CommanderProfile.MaxNameLength;
-            field.maxLength = CommanderProfile.MaxNameLength;
-            field.RegisterValueChangedCallback(evt =>
-            {
-                count.text = evt.newValue.Trim().Length + " / " + CommanderProfile.MaxNameLength;
-                error.text = string.Empty;
-            });
-
-            void Confirm()
-            {
-                string name = field.value;
-                string problem = CommanderProfile.ValidateName(ref name);
-                if (problem != null)
-                {
-                    error.text = problem;
-                    return;
-                }
-                CommanderProfile profile = CommanderProfile.Create(slot, name);
-                ProfileStore.Save(profile);
-                App.Ui.CloseModals();
-                App.SignIn(profile);
-            }
-
-            field.RegisterCallback<KeyDownEvent>(evt =>
-            {
-                if (evt.keyCode == KeyCode.Return || evt.keyCode == KeyCode.KeypadEnter)
-                {
-                    Confirm();
-                }
-            }, TrickleDown.TrickleDown);
-            dialog.Find<Button>("confirm").clicked += Confirm;
-            dialog.Find<Button>("cancel").clicked += App.Ui.CloseModals;
-            App.Ui.ShowModal(dialog);
-            field.schedule.Execute(() => field.Focus());
+            App.ShowMainMenu();
         }
 
         private void ConfirmDelete(int slot)
@@ -171,6 +131,10 @@ namespace Starline.Client
                 "指挥官“" + profile.name + "”的存档（游戏时长 " + CommanderProfile.FormatPlayTime(profile.playSeconds) + "）会被永久删除，无法恢复。",
                 ("删除", () =>
                 {
+                    if (App.Profile != null && App.Profile.slot == slot)
+                    {
+                        App.SignOut();
+                    }
                     ProfileStore.Delete(slot);
                     App.Ui.CloseModals();
                     Reload();

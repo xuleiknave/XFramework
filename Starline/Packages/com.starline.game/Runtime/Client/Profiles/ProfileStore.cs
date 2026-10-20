@@ -42,6 +42,34 @@ namespace Starline.Client
             }
         }
 
+        /// <summary>The most recently played profile, or null when there is no save yet.</summary>
+        public static CommanderProfile LoadLastPlayed()
+        {
+            CommanderProfile last = null;
+            for (int i = 0; i < SlotCount; i++)
+            {
+                CommanderProfile profile = Load(i);
+                if (profile != null && (last == null || profile.lastPlayedTicks > last.lastPlayedTicks))
+                {
+                    last = profile;
+                }
+            }
+            return last;
+        }
+
+        /// <summary>The first slot without a save file, or -1 when all are taken.</summary>
+        public static int FirstEmptySlot()
+        {
+            for (int i = 0; i < SlotCount; i++)
+            {
+                if (!File.Exists(PathOf(i)))
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
         public static void Save(CommanderProfile profile)
         {
             try

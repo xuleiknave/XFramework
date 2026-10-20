@@ -253,36 +253,42 @@ Label {
 }
 
 .commander {
+    position: absolute;
+    right: 115px;
+    top: 96px;
+    padding: 24px 43px;
+    background-color: var(--panel);
+    border-width: 2px;
+    border-color: rgba(184, 149, 79, 0.6);
+    border-radius: 5px;
     font-size: 34px;
     color: var(--gold-bright);
-    -unity-text-align: middle-center;
-    margin: -34px 0 34px 0;
 }
 
-/* ---- Login (save slots) ------------------------------------------------- */
+/* ---- Save slots ---------------------------------------------------------- */
 
-.login {
+.slots {
     align-items: center;
     justify-content: center;
 }
 
-.login-head {
+.slots-head {
     align-items: center;
     margin-bottom: 115px;
 }
 
-.login .logo {
+.slots .logo {
     font-size: 154px;
     letter-spacing: 34px;
 }
 
-.login .logo-sub {
+.slots .logo-sub {
     font-size: 86px;
     letter-spacing: 48px;
     margin: 14px 0 10px 48px;
 }
 
-.login .tagline {
+.slots .tagline {
     margin-bottom: 0;
 }
 
@@ -311,7 +317,7 @@ Label {
     letter-spacing: 10px;
 }
 
-.login-slots {
+.slots-row {
     margin-bottom: 72px;
 }
 
@@ -392,18 +398,12 @@ Label {
     color: var(--bad);
 }
 
-.login-enter {
+.slots-enter {
     min-width: 840px;
     letter-spacing: 14px;
 }
 
-.login-version {
-    position: absolute;
-    left: 115px;
-    bottom: 77px;
-}
-
-.login-corner {
+.slots-corner {
     position: absolute;
     right: 115px;
     bottom: 62px;
