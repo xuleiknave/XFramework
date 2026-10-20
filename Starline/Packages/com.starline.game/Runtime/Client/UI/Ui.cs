@@ -10,8 +10,11 @@ namespace Starline.Client
         /// <summary>UXML and USS live in Resources/StarlineUI.</summary>
         public const string ResourceFolder = "StarlineUI";
 
-        /// <summary>Reference resolution the layouts are designed for (scaled to the screen height).</summary>
-        public static readonly Vector2Int ReferenceResolution = new Vector2Int(1600, 900);
+        /// <summary>
+        /// Reference resolution the layouts are designed for: 4K, scaled to the screen height, so
+        /// every px value in Theme.uss is a 4K pixel and lower resolutions shrink evenly.
+        /// </summary>
+        public static readonly Vector2Int ReferenceResolution = new Vector2Int(3840, 2160);
 
         public static void ConfigurePanel(PanelSettings settings)
         {

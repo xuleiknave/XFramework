@@ -55,7 +55,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 - 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：舰船头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
 - 每个界面是 `UiScreen` 的子类，布局在 `Resources/StarlineUI/<名字>.uxml`，样式统一在 `Theme.uss`。可以用 Unity 的 UI Builder 直接打开 UXML 调整。
-- 设计分辨率 1600 × 900，按屏幕高度缩放。
+- 设计分辨率 3840 × 2160（4K），按屏幕高度缩放：Theme.uss 和代码里的像素值都是 4K 像素，1080p 屏幕上整体缩小一半。界面图片素材按 4K 尺寸出图。
+- 清晰度（渲染分辨率，如 1080p / 1440p / 4K）将在设置界面（M3）里选择；界面跟随屏幕自动缩放，不需要为每档分辨率单独调整。
 - 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
 - 中文字体：随包提供 Noto Sans SC Regular（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 协议，见包里的 `ThirdPartyNotices.md`）；万一缺失，退回玩家系统里的中文字体。
 - UI Toolkit 通过 EventSystem + Input System 接收输入，`GameApp` 会在场景里没有 EventSystem 时自动创建。
