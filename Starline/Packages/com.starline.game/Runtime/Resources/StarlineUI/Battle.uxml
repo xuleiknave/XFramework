@@ -17,7 +17,7 @@
             <ui:VisualElement class="supply-box">
                 <ui:Label name="points" class="body" />
                 <ui:VisualElement name="pips" class="row pips" />
-                <ui:Label text="舰船自动战斗，你只需决定何时释放指挥官技能。" class="small muted" />
+                <ui:Label text="部队自动战斗，你只需决定何时释放指挥官技能。" class="small muted" />
             </ui:VisualElement>
             <ui:VisualElement class="net-box">
                 <ui:Label name="player-net" class="body" />

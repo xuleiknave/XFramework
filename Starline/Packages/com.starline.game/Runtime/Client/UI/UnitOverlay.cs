@@ -138,7 +138,7 @@ namespace Starline.Client
             string kind = null;
             if (view.Def.HasWeapon && !view.Supplied)
             {
-                text = _battleMode ? "断补给" : "✕ 未接入";
+                text = _battleMode ? "断魔网" : "✕ 未接入";
                 kind = "bad";
             }
             else if (view.InGrace)

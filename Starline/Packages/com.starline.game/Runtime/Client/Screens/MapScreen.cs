@@ -34,11 +34,11 @@ namespace Starline.Client
                 else
                 {
                     _names[node.Id] = "补给站";
-                    _briefings[node.Id] = "一座刚刚连回星线的殖民地前哨。修理舰队（耐久 +1），或者领取 1 个中继信标。";
+                    _briefings[node.Id] = "一座刚刚连回星线的城邦驿站。休整远征军（耐久 +1），或者领取 1 个法力水晶。";
                 }
             }
 
-            Find<Label>("act-title").text = _run.Act.Title + " · 星图";
+            Find<Label>("act-title").text = _run.Act.Title + " · 地图";
             _infoBox = Find<VisualElement>("node-info");
             _infoTitle = Find<Label>("node-title");
             _infoBody = Find<Label>("node-briefing");
@@ -66,11 +66,11 @@ namespace Starline.Client
         {
             int max = ExpeditionRun.MaxDurability;
             Label durability = Find<Label>("durability");
-            durability.text = "舰队耐久  " + Ui.Hearts(_run.Durability, max) + "  " + _run.Durability + " / " + max;
+            durability.text = "远征军耐久  " + Ui.Hearts(_run.Durability, max) + "  " + _run.Durability + " / " + max;
             durability.EnableInClassList("bad", _run.Durability <= 2);
             durability.EnableInClassList("good", _run.Durability > 2);
             Find<Label>("command").text = "指挥点上限 " + _run.CommandLimit + "（每过一个战斗节点 +" + ExpeditionRun.CommandLimitPerBattle + "）";
-            Find<Label>("relays").text = "中继信标 " + _run.Fleet.Relays + " / " + ExpeditionRun.MaxRelays;
+            Find<Label>("relays").text = "法力水晶 " + _run.Fleet.Relays + " / " + ExpeditionRun.MaxRelays;
             Find<Label>("record").text = "战斗 " + _run.BattlesWon + " 胜 / " + _run.BattlesFought + " 场";
 
             VisualElement fleet = Find<VisualElement>("fleet-list");
@@ -100,13 +100,13 @@ namespace Starline.Client
             if (node == null)
             {
                 _infoTitle.text = "图例";
-                _infoBody.text = "战斗 · 精英（更强，奖励更好）· 补给站（修理或领信标）· BOSS。悬停节点查看情报，点击亮起的节点出发。";
+                _infoBody.text = "战斗 · 精英（更强，奖励更好）· 补给站（休整或领水晶）· BOSS。悬停节点查看情报，点击亮起的节点出发。";
                 _infoReward.text = "";
                 return;
             }
             _infoTitle.text = TypeName(node.Type) + " · " + _names[node.Id];
             _infoBody.text = _briefings[node.Id];
-            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一个 ★★ 舰船"
+            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一个 ★★ 部队"
                 : node.Type == NodeType.Boss ? "胜利：通关本幕    失败：耐久 −" + ExpeditionConfig.Current.BossLoss + "，可以重打"
                 : node.Type == NodeType.Supply ? ""
                 : "胜利：三选一    失败：耐久 −" + ExpeditionConfig.Current.NormalLoss;
@@ -127,12 +127,12 @@ namespace Starline.Client
 
         private void ShowSupplyDialog()
         {
-            VisualElement dialog = Ui.Dialog("补给站", "一座刚刚连回星线的殖民地前哨，可以帮舰队做一次整备。二选一：");
+            VisualElement dialog = Ui.Dialog("补给站", "一座刚刚连回星线的城邦驿站，可以帮远征军做一次整备。二选一：");
             VisualElement buttons = dialog.Q(className: "dialog-buttons");
-            Button repair = Ui.Button("修理舰队：耐久 +1（当前 " + _run.Durability + " / " + ExpeditionRun.MaxDurability + "）",
+            Button repair = Ui.Button("休整远征军：耐久 +1（当前 " + _run.Durability + " / " + ExpeditionRun.MaxDurability + "）",
                 () => ChooseSupply(true), "btn-primary");
             repair.SetEnabled(_run.Durability < ExpeditionRun.MaxDurability);
-            Button relay = Ui.Button("领取中继信标：+1（当前 " + _run.Fleet.Relays + " 个）", () => ChooseSupply(false), "btn-secondary");
+            Button relay = Ui.Button("领取法力水晶：+1（当前 " + _run.Fleet.Relays + " 个）", () => ChooseSupply(false), "btn-secondary");
             relay.SetEnabled(_run.Fleet.Relays < ExpeditionRun.MaxRelays);
             buttons.Add(repair);
             buttons.Add(relay);

@@ -259,7 +259,7 @@ namespace Starline.Client
                 }
                 if (!_hoverValid)
                 {
-                    Notice = Selection == DeploySelection.Relay && Fleet.RelaysLeft <= 0 ? "中继信标已经全部放下"
+                    Notice = Selection == DeploySelection.Relay && Fleet.RelaysLeft <= 0 ? "法力水晶已经全部放下"
                         : "这里放不下，或者指挥点不够";
                     Changed?.Invoke();
                     return;
@@ -309,7 +309,7 @@ namespace Starline.Client
             }
             if (picked.Def.IsSupplySource)
             {
-                Notice = "补给母舰不能撤下，可以左键拿起来换位置";
+                Notice = "源晶塔不能撤下，可以左键拿起来换位置";
                 Changed?.Invoke();
                 return;
             }

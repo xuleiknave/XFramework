@@ -65,11 +65,11 @@ namespace Starline.Battle
 
             if (sources != 1)
             {
-                errors.Add("需要且只能有 1 个补给源");
+                errors.Add("需要且只能有 1 个魔网源头");
             }
             if (combatants == 0)
             {
-                errors.Add("至少需要上阵 1 个作战兵器");
+                errors.Add("至少需要上阵 1 个作战部队");
             }
             int used = formation.CommandPointsUsed();
             if (used > commandLimit)

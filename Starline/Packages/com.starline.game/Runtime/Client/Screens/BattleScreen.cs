@@ -116,7 +116,7 @@ namespace Starline.Client
             }
 
             float points = sim.SupplyPoints(BoardLayout.PlayerSide).ToFloat();
-            _points.text = "补给点数  " + points.ToString("0.0") + " / 10   （每秒 +1）";
+            _points.text = "法术点数  " + points.ToString("0.0") + " / 10   （每秒 +1）";
             for (int i = 0; i < _pips.Count; i++)
             {
                 _pips[i].EnableInClassList("pip--full", i < Mathf.FloorToInt(points));
@@ -129,7 +129,7 @@ namespace Starline.Client
                 int cd = sim.SkillCooldownTicks(BoardLayout.PlayerSide, def.Skill);
                 bool can = sim.CanCast(BoardLayout.PlayerSide, def.Skill);
                 string text = cd > 0 ? "冷却 " + Mathf.CeilToInt(cd / (float)BattleSim.TicksPerSecond) + " 秒"
-                    : can ? (def.NeedsTarget ? "点击后选择落点" : "可释放") : "补给点数不足";
+                    : can ? (def.NeedsTarget ? "点击后选择落点" : "可释放") : "法术点数不足";
                 bool armed = def.NeedsTarget && _battle.StrikeArmed;
                 if (armed)
                 {
@@ -152,13 +152,13 @@ namespace Starline.Client
             {
                 "用时 " + Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒",
                 "我方损失 " + (sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide))
-                    + " 艘，击毁敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
-                    + (won ? "（舰船战后全部修复）" : ""),
+                    + " 支，击败敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
+                    + (won ? "（倒下的部队战后全部恢复）" : ""),
             };
             SideStats stats = sim.Stats[BoardLayout.PlayerSide];
             if (stats.RelaysLost > 0)
             {
-                lines.Add("我方有 " + stats.RelaysLost + " 个补给节点被摧毁");
+                lines.Add("我方有 " + stats.RelaysLost + " 个魔网节点被摧毁");
             }
             if (stats.RanDry.Count > 0)
             {
@@ -167,7 +167,7 @@ namespace Starline.Client
                 {
                     names.Add(UnitCatalog.Get(id).DisplayName);
                 }
-                lines.Add("弹药耗尽过：" + string.Join("、", names));
+                lines.Add("法力耗尽过：" + string.Join("、", names));
             }
             lines.AddRange(run.Messages);
 
@@ -176,9 +176,9 @@ namespace Starline.Client
             {
                 case RunState.Reward: next = "领取战利品"; break;
                 case RunState.Victory: next = "要塞陷落！"; break;
-                case RunState.Defeat: next = "撤回灯塔站"; break;
+                case RunState.Defeat: next = "撤回灯塔城"; break;
                 case RunState.Battle: next = "调整布阵，再次挑战 Boss"; break;
-                default: next = "返回星图"; break;
+                default: next = "返回地图"; break;
             }
             string title = won ? "胜利" : sim.Winner == BoardLayout.EnemySide ? "失败" : "平局（算作失败）";
             VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), (next, App.AfterBattle));
