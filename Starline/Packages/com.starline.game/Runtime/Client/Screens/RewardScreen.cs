@@ -23,11 +23,11 @@ namespace Starline.Client
         private VisualElement Card(RewardOption option, int index)
         {
             VisualElement card = Ui.Box("panel", "reward-card");
-            card.Add(Ui.Label(option.Kind == RewardKind.Relay ? "中继信标 +1" : UnitCatalog.Get(option.UnitId).DisplayName + " " + Ui.Stars(option.Star), "h2"));
+            card.Add(Ui.Label(option.Kind == RewardKind.Relay ? "法力水晶 +1" : UnitCatalog.Get(option.UnitId).DisplayName + " " + Ui.Stars(option.Star), "h2"));
             if (option.Kind == RewardKind.Relay)
             {
-                card.Add(Ui.Label("补给节点 · 放在格子交叉点 · 指挥 1", "small", "muted"));
-                card.Add(Ui.Label("覆盖周围 2 格，同一条格线上 3 格内的节点自动连成补给线。多一个信标，阵型就能铺得更开。", "body"));
+                card.Add(Ui.Label("魔网节点 · 放在格子交叉点 · 指挥 1", "small", "muted"));
+                card.Add(Ui.Label("覆盖周围 2 格，同一条格线上 3 格内的节点自动连成魔网连线。多一个水晶，阵型就能铺得更开。", "body"));
                 card.Add(Ui.Label("当前 " + _run.Fleet.Relays + " 个", "small", "muted"));
             }
             else
@@ -43,8 +43,8 @@ namespace Starline.Client
                 if (option.Star < UnitDef.MaxStar && owned > 0)
                 {
                     card.Add(owned >= 2
-                        ? Ui.Label("已有 2 艘同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")
-                        : Ui.Label("已有 1 艘同星（3 艘合成 " + Ui.Stars(option.Star + 1) + "）", "small", "muted"));
+                        ? Ui.Label("已有 2 支同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")
+                        : Ui.Label("已有 1 支同星（3 支合成 " + Ui.Stars(option.Star + 1) + "）", "small", "muted"));
                 }
             }
             card.Add(Ui.Box("spacer"));

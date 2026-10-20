@@ -47,7 +47,7 @@ namespace Starline.Battle.Tests
             Assert(frigates[0].MaxHp == baseHp && frigates[0].Hp == baseHp, "★1 应为基础耐久");
             Assert(frigates[1].MaxHp == baseHp * Fix.FromRatio(16, 10), "★2 耐久应为 1.6 倍");
             Assert(frigates[2].Damage == UnitCatalog.Frigate.Damage * Fix.FromRatio(22, 10), "★3 伤害应为 2.2 倍");
-            Info("护卫舰耐久 ★1/★2/★3：" + frigates[0].MaxHp.ToIntFloor() + " / " + frigates[1].MaxHp.ToIntFloor() + " / " + frigates[2].MaxHp.ToIntFloor());
+            Info("游侠耐久 ★1/★2/★3：" + frigates[0].MaxHp.ToIntFloor() + " / " + frigates[1].MaxHp.ToIntFloor() + " / " + frigates[2].MaxHp.ToIntFloor());
         }
 
         private static void MergeKeepsPlacement()
@@ -59,10 +59,10 @@ namespace Starline.Battle.Tests
             fleet.Deploy(a, 0, 2);
             AddShipResult result = fleet.Add("frigate");
             Assert(result.MergedTo.Count == 1 && result.MergedTo[0] == 2, "应合成 ★2");
-            Assert(fleet.Ships.Count == 1 && fleet.Ships[0].Star == 2, "舰队应只剩 1 艘 ★2 护卫舰");
+            Assert(fleet.Ships.Count == 1 && fleet.Ships[0].Star == 2, "远征军应只剩 1 支 ★2 游侠");
             Placement p = fleet.Formation.FindShip(result.Ship.Id);
-            Assert(p != null && p.Depth == 0 && p.Row == 2 && p.Star == 2, "★2 舰应接替原来的上阵位置");
-            Assert(fleet.Formation.Count("frigate") == 1, "棋盘上应只剩 1 艘护卫舰");
+            Assert(p != null && p.Depth == 0 && p.Row == 2 && p.Star == 2, "★2 部队应接替原来的上阵位置");
+            Assert(fleet.Formation.Count("frigate") == 1, "棋盘上应只剩 1 支游侠");
         }
 
         private static void ChainMerge()
@@ -75,8 +75,8 @@ namespace Starline.Battle.Tests
             fleet.Add("pd_ship");
             fleet.Add("pd_ship");
             AddShipResult result = fleet.Add("pd_ship");
-            Assert(result.MergedTo.Count == 2 && result.Ship.Star == 3, "第 9 艘应连锁合成到 ★3");
-            Assert(fleet.Ships.Count == 1, "9 艘 ★1 应合成 1 艘 ★3");
+            Assert(result.MergedTo.Count == 2 && result.Ship.Star == 3, "第 9 支应连锁合成到 ★3");
+            Assert(fleet.Ships.Count == 1, "9 支 ★1 应合成 1 支 ★3");
         }
 
         private static void StarMapIsConnected()
@@ -117,7 +117,7 @@ namespace Starline.Battle.Tests
             {
                 lines.Add(string.Join("/", layer.ConvertAll(n => n.Type.ToString())));
             }
-            Info("种子 7 的星图：" + string.Join(" → ", lines));
+            Info("种子 7 的地图：" + string.Join(" → ", lines));
         }
 
         private static void DurabilityRules()
@@ -125,7 +125,7 @@ namespace Starline.Battle.Tests
             var run = new ExpeditionRun(3);
             run.Enter(run.Reachable()[0]);
             run.ReportBattle(false);
-            Assert(run.Durability == ExpeditionRun.MaxDurability - 1 && run.State == RunState.Map, "普通战失败应 −1 并回到星图");
+            Assert(run.Durability == ExpeditionRun.MaxDurability - 1 && run.State == RunState.Map, "普通战失败应 −1 并回到地图");
             Assert(run.Rewards.Count == 0, "失败没有奖励");
 
             // Walk to the boss, losing nothing else.
@@ -166,8 +166,8 @@ namespace Starline.Battle.Tests
             int index = run.Rewards.FindIndex(r => r.Kind == RewardKind.Ship);
             string name = run.Rewards[index].Title;
             run.ChooseReward(index);
-            Assert(run.State == RunState.Map, "选完奖励回到星图");
-            Assert(run.Fleet.Ships.Count == ships + 1 || run.Messages.Exists(m => m.Contains("合成")), "应获得舰船");
+            Assert(run.State == RunState.Map, "选完奖励回到地图");
+            Assert(run.Fleet.Ships.Count == ships + 1 || run.Messages.Exists(m => m.Contains("合成")), "应获得部队");
             SupplyNetwork network = SupplyNetwork.ForFormation(run.Fleet.Formation, BoardLayout.PlayerSide);
             int deployed = 0, covered = 0;
             foreach (Placement p in run.Fleet.Formation.Placements)
@@ -181,8 +181,8 @@ namespace Starline.Battle.Tests
                     }
                 }
             }
-            Assert(deployed == 4, "新舰船应自动上阵");
-            Assert(covered == deployed, "自动上阵应放在补给覆盖内");
+            Assert(deployed == 4, "新部队应自动上阵");
+            Assert(covered == deployed, "自动上阵应放在魔网覆盖内");
             Assert(FormationRules.Validate(run.Fleet.Formation, run.CommandLimit).Count == 0, "阵型应合法");
             Info("选了 " + name + "：" + string.Join("；", run.Messages));
         }
@@ -195,7 +195,7 @@ namespace Starline.Battle.Tests
             act.EliteTiers.ForEach(keys.AddRange);
             foreach (string key in keys)
             {
-                Assert(EncounterLibrary.Exists(key), "星图引用了不存在的敌方阵容 " + key);
+                Assert(EncounterLibrary.Exists(key), "地图引用了不存在的敌方阵容 " + key);
             }
             foreach (string key in EncounterLibrary.Ids())
             {

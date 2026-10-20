@@ -105,7 +105,7 @@ namespace Starline.Client
             _stage.Interpolate(Mathf.Clamp01(_accumulator * BattleSim.TicksPerSecond));
         }
 
-        /// <summary>"我方补给：5 / 6 有补给 · 网络完好" for one side.</summary>
+        /// <summary>"我方魔网：5 / 6 有魔网 · 网络完好" for one side.</summary>
         public string NetworkSummary(int side)
         {
             int supplied = 0, combat = 0;
@@ -121,7 +121,7 @@ namespace Starline.Client
                 }
             }
             int lost = Battle.Stats[side].RelaysLost;
-            return (side == BoardLayout.PlayerSide ? "我方补给：" : "敌方补给：") + supplied + " / " + combat + " 有补给"
+            return (side == BoardLayout.PlayerSide ? "我方魔网：" : "敌方魔网：") + supplied + " / " + combat + " 有魔网"
                 + (lost > 0 ? " · " + lost + " 个节点被毁" : " · 网络完好");
         }
 

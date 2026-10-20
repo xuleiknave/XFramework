@@ -31,7 +31,7 @@ namespace Starline.Expedition
         public string UnitId;
         public int Star = 1;
 
-        public string Title => Kind == RewardKind.Relay ? "中继信标 +1" : UnitCatalog.Get(UnitId).DisplayName + " " + Stars(Star);
+        public string Title => Kind == RewardKind.Relay ? "法力水晶 +1" : UnitCatalog.Get(UnitId).DisplayName + " " + Stars(Star);
 
         public static string Stars(int star) => new string('★', star);
     }
@@ -176,7 +176,7 @@ namespace Starline.Expedition
 
             int loss = boss ? Rules.BossLoss : Rules.NormalLoss;
             Durability -= loss;
-            Messages.Add("战斗失败，舰队耐久 −" + loss);
+            Messages.Add("战斗失败，远征军耐久 −" + loss);
             if (Durability <= 0)
             {
                 Durability = 0;
@@ -204,7 +204,7 @@ namespace Starline.Expedition
                 {
                     Fleet.Relays++;
                     AutoDeploy.PlaceRelay(Fleet, CommandLimit);
-                    Messages.Add("获得 中继信标（共 " + Fleet.Relays + " 个）");
+                    Messages.Add("获得 法力水晶（共 " + Fleet.Relays + " 个）");
                 }
                 else
                 {
@@ -226,13 +226,13 @@ namespace Starline.Expedition
             if (repair)
             {
                 Durability = Durability + 1 > MaxDurability ? MaxDurability : Durability + 1;
-                Messages.Add("舰队修理完毕，耐久 " + Durability + " / " + MaxDurability);
+                Messages.Add("远征军休整完毕，耐久 " + Durability + " / " + MaxDurability);
             }
             else
             {
                 Fleet.Relays++;
                 AutoDeploy.PlaceRelay(Fleet, CommandLimit);
-                Messages.Add("获得 中继信标（共 " + Fleet.Relays + " 个）");
+                Messages.Add("获得 法力水晶（共 " + Fleet.Relays + " 个）");
             }
             State = RunState.Map;
         }
@@ -244,7 +244,7 @@ namespace Starline.Expedition
             Messages.Add("获得 " + UnitCatalog.Get(unitId).DisplayName + " " + RewardOption.Stars(star));
             foreach (int merged in added.MergedTo)
             {
-                Messages.Add("3 艘合成 → " + name + " " + RewardOption.Stars(merged));
+                Messages.Add("3 支合成 → " + name + " " + RewardOption.Stars(merged));
             }
             if (!Fleet.IsDeployed(added.Ship.Id))
             {

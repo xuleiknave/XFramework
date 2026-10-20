@@ -115,7 +115,7 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)lost[worstLost] / defeats,
-                    Text = UnitCatalog.Get(worstLost).DisplayName + " 被击毁",
+                    Text = UnitCatalog.Get(worstLost).DisplayName + " 被击败",
                     Advice = AdviceForLoss(UnitCatalog.Get(worstLost)),
                 });
             }
@@ -125,8 +125,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)dry[worstDry] / defeats,
-                    Text = UnitCatalog.Get(worstDry).DisplayName + " 弹药耗尽停火",
-                    Advice = "让 " + UnitCatalog.Get(worstDry).DisplayName + " 待在补给覆盖范围内，或者在它附近加一个中继信标。",
+                    Text = UnitCatalog.Get(worstDry).DisplayName + " 法力耗尽停手",
+                    Advice = "让 " + UnitCatalog.Get(worstDry).DisplayName + " 待在魔网覆盖范围内，或者在它附近加一个法力水晶。",
                 });
             }
             if (relayLost > 0)
@@ -134,8 +134,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)relayLost / defeats,
-                    Text = "补给节点被摧毁",
-                    Advice = "在中继信标附近放一艘点防御舰，挡住来切补给线的飞蝗群。",
+                    Text = "魔网节点被摧毁",
+                    Advice = "在法力水晶附近放一支弩手，挡住来切魔网连线的怨灵群。",
                 });
             }
             if (unsupplied > 0)
@@ -143,8 +143,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)unsupplied / defeats,
-                    Text = "兵器长时间断补给",
-                    Advice = "检查红框的“未接入”兵器，把它们移进绿色覆盖区。",
+                    Text = "部队长时间断开魔网",
+                    Advice = "检查红框的“未接入”部队，把它们移进绿色覆盖区。",
                 });
             }
 
@@ -181,11 +181,11 @@ namespace Starline.Battle
             switch (def.Role)
             {
                 case UnitRole.Artillery:
-                    return "把 " + def.DisplayName + " 往后放，前面用战列舰或护卫舰挡住突进的敌人。";
+                    return "把 " + def.DisplayName + " 往后放，前面用重甲骑士或游侠挡住突进的敌人。";
                 case UnitRole.Craft:
                     return def.DisplayName + " 怕点防御，避开敌方点防御单位所在的一翼。";
                 case UnitRole.Heavy:
-                    return "敌方炮巢和飞蝗群克制重型舰，先用舰载机群或护卫舰解决它们。";
+                    return "敌方骨塔和怨灵群克制重装单位，先用狮鹫骑队或游侠解决它们。";
                 case UnitRole.PointDefense:
                     return def.DisplayName + " 很脆，放在第二排，让前排替它挡伤害。";
                 default:

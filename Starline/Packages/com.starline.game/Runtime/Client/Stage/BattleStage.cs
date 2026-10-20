@@ -164,7 +164,7 @@ namespace Starline.Client
                         {
                             UnitDef def = dead.Def;
                             string who = (dead.Side == BoardLayout.PlayerSide ? "我方 " : "敌方 ") + def.DisplayName;
-                            feed(def.IsRelay ? who + " 补给节点被摧毁！" : def.IsSupplySource ? who + " 补给源被摧毁！" : who + " 被击毁");
+                            feed(def.IsRelay ? who + " 魔网节点被摧毁！" : def.IsSupplySource ? who + " 魔网源头被摧毁！" : who + " 被击败");
                             if (withEffects)
                             {
                                 SpawnFlash(dead.transform.position + Vector3.up * 0.5f, def.Size >= 2 ? 4f : 2f, 0.45f, new Color(1f, 0.8f, 0.4f));
@@ -182,7 +182,7 @@ namespace Starline.Client
                         Unit unit = _battle.GetUnit(e.TargetId);
                         if (unit != null)
                         {
-                            feed((unit.Side == BoardLayout.PlayerSide ? "我方 " : "敌方 ") + unit.Def.DisplayName + " 弹药耗尽");
+                            feed((unit.Side == BoardLayout.PlayerSide ? "我方 " : "敌方 ") + unit.Def.DisplayName + " 法力耗尽");
                         }
                         break;
                     }
