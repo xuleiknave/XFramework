@@ -9,7 +9,11 @@ namespace Starline.Client
         public MainMenuScreen(GameApp app) : base(app, "MainMenu")
         {
             Button("start", App.StartRunOrCreateCommander);
+            // Not built yet: saved expeditions (M3), the endless tower, the workshop and the archive (P3).
             Find<Button>("continue").SetEnabled(false);
+            Find<Button>("tower").SetEnabled(false);
+            Find<Button>("workshop").SetEnabled(false);
+            Find<Button>("archive").SetEnabled(false);
             Find<Button>("settings").SetEnabled(false);
             CommanderProfile profile = App.Profile;
             Find<Label>("commander").text = profile != null

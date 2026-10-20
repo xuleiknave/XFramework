@@ -217,11 +217,127 @@ Label {
 
 /* ---- Main menu ----------------------------------------------------------- */
 
-.menu-card {
-    width: 1104px;
-    padding: 86px 96px;
+/* Left column over the 3D background (design: 1600 x 900 artboard, x2.4 here). */
+.menu-column {
+    position: absolute;
+    left: 230px;
+    top: 221px;
+    width: 960px;
 }
 
+.menu-logo {
+    font-size: 130px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 24px;
+    margin: 0;
+}
+
+.menu-divider {
+    align-items: center;
+    margin: 34px 0;
+}
+
+.diamond--start {
+    margin: 0 34px 0 0;
+}
+
+.menu-title {
+    font-size: 82px;
+    -unity-font-style: bold;
+    letter-spacing: 38px;
+    margin: 0 0 34px 0;
+}
+
+.menu-tagline {
+    font-size: 36px;
+    color: var(--muted);
+    margin: 0 0 86px 0;
+}
+
+/* A menu entry: title on the left, a short status on the right; gold bar on the left when highlighted. */
+.menu-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 14px 0;
+    padding: 34px 43px;
+    background-color: transparent;
+    border-width: 0;
+    border-left-width: 5px;
+    border-color: transparent;
+    border-radius: 0;
+    transition-duration: 0.12s;
+}
+
+.menu-item:hover,
+.menu-item--on {
+    border-color: var(--gold-bright);
+    background-color: rgba(232, 199, 122, 0.12);
+}
+
+.menu-item:active {
+    background-color: rgba(232, 199, 122, 0.2);
+}
+
+.menu-item-title {
+    font-size: 50px;
+    -unity-font-style: bold;
+    color: var(--text);
+    letter-spacing: 5px;
+    margin: 0;
+}
+
+.menu-item:hover .menu-item-title,
+.menu-item--on .menu-item-title {
+    color: var(--gold-bright);
+}
+
+.menu-item-sub {
+    font-size: 31px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.menu-item:disabled {
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.menu-item:disabled .menu-item-title {
+    color: #5D6678;
+}
+
+.menu-small {
+    margin-top: 53px;
+}
+
+.menu-small .btn-small {
+    margin: 0 29px 0 0;
+}
+
+.menu-version {
+    position: absolute;
+    left: 230px;
+    bottom: 77px;
+    color: #5D6678;
+}
+
+.menu-place {
+    position: absolute;
+    right: 115px;
+    bottom: 77px;
+    align-items: flex-end;
+}
+
+.menu-place-title {
+    font-size: 38px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    margin: 0;
+}
+
+/* Logo used by the save-slot screen. */
 .logo {
     font-size: 134px;
     -unity-font-style: bold;
@@ -244,12 +360,6 @@ Label {
     color: var(--muted);
     -unity-text-align: middle-center;
     margin-bottom: 58px;
-}
-
-.version {
-    position: absolute;
-    right: 48px;
-    bottom: 34px;
 }
 
 .commander {
