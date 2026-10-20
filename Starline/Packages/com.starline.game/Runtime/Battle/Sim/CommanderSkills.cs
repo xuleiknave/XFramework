@@ -8,26 +8,79 @@ namespace Starline.Battle
         EmergencyShield,
     }
 
+    /// <summary>Commander skill parameters, loaded from skills.json (together with the star multipliers).</summary>
     public sealed class CommanderSkillDef
     {
         public CommanderSkill Skill;
         public string DisplayName;
+        public string Description = "";
         public int Cost;
         public int CooldownSeconds;
         public bool NeedsTarget;
+        /// <summary>Area skills: seconds before impact, radius and damage.</summary>
+        public Fix DelaySeconds;
+        public Fix Radius;
+        public Fix Damage;
 
-        public static readonly CommanderSkillDef[] All =
-        {
-            new CommanderSkillDef { Skill = CommanderSkill.OrbitalStrike, DisplayName = "轨道打击", Cost = 4, CooldownSeconds = 10, NeedsTarget = true },
-            new CommanderSkillDef { Skill = CommanderSkill.EmergencyShield, DisplayName = "紧急护盾", Cost = 3, CooldownSeconds = 15 },
-        };
+        public static CommanderSkillDef[] All { get; private set; } = new CommanderSkillDef[0];
 
         public static CommanderSkillDef Get(CommanderSkill skill) => All[(int)skill];
 
         // Orbital strike tuning.
-        public static readonly int StrikeDelayTicks = BattleSim.TicksPerSecond;
-        public static readonly Fix StrikeRadius = 3;
-        public static readonly Fix StrikeDamage = 220;
+        public static int StrikeDelayTicks => (Get(CommanderSkill.OrbitalStrike).DelaySeconds * BattleSim.TicksPerSecond).ToIntFloor();
+        public static Fix StrikeRadius => Get(CommanderSkill.OrbitalStrike).Radius;
+        public static Fix StrikeDamage => Get(CommanderSkill.OrbitalStrike).Damage;
+
+        internal static Fix[] StarHpScale = { Fix.One, Fix.One, Fix.One };
+        internal static Fix[] StarDamageScale = { Fix.One, Fix.One, Fix.One };
+
+        internal static void Load(JsonValue root)
+        {
+            JsonValue skills = root["skills"];
+            var all = new CommanderSkillDef[System.Enum.GetValues(typeof(CommanderSkill)).Length];
+            foreach (JsonValue s in skills.Elements)
+            {
+                CommanderSkill skill = GameData.ParseEnum<CommanderSkill>(s["id"]);
+                all[(int)skill] = new CommanderSkillDef
+                {
+                    Skill = skill,
+                    DisplayName = s["name"].AsString(),
+                    Description = s.String("description", ""),
+                    Cost = s["cost"].AsInt(),
+                    CooldownSeconds = s["cooldown"].AsInt(),
+                    NeedsTarget = s.Bool("needsTarget"),
+                    DelaySeconds = s.FixValue("delay"),
+                    Radius = s.FixValue("radius"),
+                    Damage = s.FixValue("damage"),
+                };
+            }
+            for (int i = 0; i < all.Length; i++)
+            {
+                if (all[i] == null)
+                {
+                    throw new System.FormatException("skills.json：缺少技能 " + (CommanderSkill)i);
+                }
+            }
+            All = all;
+
+            JsonValue stars = root["stars"];
+            StarHpScale = ReadStars(stars["hp"]);
+            StarDamageScale = ReadStars(stars["damage"]);
+        }
+
+        private static Fix[] ReadStars(JsonValue list)
+        {
+            if (list.Count != UnitDef.MaxStar)
+            {
+                throw new System.FormatException(list.Path + "：应有 " + UnitDef.MaxStar + " 个星级倍率");
+            }
+            var result = new Fix[UnitDef.MaxStar];
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = list[i].AsFix();
+            }
+            return result;
+        }
     }
 
     /// <summary>

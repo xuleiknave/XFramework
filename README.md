@@ -4,6 +4,7 @@
 
 - 游戏设计文档：[docs/game-design.md](docs/game-design.md)
 - 界面原型图：[docs/prototype/](docs/prototype/)
+- 客户端架构（代码结构、配置表、界面流程）：[docs/client-architecture.md](docs/client-architecture.md)
 - 确定性仿真内核架构参考：[docs/architecture.md](docs/architecture.md)
 - 决策记录（定了什么、为什么）：[docs/decisions.md](docs/decisions.md)
 - 完整开发对话：[docs/conversation-log.md](docs/conversation-log.md)
@@ -15,16 +16,19 @@ Starline/                          Unity 工程（用 Unity Hub 直接打开这�
 ├── Assets/
 ├── Packages/manifest.json
 ├── Packages/com.starline.game/    游戏代码（嵌入式包）
-│   ├── Runtime/Battle/            确定性战斗内核（纯 C#，不依赖 Unity）：棋盘、补给网络、战斗、推演
-│   ├── Runtime/Client/            Unity 显示与操作（可玩原型）
-│   └── Editor/                    编辑器菜单
+│   ├── Runtime/Battle/            确定性战斗内核（纯 C#，不依赖 Unity）：配置读取、棋盘、补给网络、战斗、推演、远征
+│   ├── Runtime/Client/            Unity 客户端：App 入口、Screens 界面、Gameplay 布阵/战斗逻辑、Stage 3D 舞台、UI
+│   ├── Runtime/Resources/
+│   │   ├── StarlineData/          配置表（JSON）：舰船、克制、技能、敌方阵容、远征
+│   │   └── StarlineUI/            界面布局（UXML）和主题样式（USS）
+│   └── Editor/                    编辑器菜单：工程初始化、URP 配置
 └── ProjectSettings/
 src/Starline.Battle/               用 .NET 编译同一份内核源码（测试与批量模拟用）
 tests/Starline.Battle.Tests/       内核测试
 docs/                              设计文档与原型图
 ```
 
-## 可玩原型：在 Unity 中试玩
+## 在 Unity 中试玩
 
 内容：**第一幕“边境星区”的完整一局远征**（约 15~25 分钟）：
 
@@ -35,7 +39,16 @@ docs/                              设计文档与原型图
    - 如果 Hub 提示编辑器版本不一致，选择你安装的 Unity 6 版本打开即可。
 3. 第一次打开时如果提示启用新输入系统（Input System），选 **Yes**，编辑器会重启。
 4. **等待 URP 自动配置**：第一次打开时会自动安装 URP（通用渲染管线）包，并在 `Assets/Settings/` 下生成渲染配置，Console 里会依次出现“正在安装 URP”和“已启用 URP 渲染管线”。整个过程需要一两分钟。
-5. 菜单栏点 `Starline > 创建可玩原型场景`，然后点 **Play**。
+5. 菜单栏点 `Starline > 初始化工程（场景与界面配置）`，会生成并打开 `Assets/Scenes/Main.unity`，然后点 **Play**。
+   - 以前生成过的 `Assets/Scenes/PlayablePrototype.unity` 已经不用了（里面的脚本已删除），可以直接删掉。
+
+### 中文字体
+
+界面字体是随工程提供的 **Noto Sans SC Regular**（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 开源协议，可免费用于商业游戏）。想换字体，用新字体文件替换它即可（文件名不变）。发布时要把 `ThirdPartyNotices.md` 和 `Licenses/` 里的许可证随游戏一起提供。
+
+### 修改数值
+
+舰船、敌人、技能、星图和剧情文本都在 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/` 的 JSON 文件里，改完保存，下次点 Play 就生效。改完建议跑一遍内核测试，看平衡模拟的变化。
 
 ### 渲染
 

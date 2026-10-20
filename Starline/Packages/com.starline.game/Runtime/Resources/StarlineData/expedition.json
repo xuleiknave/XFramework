@@ -1,0 +1,53 @@
+{
+  "_说明": "远征规则与第一幕配置（设计文档 4、4.7）。",
+  "rules": {
+    "maxDurability": 5,
+    "maxRelays": 6,
+    "baseCommandLimit": 12,
+    "commandLimitPerBattle": 2,
+    "maxCommandLimit": 24,
+    "normalLoss": 1,
+    "bossLoss": 2
+  },
+  "acts": [
+    {
+      "id": "act1",
+      "title": "第一幕 · 边境星区",
+      "start": {
+        "relays": 2,
+        "formation": [["supply_ship", 4, 3], ["relay", 2, 4], ["relay", 2, 1]],
+        "ships": [["battleship", 0, 3], ["frigate", 0, 1], ["missile_ship", 3, 3]]
+      },
+      "_layers说明": "每层的节点类型，顺序会随机打乱；最后一层是 Boss。",
+      "layers": [
+        ["Battle", "Battle"],
+        ["Battle", "Battle", "Supply"],
+        ["Battle", "Elite", "Supply"],
+        ["Battle", "Battle", "Elite"],
+        ["Supply", "Battle"],
+        ["Boss"]
+      ],
+      "_tiers说明": "普通战按层选档：第 0 层用第 1 档，第 1~2 层第 2 档，之后第 3 档。精英战第 0~2 层用第 1 档，之后第 2 档。",
+      "normalTiers": [["patrol", "locust_raid"], ["turret_line", "crawler_wall"], ["hive_outpost", "evolved_pack"]],
+      "normalTierByLayer": [0, 1, 1, 2, 2],
+      "eliteTiers": [["brood_patrol"], ["wreck_ambush"]],
+      "eliteTierByLayer": [0, 0, 0, 1, 1],
+      "boss": "wreck_fortress",
+      "rewardPool": [
+        {"unit": "frigate", "weight": 3},
+        {"unit": "pd_ship", "weight": 3},
+        {"unit": "missile_ship", "weight": 3},
+        {"unit": "strike_craft", "weight": 3},
+        {"unit": "battleship", "weight": 1, "eliteWeight": 3}
+      ],
+      "story": {
+        "introTitle": "启程",
+        "intro": "雷恩舰长：断线日之后，灯塔站是星线最末端还亮着的信标。从这里往外，每一座信标都被蜂群啃断了。\n\n指挥官，晨星舰队现在只有三艘船。但每打下一座信标，就能把一个殖民地重新连回星线，也能收编那里的舰船。\n\n残骸要塞在这片星区的尽头。拿下它，边境星区的星线就通了。",
+        "victoryTitle": "边境星区 · 通关",
+        "victory": "诺娃：残骸要塞的信号消失了。边境星区的星线……重新亮了起来。\n\n雷恩舰长：干得漂亮，指挥官。三个边境殖民地已经连回灯塔站。下一站是星团腹地。\n\n（第二幕“星团腹地”正在开发中）",
+        "defeatTitle": "远征失败",
+        "defeat": "雷恩舰长：舰队撤回灯塔站。星线还在那里，蜂群也还在那里——我们还会回去的。"
+      }
+    }
+  ]
+}

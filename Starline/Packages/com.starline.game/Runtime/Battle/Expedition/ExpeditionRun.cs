@@ -43,34 +43,40 @@ namespace Starline.Expedition
     /// </summary>
     public sealed class ExpeditionRun
     {
-        public const int MaxDurability = 5;
-        public const int MaxRelays = 6;
-        public const int BaseCommandLimit = 12;
-        /// <summary>Command limit gained per battle node passed, won or lost, so one defeat does not snowball.</summary>
-        public const int CommandLimitPerBattle = 2;
-        public const int MaxCommandLimit = 24;
+        private static ExpeditionConfig Rules => ExpeditionConfig.Current;
 
-        private static readonly string[] ShipPool = { "frigate", "pd_ship", "missile_ship", "strike_craft", "battleship" };
-        private static readonly int[] ShipWeights = { 3, 3, 3, 3, 1 };
+        public static int MaxDurability => Rules.MaxDurability;
+        public static int MaxRelays => Rules.MaxRelays;
+        public static int BaseCommandLimit => Rules.BaseCommandLimit;
+        /// <summary>Command limit gained per battle node passed, won or lost, so one defeat does not snowball.</summary>
+        public static int CommandLimitPerBattle => Rules.CommandLimitPerBattle;
+        public static int MaxCommandLimit => Rules.MaxCommandLimit;
 
         private readonly DeterministicRandom _random;
 
-        public ExpeditionRun(ulong seed)
+        public ExpeditionRun(ulong seed) : this(ExpeditionConfig.Current.Acts[0], seed)
         {
+        }
+
+        public ExpeditionRun(ActConfig act, ulong seed)
+        {
+            Act = act;
             Seed = seed;
             _random = new DeterministicRandom(seed * 2654435761UL + 1);
-            Map = StarMap.GenerateAct1(seed);
+            Map = StarMap.Generate(act, seed);
             Durability = MaxDurability;
             State = RunState.Map;
 
-            // Starting fleet (GDD 4.1): supply ship, two relays and three ships.
-            Fleet.Relays = 2;
-            Fleet.Formation.Add("supply_ship", 4, 3).Add("relay", 2, 4).Add("relay", 2, 1);
-            Fleet.Deploy(Fleet.Add("battleship").Ship, 0, 3);
-            Fleet.Deploy(Fleet.Add("frigate").Ship, 0, 1);
-            Fleet.Deploy(Fleet.Add("missile_ship").Ship, 3, 3);
+            // Starting fleet (GDD 4.1): supply ship, relays and three ships.
+            Fleet.Relays = act.StartRelays;
+            Fleet.Formation = act.StartFormation.Clone();
+            foreach (Placement p in act.StartShips)
+            {
+                Fleet.Deploy(Fleet.Add(p.UnitId).Ship, p.Depth, p.Row);
+            }
         }
 
+        public ActConfig Act { get; }
         public ulong Seed { get; }
         public StarMap Map { get; }
         public Fleet Fleet { get; } = new Fleet();
@@ -168,7 +174,7 @@ namespace Starline.Expedition
                 return;
             }
 
-            int loss = boss ? 2 : 1;
+            int loss = boss ? Rules.BossLoss : Rules.NormalLoss;
             Durability -= loss;
             Messages.Add("战斗失败，舰队耐久 −" + loss);
             if (Durability <= 0)
@@ -282,24 +288,22 @@ namespace Starline.Expedition
 
         private string WeightedShip(bool elite)
         {
+            List<RewardPoolEntry> pool = Act.RewardPool;
             int total = 0;
-            for (int i = 0; i < ShipPool.Length; i++)
+            foreach (RewardPoolEntry entry in pool)
             {
-                total += Weight(i, elite);
+                total += elite ? entry.EliteWeight : entry.Weight;
             }
             int roll = _random.Range(0, total);
-            for (int i = 0; i < ShipPool.Length; i++)
+            foreach (RewardPoolEntry entry in pool)
             {
-                roll -= Weight(i, elite);
+                roll -= elite ? entry.EliteWeight : entry.Weight;
                 if (roll < 0)
                 {
-                    return ShipPool[i];
+                    return entry.UnitId;
                 }
             }
-            return ShipPool[0];
+            return pool[0].UnitId;
         }
-
-        private static int Weight(int index, bool elite) =>
-            ShipPool[index] == "battleship" && elite ? 3 : ShipWeights[index];
     }
 }

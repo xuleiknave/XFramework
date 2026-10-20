@@ -6,6 +6,29 @@ namespace Starline.Battle.Tests
 {
     internal static partial class Program
     {
+        private static void JsonParsing()
+        {
+            JsonValue v = Json.Parse("{\"a\": [1, -2.5, 0.25, \"中文\\n\"], \"b\": true, \"c\": null}");
+            Assert(v["a"][0].AsFix() == Fix.FromInt(1), "整数");
+            Assert(v["a"][1].AsFix() == Fix.FromRatio(-25, 10), "负小数");
+            Assert(v["a"][2].AsFix() == Fix.FromRatio(25, 100), "两位小数");
+            Assert(v["a"][3].AsString() == "中文\n", "字符串转义");
+            Assert(v["b"].AsBool() && v["c"].IsNull, "布尔与 null");
+            Assert(UnitCatalog.Get("frigate").FireIntervalSeconds == Fix.FromRatio(6, 10), "units.json 读取");
+            Assert(CounterTable.Get(UnitRole.PointDefense, UnitRole.Craft) == Fix.FromRatio(25, 10), "counters.json 读取");
+            bool threw = false;
+            try
+            {
+                Json.Parse("{\"a\": 1,\n \"b\" 2}", "test.json");
+            }
+            catch (System.FormatException e)
+            {
+                threw = e.Message.Contains("第 2 行");
+            }
+            Assert(threw, "语法错误应报告行号");
+            Info("已加载 " + UnitCatalog.All.Count + " 种单位、" + EncounterLibrary.Ids().Count + " 个敌方阵容");
+        }
+
         private static void StarScaling()
         {
             var player = new Formation().Add("supply_ship", 4, 3)
@@ -166,16 +189,15 @@ namespace Starline.Battle.Tests
 
         private static void EncountersAreValid()
         {
-            var keys = new List<string> { EncounterLibrary.Boss };
-            foreach (string[] tier in EncounterLibrary.NormalTiers)
-            {
-                keys.AddRange(tier);
-            }
-            foreach (string[] tier in EncounterLibrary.EliteTiers)
-            {
-                keys.AddRange(tier);
-            }
+            ActConfig act = ExpeditionConfig.Current.Acts[0];
+            var keys = new List<string> { act.Boss };
+            act.NormalTiers.ForEach(keys.AddRange);
+            act.EliteTiers.ForEach(keys.AddRange);
             foreach (string key in keys)
+            {
+                Assert(EncounterLibrary.Exists(key), "星图引用了不存在的敌方阵容 " + key);
+            }
+            foreach (string key in EncounterLibrary.Ids())
             {
                 Encounter e = EncounterLibrary.Create(key);
                 List<string> errors = FormationRules.Validate(e.Enemy, 999);
@@ -254,13 +276,14 @@ namespace Starline.Battle.Tests
 
         private static int Order(string key)
         {
-            if (key == EncounterLibrary.Boss)
+            ActConfig act = ExpeditionConfig.Current.Acts[0];
+            if (key == act.Boss)
             {
                 return 100;
             }
-            for (int t = 0; t < EncounterLibrary.NormalTiers.Length; t++)
+            for (int t = 0; t < act.NormalTiers.Count; t++)
             {
-                if (System.Array.IndexOf(EncounterLibrary.NormalTiers[t], key) >= 0)
+                if (System.Array.IndexOf(act.NormalTiers[t], key) >= 0)
                 {
                     return t * 10;
                 }

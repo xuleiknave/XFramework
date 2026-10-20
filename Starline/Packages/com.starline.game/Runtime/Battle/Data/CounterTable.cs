@@ -1,23 +1,31 @@
 namespace Starline.Battle
 {
-    /// <summary>Damage multipliers by attacker role versus target role (GDD 5.5).</summary>
+    /// <summary>Damage multipliers by attacker role versus target role, loaded from counters.json.</summary>
     public static class CounterTable
     {
-        private static Fix F(int tenths) => Fix.FromRatio(tenths, 10);
-
-        // Rows: attacker. Columns: target, in UnitRole order
-        // Light, Heavy, Craft, PointDefense, Artillery, Structure.
-        private static readonly Fix[,] Multipliers =
-        {
-            /* Light     */ { F(10), F(5),  F(5),  F(12), F(18), F(12) },
-            /* Heavy     */ { F(18), F(10), F(3),  F(18), F(10), F(12) },
-            /* Craft     */ { F(10), F(18), F(10), F(5),  F(18), F(15) },
-            /* PointDef  */ { F(6),  F(4),  F(25), F(10), F(6),  F(8) },
-            /* Artillery */ { F(10), F(18), F(3),  F(10), F(10), F(15) },
-            /* Structure */ { F(0),  F(0),  F(0),  F(0),  F(0),  F(0) },
-        };
+        private const int RoleCount = 6;
+        private static readonly Fix[,] Multipliers = new Fix[RoleCount, RoleCount];
 
         public static Fix Get(UnitRole attacker, UnitRole target) =>
             Multipliers[(int)attacker, (int)target];
+
+        internal static void Load(JsonValue root)
+        {
+            JsonValue roles = root["roles"];
+            JsonValue rows = root["multipliers"];
+            for (int a = 0; a < roles.Count; a++)
+            {
+                UnitRole attacker = GameData.ParseEnum<UnitRole>(roles[a]);
+                JsonValue row = rows[roles[a].AsString()];
+                if (row.Count != roles.Count)
+                {
+                    throw new System.FormatException(row.Path + "：应有 " + roles.Count + " 个倍率");
+                }
+                for (int t = 0; t < roles.Count; t++)
+                {
+                    Multipliers[(int)attacker, (int)GameData.ParseEnum<UnitRole>(roles[t])] = row[t].AsFix();
+                }
+            }
+        }
     }
 }

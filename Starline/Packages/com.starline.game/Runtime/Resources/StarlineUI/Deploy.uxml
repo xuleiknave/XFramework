@@ -1,0 +1,40 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="screen column" picking-mode="Ignore">
+        <ui:VisualElement class="topbar">
+            <ui:Label name="title" class="h2 grow" />
+            <ui:Label name="durability" class="stat good" />
+            <ui:Label text="左键：放置 / 拿起移动    右键：撤下 / 取消    选中中继信标后点交叉点" class="small muted hint" />
+        </ui:VisualElement>
+        <ui:VisualElement class="row grow" picking-mode="Ignore">
+            <ui:VisualElement name="roster-panel" class="panel side-left">
+                <ui:Label name="command" class="h3" />
+                <ui:ScrollView name="roster" class="grow roster" />
+                <ui:Button name="auto" text="自动补满（后备舰船和信标）" class="btn" />
+                <ui:Button name="clear" text="全部撤下（保留补给母舰）" class="btn btn-secondary" />
+                <ui:Label name="supply" class="small" />
+                <ui:Label text="绿色格子 = 补给覆盖（节点周围 2 格）。节点相距 ≤ 3 格且在同一条格线上会自动连线。" class="small muted" />
+                <ui:Label name="notice" class="small bad" />
+            </ui:VisualElement>
+            <ui:VisualElement class="grow" picking-mode="Ignore" />
+            <ui:VisualElement name="forecast-panel" class="panel side-right">
+                <ui:Label name="enc-name" class="h2" />
+                <ui:Label name="enc-briefing" class="body" />
+                <ui:Label name="intel" class="h3 section" />
+                <ui:VisualElement name="forecast-empty">
+                    <ui:Label text="消耗 1 点情报点，模拟 100 场战斗，预测胜率和常见败因。（推演不使用指挥官技能）" class="body" />
+                </ui:VisualElement>
+                <ui:VisualElement name="forecast-result">
+                    <ui:Label name="win-rate" class="big" />
+                    <ui:Label name="win-detail" class="small muted" />
+                    <ui:VisualElement name="reasons" />
+                    <ui:Label name="advice" class="body" />
+                    <ui:Label name="history" class="small muted" />
+                </ui:VisualElement>
+                <ui:VisualElement class="spacer" />
+                <ui:VisualElement name="errors" />
+                <ui:Button name="forecast" class="btn" />
+                <ui:Button name="fight" text="开战" class="btn btn-primary btn-large" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

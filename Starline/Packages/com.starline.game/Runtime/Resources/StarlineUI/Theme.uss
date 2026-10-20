@@ -1,0 +1,527 @@
+/*
+ * Starline UI theme. Every screen uses these classes; layouts are designed for 1600 x 900
+ * and scaled to the screen height (see Ui.ConfigurePanel).
+ */
+
+:root, .starline {
+    --bg: #0B111B;
+    --bg-dim: rgba(5, 8, 14, 0.72);
+    --panel: rgba(18, 26, 39, 0.94);
+    --panel-solid: #121A27;
+    --panel-raised: #1A2536;
+    --border: #2C3A50;
+    --text: #E3E9F2;
+    --muted: #93A1B5;
+    --primary: #5AB8FF;
+    --primary-dark: #13243A;
+    --good: #6FD08C;
+    --warn: #E8C15A;
+    --bad: #FF6B6B;
+    --enemy: #FF8F4A;
+    --elite: #E8C15A;
+    --supply: #6FD0B4;
+}
+
+/* ---- Layout -------------------------------------------------------------- */
+
+.starline {
+    color: var(--text);
+    font-size: 15px;
+}
+
+.layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+}
+
+.fill {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+}
+
+.screen {
+    flex-grow: 1;
+}
+
+.backdrop {
+    background-color: var(--bg);
+}
+
+.center {
+    align-items: center;
+    justify-content: center;
+}
+
+.row {
+    flex-direction: row;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.grow {
+    flex-grow: 1;
+}
+
+.spacer {
+    flex-grow: 1;
+    min-height: 8px;
+}
+
+.section {
+    margin-top: 14px;
+}
+
+.panel {
+    background-color: var(--panel);
+    border-width: 1px;
+    border-color: var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+}
+
+/* ---- Text ---------------------------------------------------------------- */
+
+Label {
+    white-space: normal;
+}
+
+.h1 {
+    font-size: 28px;
+    -unity-font-style: bold;
+    margin-bottom: 6px;
+}
+
+.h2 {
+    font-size: 20px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.h3 {
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin-bottom: 4px;
+}
+
+.body {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.small {
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.big {
+    font-size: 48px;
+    -unity-font-style: bold;
+    color: var(--primary);
+}
+
+.stat {
+    font-size: 16px;
+    -unity-font-style: bold;
+    margin: 4px 0;
+}
+
+.muted { color: var(--muted); }
+.good { color: var(--good); }
+.warn { color: var(--warn); }
+.bad { color: var(--bad); }
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+.btn {
+    background-color: var(--panel-raised);
+    border-width: 1px;
+    border-color: var(--border);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 14px;
+    padding: 6px 12px;
+    margin: 4px 0;
+    min-height: 34px;
+    -unity-text-align: middle-center;
+    white-space: normal;
+    transition-duration: 0.12s;
+}
+
+.btn:hover {
+    border-color: var(--primary);
+    background-color: #22324A;
+}
+
+.btn:active {
+    background-color: var(--primary-dark);
+}
+
+.btn:disabled {
+    opacity: 0.4;
+}
+
+.btn-primary {
+    background-color: #1D4E7A;
+    border-color: var(--primary);
+    -unity-font-style: bold;
+}
+
+.btn-primary:hover {
+    background-color: #2A649A;
+}
+
+.btn-secondary {
+    background-color: transparent;
+}
+
+.btn-large {
+    min-height: 52px;
+    font-size: 18px;
+}
+
+.btn-small {
+    min-height: 30px;
+    padding: 2px 10px;
+    margin: 0 0 0 6px;
+}
+
+.btn-toggled {
+    background-color: var(--primary-dark);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* ---- Main menu ----------------------------------------------------------- */
+
+.menu-card {
+    width: 460px;
+    padding: 36px 40px;
+}
+
+.logo {
+    font-size: 56px;
+    -unity-font-style: bold;
+    color: var(--primary);
+    -unity-text-align: middle-center;
+    letter-spacing: 12px;
+}
+
+.logo-sub {
+    font-size: 22px;
+    color: var(--muted);
+    -unity-text-align: middle-center;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-size: 14px;
+    color: var(--muted);
+    -unity-text-align: middle-center;
+    margin-bottom: 24px;
+}
+
+.version {
+    position: absolute;
+    right: 20px;
+    bottom: 14px;
+}
+
+/* ---- Star map ------------------------------------------------------------ */
+
+.sidebar {
+    width: 320px;
+    margin: 16px;
+}
+
+.map-area {
+    flex-grow: 1;
+    padding: 28px 40px 40px 24px;
+}
+
+.map-canvas {
+    flex-grow: 1;
+    margin-top: 24px;
+}
+
+.star-map {
+    flex-grow: 1;
+}
+
+.node {
+    position: absolute;
+    margin: 0;
+    font-size: 13px;
+    border-width: 2px;
+    border-radius: 8px;
+}
+
+.node--battle { border-color: var(--primary); }
+.node--elite { border-color: var(--elite); }
+.node--supply { border-color: var(--supply); }
+.node--boss { border-color: var(--enemy); background-color: #3A1F17; }
+
+.node--open {
+    background-color: #1D3550;
+}
+
+.node--closed {
+    opacity: 0.45;
+}
+
+.node--closed:hover {
+    background-color: var(--panel-raised);
+}
+
+.node--visited {
+    opacity: 0.8;
+    background-color: #1C3326;
+    border-color: var(--good);
+}
+
+.node--current {
+    opacity: 1;
+    border-color: var(--good);
+    background-color: #24503A;
+}
+
+.info-box {
+    background-color: var(--panel-raised);
+    border-radius: 5px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+}
+
+.messages {
+    margin-top: 10px;
+}
+
+/* ---- Deployment and battle bars ---------------------------------------- */
+
+.topbar {
+    flex-direction: row;
+    align-items: center;
+    height: 52px;
+    padding: 0 16px;
+    background-color: var(--panel);
+    border-bottom-width: 1px;
+    border-color: var(--border);
+}
+
+.topbar .h2 {
+    margin-bottom: 0;
+}
+
+.hint {
+    margin-left: 24px;
+}
+
+.side-left {
+    width: 250px;
+    margin: 8px;
+}
+
+.side-right {
+    width: 340px;
+    margin: 8px;
+}
+
+.roster {
+    margin: 6px 0;
+}
+
+.roster-card {
+    flex-direction: column;
+    align-items: stretch;
+    -unity-text-align: upper-left;
+    padding: 6px 10px;
+    margin: 0 0 6px 0;
+}
+
+.roster-card-head {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.roster-card-title {
+    font-size: 14px;
+    -unity-font-style: bold;
+}
+
+.roster-card-state {
+    font-size: 12px;
+    color: var(--muted);
+}
+
+.roster-card--deployed {
+    border-color: var(--good);
+    background-color: #17271F;
+}
+
+.roster-card--selected {
+    border-color: var(--primary);
+    background-color: var(--primary-dark);
+}
+
+.count {
+    min-width: 140px;
+}
+
+.speeds {
+    margin-left: 24px;
+}
+
+.feed {
+    width: 300px;
+    margin: 8px 12px;
+}
+
+.bottombar {
+    flex-direction: row;
+    align-items: center;
+    height: 112px;
+    padding: 10px 16px;
+    background-color: var(--panel);
+    border-top-width: 1px;
+    border-color: var(--border);
+}
+
+.supply-box {
+    width: 360px;
+}
+
+.pips {
+    margin: 6px 0;
+}
+
+.pip {
+    width: 26px;
+    height: 12px;
+    margin-right: 4px;
+    background-color: #202838;
+    border-radius: 2px;
+}
+
+.pip--full {
+    background-color: var(--good);
+}
+
+.net-box {
+    width: 300px;
+    margin-left: 24px;
+}
+
+.skill {
+    width: 170px;
+    height: 86px;
+    margin: 0 0 0 10px;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.skill-name {
+    font-size: 16px;
+    -unity-font-style: bold;
+}
+
+.skill--armed {
+    border-color: var(--bad);
+    background-color: #3A1A1A;
+}
+
+/* ---- Rewards ------------------------------------------------------------- */
+
+.cards {
+    margin: 24px 0;
+}
+
+.reward-card {
+    width: 280px;
+    height: 380px;
+    margin: 0 14px;
+}
+
+.stats {
+    margin-top: 8px;
+}
+
+/* ---- Dialogs ------------------------------------------------------------- */
+
+.modal-backdrop {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-dim);
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog {
+    width: 600px;
+    padding: 24px 28px;
+}
+
+.dialog-body {
+    margin: 10px 0 16px 0;
+}
+
+.dialog-buttons {
+    flex-direction: column;
+}
+
+.dialog--win { border-color: var(--good); }
+.dialog--loss { border-color: var(--bad); }
+
+/* ---- Labels over the ships ---------------------------------------------- */
+
+.unit-tag {
+    position: absolute;
+    align-items: center;
+    translate: -50% -100%;
+}
+
+.unit-tag-status {
+    font-size: 11px;
+    color: var(--text);
+    margin: 0;
+}
+
+.unit-tag-name {
+    font-size: 11px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.unit-bars {
+    height: 6px;
+    background-color: rgba(0, 0, 0, 0.6);
+    margin: 1px 0;
+}
+
+.unit-bars--small { width: 34px; }
+.unit-bars--large { width: 52px; }
+
+.unit-bar-hp {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 3px;
+}
+
+.unit-bar-hp--player { background-color: #66E680; }
+.unit-bar-hp--enemy { background-color: #FF8059; }
+
+.unit-bar-shield {
+    position: absolute;
+    left: 0;
+    top: 3px;
+    height: 2px;
+    background-color: #73CCFF;
+}
