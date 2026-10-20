@@ -217,6 +217,28 @@ Label {
 
 /* ---- Main menu ----------------------------------------------------------- */
 
+/* Shades over the 3D menu scene (MenuScene) so the text stays readable; USS has no
+   gradients, so they are small textures stretched to fit. */
+.shade-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 62%;
+    background-image: resource("StarlineUI/FadeLeft");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+.shade-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22%;
+    background-image: resource("StarlineUI/FadeBottom");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
 /* Left column over the 3D background (design: 1600 x 900 artboard, x2.4 here). */
 .menu-column {
     position: absolute;
@@ -380,6 +402,7 @@ Label {
 .slots {
     align-items: center;
     justify-content: center;
+    background-color: rgba(10, 16, 32, 0.72);
 }
 
 .slots-head {

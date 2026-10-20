@@ -14,6 +14,8 @@ namespace Starline.Client
         private readonly Button _enter;
         private int _selected = -1;
 
+        public override bool UsesMenuScene => true;
+
         public SaveSlotsScreen(GameApp app) : base(app, "SaveSlots")
         {
             _slots = Find<VisualElement>("slots");

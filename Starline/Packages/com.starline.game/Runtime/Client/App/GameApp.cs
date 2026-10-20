@@ -18,6 +18,8 @@ namespace Starline.Client
         public BattleStage Stage { get; private set; }
         public UiRoot Ui { get; private set; }
         public UnitOverlay Overlay { get; private set; }
+        /// <summary>3D night scene behind the main menu and the save slots.</summary>
+        public MenuScene Menu { get; private set; }
         /// <summary>The expedition in progress, or null on the main menu.</summary>
         public ExpeditionRun Run { get; private set; }
         /// <summary>The save slot in use, or null before the first commander is created.</summary>
@@ -40,6 +42,7 @@ namespace Starline.Client
             Stage = new BattleStage(transform, camera);
             Ui = UiRoot.Create(transform);
             Overlay = new UnitOverlay(Ui, Stage);
+            Menu = new MenuScene(transform, camera, Stage.Rig);
         }
 
         private void Start() => ShowMainMenu();
@@ -51,6 +54,7 @@ namespace Starline.Client
                 Profile.playSeconds += Time.unscaledDeltaTime;
             }
             _screen?.Tick(Time.deltaTime);
+            Menu.Tick(Time.unscaledDeltaTime);
             Stage.Tick();
             Overlay.Update();
         }
@@ -97,6 +101,7 @@ namespace Starline.Client
         {
             _screen?.Exit();
             _screen = screen;
+            Menu.SetVisible(screen.UsesMenuScene);
             Ui.SetScreen(screen.Root);
             screen.Enter();
         }

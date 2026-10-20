@@ -1,5 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="main-menu" class="screen backdrop" picking-mode="Ignore">
+    <ui:VisualElement name="main-menu" class="screen" picking-mode="Ignore">
+        <ui:VisualElement class="shade-left" picking-mode="Ignore" />
+        <ui:VisualElement class="shade-bottom" picking-mode="Ignore" />
         <ui:VisualElement class="menu-column" picking-mode="Ignore">
             <ui:Label text="STARLINE" class="menu-logo" picking-mode="Ignore" />
             <ui:VisualElement class="row menu-divider" picking-mode="Ignore">

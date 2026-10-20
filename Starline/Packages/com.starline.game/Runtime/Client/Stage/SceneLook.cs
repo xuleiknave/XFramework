@@ -7,11 +7,20 @@ using UnityEngine.Rendering.Universal;
 namespace Starline.Client
 {
     /// <summary>
-    /// Lighting and post-processing for the sci-fi look: a cool key light, dim blue ambient,
+    /// Lighting and post-processing: a cool key light, dim blue ambient,
     /// and (with URP) HDR bloom so lasers, supply lines and explosions glow.
     /// </summary>
     public static class SceneLook
     {
+        private static readonly Color DayAmbient = new Color(0.16f, 0.2f, 0.3f);
+        private static readonly Color NightAmbient = new Color(0.07f, 0.09f, 0.16f);
+        private static readonly Quaternion SunRotation = Quaternion.Euler(50f, -35f, 0f);
+        /// <summary>Moonlight comes from behind the menu scene (the moon is up and to the left).</summary>
+        private static readonly Quaternion MoonRotation = Quaternion.Euler(28f, 160f, 0f);
+
+        private static Light _sun;
+        private static Light _rim;
+
         public static void Apply(Camera camera)
         {
             camera.clearFlags = CameraClearFlags.SolidColor;
@@ -19,7 +28,7 @@ namespace Starline.Client
             camera.allowHDR = true;
 
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.16f, 0.2f, 0.3f);
+            RenderSettings.ambientLight = DayAmbient;
 
             Light sun = Object.FindFirstObjectByType<Light>();
             if (sun == null)
@@ -30,7 +39,8 @@ namespace Starline.Client
             sun.color = new Color(0.85f, 0.9f, 1f);
             sun.intensity = 1.3f;
             sun.shadows = LightShadows.Soft;
-            sun.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
+            sun.transform.rotation = SunRotation;
+            _sun = sun;
 
             // A warm rim light from the enemy side separates units from the dark floor.
             var rim = new GameObject("Rim").AddComponent<Light>();
@@ -39,6 +49,7 @@ namespace Starline.Client
             rim.intensity = 0.35f;
             rim.shadows = LightShadows.None;
             rim.transform.rotation = Quaternion.Euler(25f, 120f, 0f);
+            _rim = rim;
 
 #if STARLINE_URP
             UniversalAdditionalCameraData data = camera.GetUniversalAdditionalCameraData();
@@ -65,6 +76,25 @@ namespace Starline.Client
             color.contrast.Override(12f);
             color.saturation.Override(8f);
 #endif
+        }
+
+        /// <summary>
+        /// Night lighting for the menu scene: dim blue moonlight from behind, darker ambient, no
+        /// warm rim. The board lighting comes back when <paramref name="night"/> is false.
+        /// </summary>
+        public static void SetNight(bool night)
+        {
+            RenderSettings.ambientLight = night ? NightAmbient : DayAmbient;
+            if (_sun != null)
+            {
+                _sun.color = night ? new Color(0.55f, 0.66f, 1f) : new Color(0.85f, 0.9f, 1f);
+                _sun.intensity = night ? 0.6f : 1.3f;
+                _sun.transform.rotation = night ? MoonRotation : SunRotation;
+            }
+            if (_rim != null)
+            {
+                _rim.enabled = !night;
+            }
         }
 
         /// <summary>Makes a lit material glow a little in its own colour (picked up by bloom).</summary>

@@ -6,6 +6,8 @@ namespace Starline.Client
     /// <summary>Home screen shown at launch (the home port in later versions): start an expedition, switch save slots or quit.</summary>
     public sealed class MainMenuScreen : UiScreen
     {
+        public override bool UsesMenuScene => true;
+
         public MainMenuScreen(GameApp app) : base(app, "MainMenu")
         {
             Button("start", App.StartRunOrCreateCommander);

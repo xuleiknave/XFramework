@@ -13,6 +13,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
 │  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
+│             MenuScene：主菜单和存档界面背后的 3D 夜景          │
 │  UI/        UiRoot（UI Toolkit 根）、主题、字体、角色头顶标签   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
@@ -86,6 +87,12 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
 | 战利品 | `RewardScreen` | `Reward.uxml` |
 | 远征结束 | `RunEndScreen` | `RunEnd.uxml` |
+
+### 主菜单夜景
+
+- 主菜单和存档界面背后是实时 3D 场景 `MenuScene`：灯塔城的源晶塔亮着，远征军围在旁边，往远处的法力水晶只亮了第一座，其余是暗的，最远处有一座燃着绿火的亡灵祭坛；天上是星星和月亮，远处一圈暗色山影。全部用现有部队模型和代码生成的网格拼出来，不需要额外美术资源。
+- 场景放在离棋盘很远的地方（z = 400），界面的 `UsesMenuScene` 为 true 时显示，此时镜头由它控制（缓慢漂移），灯光切到夜间（`SceneLook.SetNight`）；离开时镜头回到布阵位置。
+- 界面上用两张小渐变贴图（`StarlineUI/FadeLeft.png`、`FadeBottom.png`）压暗左侧和底部，保证文字清楚；它们的 .meta 设成不重复平铺、无 mipmap，避免边缘出现细线。
 
 ### 存档位
 

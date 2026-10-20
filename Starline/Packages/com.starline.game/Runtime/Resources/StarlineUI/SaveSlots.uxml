@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="save-slots" class="screen backdrop slots" picking-mode="Ignore">
+    <ui:VisualElement name="save-slots" class="screen slots" picking-mode="Ignore">
         <ui:VisualElement class="slots-head" picking-mode="Ignore">
             <ui:Label text="STARLINE" class="logo" picking-mode="Ignore" />
             <ui:VisualElement class="row divider" picking-mode="Ignore">
