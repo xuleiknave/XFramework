@@ -95,6 +95,8 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 - 界面配置在第一次打开工程时也会自动生成；缺少它时游戏会用临时设置运行，并在 Console 提示。
 - URP 的安装和配置沿用原来的 `UrpInstaller` / `UrpSetup`。
 
+- 舰船模型在 `Resources/StarlineModels/<单位 id>.fbx`，由 `tools/models/build_models.py` 生成（见 [art-direction.md](art-direction.md)）。`ModelLibrary` 按单位 id 加载并换上运行时材质，`UnitView` 按补给状态设置发光颜色；没有模型的单位退回几何体占位。
+
 ## 5. 里程碑
 
 | 里程碑 | 内容 | 状态 |
@@ -102,5 +104,5 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 | M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
 | M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
-| M4 | 美术：舰船模型、星空背景、特效、界面美术 | |
+| M4 | 美术：舰船模型（第一幕 15 个单位已由脚本生成并接入）、星空背景、特效、界面美术 | 进行中 |
 | M5 | 设计文档的 P3：扩展组件、商店、事件、剧情对话系统 | |

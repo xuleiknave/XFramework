@@ -4,8 +4,9 @@ using Starline.Battle;
 namespace Starline.Client
 {
     /// <summary>
-    /// Placeholder visual for one unit, built from primitives. In battle it interpolates
-    /// between the last two simulation positions so movement looks smooth.
+    /// Visual for one unit: the generated model from <see cref="ModelLibrary"/> when there is one,
+    /// otherwise a placeholder built from primitives. In battle it interpolates between the last
+    /// two simulation positions so movement looks smooth.
     /// </summary>
     public sealed class UnitView : MonoBehaviour
     {
@@ -16,6 +17,9 @@ namespace Starline.Client
         private Renderer[] _renderers;
         private Color _baseColor;
         private float _flashUntil;
+        private Material _hull;
+        private Material _glow;
+        private Color _glowColor;
 
         public int UnitId { get; private set; }
         public int Side { get; private set; }
@@ -49,7 +53,15 @@ namespace Starline.Client
                 : def.Id == "wreck_fortress" ? new Color(0.62f, 0.55f, 0.48f)
                 : def.IsStructure ? (side == BoardLayout.PlayerSide ? ViewUtil.SupplyColor : ViewUtil.EnemyColor * 0.85f)
                 : ViewUtil.SideColor(side);
-            view.BuildBody();
+            GameObject model = ModelLibrary.Instantiate(def.Id, root.transform);
+            if (model != null)
+            {
+                view.UseModel(model);
+            }
+            else
+            {
+                view.BuildBody();
+            }
             if (def.IsCraft)
             {
                 position += Vector3.up * CraftHeight;
@@ -60,6 +72,11 @@ namespace Starline.Client
             // Higher stars read as slightly bigger ships.
             root.transform.localScale = Vector3.one * (1f + 0.12f * (star - 1));
             view._renderers = root.GetComponentsInChildren<Renderer>();
+            if (view._hull != null)
+            {
+                view.Height = view.MeasureHeight();
+                return view;
+            }
             foreach (Renderer r in view._renderers)
             {
                 SceneLook.SetGlow(r.material, view._baseColor, def.IsStructure ? 0.35f : 0.2f);
@@ -98,6 +115,10 @@ namespace Starline.Client
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 0.2f);
             }
             transform.position = pos;
+            if (_hull != null)
+            {
+                return; // model colours are updated in LateUpdate
+            }
 
             Color c = Time.time < _flashUntil ? Color.white : _baseColor;
             foreach (Renderer r in _renderers)
@@ -107,6 +128,62 @@ namespace Starline.Client
         }
 
         public void FlashHit() => _flashUntil = Time.time + 0.06f;
+
+        private void UseModel(GameObject model)
+        {
+            _hull = ModelLibrary.CreateHullMaterial();
+            _glow = ModelLibrary.CreateGlowMaterial();
+            ModelLibrary.AssignMaterials(model, _hull, _glow);
+            _glowColor = Def.Id == "brood_mother" ? ViewUtil.HiddenColor
+                : Side == BoardLayout.EnemySide ? ViewUtil.EnemyColor
+                : Def.IsStructure ? ViewUtil.SupplyColor
+                : ViewUtil.PlayerColor;
+        }
+
+        private float MeasureHeight()
+        {
+            float top = transform.position.y;
+            foreach (Renderer r in _renderers)
+            {
+                top = Mathf.Max(top, r.bounds.max.y);
+            }
+            return top - transform.position.y;
+        }
+
+        /// <summary>
+        /// Model look (design: glow strips show supply state): steady side colour when supplied,
+        /// dim pulsing red when cut off, blinking yellow while a strike craft is off-grid.
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (_hull == null)
+            {
+                return;
+            }
+            _hull.SetColor("_EmissionColor", Time.time < _flashUntil ? Color.white * 0.6f : Color.black);
+            Color glow = _glowColor;
+            float strength = 2.5f;
+            if (!Def.IsStructure && !Supplied)
+            {
+                glow = ViewUtil.CutColor;
+                strength = 0.5f + 0.6f * Mathf.PingPong(Time.time * 2f, 1f);
+            }
+            else if (InGrace)
+            {
+                glow = ViewUtil.GraceColor;
+                strength = Mathf.Repeat(Time.time * 2f, 1f) < 0.5f ? 2.5f : 0.8f;
+            }
+            _glow.SetColor("_EmissionColor", glow * strength);
+        }
+
+        private void OnDestroy()
+        {
+            if (_hull != null)
+            {
+                Destroy(_hull);
+                Destroy(_glow);
+            }
+        }
 
         /// <summary>
         /// Placeholder models: angular hulls for the Morningstar fleet, rounded organic
