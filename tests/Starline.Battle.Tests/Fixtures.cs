@@ -58,7 +58,7 @@ namespace Starline.Battle.Tests
 
             return new Encounter
             {
-                Name = "精英战：残骸带伏击",
+                Name = "精英战：古战场伏击",
                 Enemy = enemy,
                 SuggestedPlayer = player,
                 Roster = new List<RosterEntry>

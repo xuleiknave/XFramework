@@ -15,27 +15,27 @@ namespace Starline.Battle.Tests
             Fixtures.LoadGameData();
             Run("配置表：JSON 解析与定点数精确转换", JsonParsing);
             Run("定点数基础运算", FixMath);
-            Run("棋盘坐标：格子中心与补给口", BoardGeometry);
-            Run("布阵规则：重叠、越界、指挥点、补给源", FormationValidation);
-            Run("补给网络：默认阵型的覆盖情况", SuggestedFormationCoverage);
-            Run("补给网络：中间节点被毁后两翼断开", NetworkBreaksWhenMiddleNodeDies);
+            Run("棋盘坐标：格子中心与源口", BoardGeometry);
+            Run("布阵规则：重叠、越界、指挥点、魔网源头", FormationValidation);
+            Run("魔网：默认阵型的覆盖情况", SuggestedFormationCoverage);
+            Run("魔网：中间节点被毁后两翼断开", NetworkBreaksWhenMiddleNodeDies);
             Run("确定性：同种子两次结果完全相同", SameSeedSameResult);
-            Run("断补给：导弹舰打光弹药后停火", UnsuppliedUnitRunsDry);
-            Run("机动单位离网 10 秒内仍算有补给", MobileGracePeriod);
-            Run("克制：2 点防御舰胜 4 飞蝗群", AntiAirBeatsAir);
-            Run("克制：1 战列舰胜 3 撕裂者", HeavyBeatsLight);
-            Run("克制：3 舰载机群胜 1 甲壳兽", AirBeatsHeavy);
-            Run("指挥官技能：轨道打击消耗补给点数并造成范围伤害", OrbitalStrike);
-            Run("指挥官技能：补给点数不足时无法释放", SkillNeedsSupplyPoints);
+            Run("断魔网：奥术法师用光法力后停手", UnsuppliedUnitRunsDry);
+            Run("机动单位离网 10 秒内仍算有魔网", MobileGracePeriod);
+            Run("克制：2 弩手胜 4 怨灵群", AntiAirBeatsAir);
+            Run("克制：1 重甲骑士胜 3 食尸鬼", HeavyBeatsLight);
+            Run("克制：3 狮鹫骑队胜 1 憎恶", AirBeatsHeavy);
+            Run("指挥官技能：陨星术消耗法术点数并造成范围伤害", OrbitalStrike);
+            Run("指挥官技能：法术点数不足时无法释放", SkillNeedsSupplyPoints);
             Run("战斗在时间限制内结束", BattlesEndInTime);
             Run("战前推演：100 场在 5 秒内完成，胜率在合理区间", ForecastIsFastAndBalanced);
-            Run("补给网络影响胜负：去掉中继信标后胜率下降", SupplyMatters);
+            Run("魔网影响胜负：去掉法力水晶后胜率下降", SupplyMatters);
             Run("星级：★2 / ★3 提升耐久和伤害", StarScaling);
-            Run("合成：3 艘同星舰船合成高一星，并保留上阵位置", MergeKeepsPlacement);
+            Run("合成：3 支同星部队合成高一星，并保留上阵位置", MergeKeepsPlacement);
             Run("合成：连锁合成到 ★3", ChainMerge);
-            Run("星图：结构完整，每个节点都能到达 Boss", StarMapIsConnected);
+            Run("地图：结构完整，每个节点都能到达 Boss", StarMapIsConnected);
             Run("远征：失败扣耐久，Boss 失败扣 2，归零结束", DurabilityRules);
-            Run("远征：胜利后三选一，舰船自动上阵", RewardsAndAutoDeploy);
+            Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
             Run("敌方阵容都合法", EncountersAreValid);
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
 
@@ -98,15 +98,15 @@ namespace Starline.Battle.Tests
             Assert(FormationRules.Validate(e.Enemy, 99).Count == 0, "敌方阵型应合法");
 
             Formation f = e.SuggestedPlayer;
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 3), "战列舰占用的格子不能再放");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 3), "重甲骑士占用的格子不能再放");
             Assert(!FormationRules.CanPlace(f, UnitCatalog.Get("battleship"), 5, 7), "2x2 越界");
             Assert(FormationRules.CanPlace(f, UnitCatalog.Frigate, 1, 0), "空格可以放");
-            Assert(!FormationRules.CanPlace(f, UnitCatalog.Relay, 2, 4), "交叉点已有中继信标");
-            Assert(FormationRules.CanPlace(f, UnitCatalog.Relay, 0, 4), "空交叉点可以放中继信标");
+            Assert(!FormationRules.CanPlace(f, UnitCatalog.Relay, 2, 4), "交叉点已有法力水晶");
+            Assert(FormationRules.CanPlace(f, UnitCatalog.Relay, 0, 4), "空交叉点可以放法力水晶");
 
             Formation noSource = f.Clone();
             noSource.Placements.RemoveAll(p => p.Def.IsSupplySource);
-            Assert(FormationRules.Validate(noSource, e.CommandLimit).Count > 0, "缺少补给源应报错");
+            Assert(FormationRules.Validate(noSource, e.CommandLimit).Count > 0, "缺少魔网源头应报错");
             Assert(FormationRules.Validate(f, 5).Count > 0, "指挥点超限应报错");
         }
 
@@ -129,17 +129,17 @@ namespace Starline.Battle.Tests
                 }
                 if (p.UnitId == "missile_ship" && p.Depth == 5 && p.Row == 0)
                 {
-                    Assert(!c, "左下角导弹舰应未接入");
+                    Assert(!c, "左下角奥术法师应未接入");
                 }
                 if (p.UnitId == "battleship")
                 {
-                    Assert(c, "战列舰应已接入");
+                    Assert(c, "重甲骑士应已接入");
                 }
             }
-            Info("默认阵型：" + covered + " / " + total + " 个兵器接入补给");
+            Info("默认阵型：" + covered + " / " + total + " 支部队接入魔网");
             foreach (SupplyNode node in net.Nodes)
             {
-                Assert(node.Connected, "所有节点都应连回补给源");
+                Assert(node.Connected, "所有节点都应连回魔网源头");
             }
         }
 
@@ -154,13 +154,13 @@ namespace Starline.Battle.Tests
             net.AddNode(wing, BoardLayout.Intersection(0, 2, 1), false);   // (-4, -6)
             net.BuildLinks();
             Assert(net.Nodes[2].Connected, "两翼节点通过中间节点连通");
-            Assert(!SupplyNetwork.AreLinked(net.Nodes[0].Position, net.Nodes[2].Position), "补给源和两翼不直接相连");
+            Assert(!SupplyNetwork.AreLinked(net.Nodes[0].Position, net.Nodes[2].Position), "魔网源头和两翼不直接相连");
 
             middle.Hp = Fix.Zero;
             net.Rebuild();
             Assert(!net.Nodes[2].Connected, "中间节点被毁后两翼断开");
             Assert(!net.IsCovered(new FixVec2(-5, -7)), "两翼覆盖区失效");
-            Assert(net.IsCovered(new FixVec2(-9, 1)), "补给源附近仍有覆盖");
+            Assert(net.IsCovered(new FixVec2(-9, 1)), "魔网源头附近仍有覆盖");
         }
 
         private static void SameSeedSameResult()
@@ -195,7 +195,7 @@ namespace Starline.Battle.Tests
             var battle = new BattleSim(setup);
             Unit car = battle.Units[1];
             Assert(car.Def.Id == "missile_ship", "测试单位");
-            Assert(!car.Supplied, "导弹舰开局应未接入补给");
+            Assert(!car.Supplied, "奥术法师开局应未接入魔网");
             const int carried = 3;
             car.Ammo = carried;
 
@@ -213,9 +213,9 @@ namespace Starline.Battle.Tests
                     }
                 }
             }
-            Assert(shots == carried, "断补给时只能打出携带的 " + carried + " 发，实际 " + shots);
-            Assert(car.RanDry, "应记录弹药耗尽");
-            Info("导弹舰最后一发在第 " + lastShotTick / BattleSim.TicksPerSecond + " 秒，之后停火");
+            Assert(shots == carried, "断魔网时只能打出携带的 " + carried + " 发，实际 " + shots);
+            Assert(car.RanDry, "应记录法力耗尽");
+            Info("奥术法师最后一发在第 " + lastShotTick / BattleSim.TicksPerSecond + " 秒，之后停手");
         }
 
         private static void MobileGracePeriod()
@@ -228,13 +228,13 @@ namespace Starline.Battle.Tests
             {
                 battle.Step();
             }
-            Assert(fighter.OffGridTicks > 0, "舰载机群应已离开覆盖范围");
-            Assert(fighter.Supplied, "离网 9 秒内仍算有补给");
+            Assert(fighter.OffGridTicks > 0, "狮鹫骑队应已离开覆盖范围");
+            Assert(fighter.Supplied, "离网 9 秒内仍算有魔网");
             for (int i = 0; i < 3 * BattleSim.TicksPerSecond && !battle.IsOver; i++)
             {
                 battle.Step();
             }
-            Assert(!fighter.IsAlive || !fighter.Supplied || fighter.InCoverage, "离网超过 10 秒后应断补给");
+            Assert(!fighter.IsAlive || !fighter.Supplied || fighter.InCoverage, "离网超过 10 秒后应断魔网");
         }
 
         private static int Duel(string attacker, int na, string defender, int nd, ulong seed)
@@ -296,20 +296,20 @@ namespace Starline.Battle.Tests
             Fix hpBefore = target.Hp + target.Shield;
             battle.Issue(Command.Cast(0, CommanderSkill.OrbitalStrike, target.Position));
             battle.Step();
-            Assert(battle.SupplyPoints(0) < before, "应扣除补给点数");
+            Assert(battle.SupplyPoints(0) < before, "应扣除法术点数");
             Assert(battle.SkillCooldownTicks(0, CommanderSkill.OrbitalStrike) > 0, "应进入冷却");
             for (int i = 0; i < CommanderSkillDef.StrikeDelayTicks + 1; i++)
             {
                 battle.Step();
             }
-            Assert(!target.IsAlive || target.Hp + target.Shield < hpBefore - Fix.FromInt(100), "目标应受到轨道打击伤害");
+            Assert(!target.IsAlive || target.Hp + target.Shield < hpBefore - Fix.FromInt(100), "目标应受到陨星术伤害");
         }
 
         private static void SkillNeedsSupplyPoints()
         {
             Encounter e = Fixtures.WreckFieldAmbush();
             var battle = new BattleSim(e.CreateSetup(e.SuggestedPlayer, 5));
-            Assert(!battle.CanCast(0, CommanderSkill.OrbitalStrike), "开局 2 点补给不足以释放轨道打击");
+            Assert(!battle.CanCast(0, CommanderSkill.OrbitalStrike), "开局 2 点补给不足以释放陨星术");
             battle.Issue(Command.Cast(0, CommanderSkill.OrbitalStrike, new FixVec2(4, 0)));
             battle.Step();
             foreach (BattleEvent ev in battle.Events)
@@ -331,7 +331,7 @@ namespace Starline.Battle.Tests
                 min = Math.Min(min, s);
                 max = Math.Max(max, s);
             }
-            Info("默认阵型对残骸带伏击：每局 " + min + "~" + max + " 秒");
+            Info("默认阵型对古战场伏击：每局 " + min + "~" + max + " 秒");
         }
 
         private static void ForecastIsFastAndBalanced()
@@ -358,8 +358,8 @@ namespace Starline.Battle.Tests
             noRelays.Placements.RemoveAll(p => p.IsRelay);
             double with = BattleForecast.Run(e, e.SuggestedPlayer).WinRate;
             double without = BattleForecast.Run(e, noRelays).WinRate;
-            Info("有中继信标 " + Math.Round(with * 100) + "%，没有中继信标 " + Math.Round(without * 100) + "%");
-            Assert(without < with - 0.1, "去掉中继信标后胜率应明显下降");
+            Info("有法力水晶 " + Math.Round(with * 100) + "%，没有法力水晶 " + Math.Round(without * 100) + "%");
+            Assert(without < with - 0.1, "去掉法力水晶后胜率应明显下降");
         }
     }
 }

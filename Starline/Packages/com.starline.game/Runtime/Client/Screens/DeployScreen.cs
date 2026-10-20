@@ -71,7 +71,7 @@ namespace Starline.Client
             BuildRoster();
 
             Label supply = Find<Label>("supply");
-            supply.text = "补给网络：" + _deploy.SuppliedShips + " / " + _deploy.DeployedShips + " 艘舰船已接入";
+            supply.text = "魔网：" + _deploy.SuppliedShips + " / " + _deploy.DeployedShips + " 支部队已接入";
             supply.EnableInClassList("warn", _deploy.SuppliedShips < _deploy.DeployedShips);
             supply.EnableInClassList("good", _deploy.SuppliedShips >= _deploy.DeployedShips);
             Label notice = Find<Label>("notice");
@@ -86,7 +86,7 @@ namespace Starline.Client
             _roster.Clear();
             int relaysLeft = _deploy.Fleet.RelaysLeft;
             bool relaySelected = _deploy.Selection == DeploySelection.Relay;
-            Button relay = RosterCard("中继信标", "剩 " + relaysLeft + " / " + _deploy.Fleet.Relays + "   指挥 1", "补给节点 · 放在格子交叉点",
+            Button relay = RosterCard("法力水晶", "剩 " + relaysLeft + " / " + _deploy.Fleet.Relays + "   指挥 1", "魔网节点 · 放在格子交叉点",
                 () =>
                 {
                     if (relaySelected)
@@ -156,7 +156,7 @@ namespace Starline.Client
             {
                 Find<Label>("win-rate").text = UnityEngine.Mathf.RoundToInt((float)f.WinRate * 100f) + "%";
                 Find<Label>("win-detail").text = "胜率（±" + UnityEngine.Mathf.RoundToInt((float)f.Margin * 100f) + "%）    平均 "
-                    + UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds) + " 秒    平均损失 " + f.AverageLosses.ToString("0.0") + " 艘";
+                    + UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds) + " 秒    平均损失 " + f.AverageLosses.ToString("0.0") + " 支";
                 VisualElement reasons = Find<VisualElement>("reasons");
                 reasons.Clear();
                 if (f.LossReasons.Count > 0)

@@ -11,17 +11,17 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  App/       GameApp：入口、界面切换、持有当前远征              │
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
-│  Stage/     BattleStage：3D 棋盘、舰船模型、特效、镜头         │
-│  UI/        UiRoot（UI Toolkit 根）、主题、字体、舰船头顶标签   │
+│  Stage/     BattleStage：3D 棋盘、部队模型、特效、镜头         │
+│  UI/        UiRoot（UI Toolkit 根）、主题、字体、部队头顶标签   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
 ┌───────────────▼──────────────────────────────────────────────┐
 │ 内核  Starline.Battle（Runtime/Battle，纯 C#，不依赖 Unity）   │
 │  Data/       JSON 解析、GameData、单位表、克制表               │
-│  Board/      棋盘坐标、布阵规则、补给网络                      │
+│  Board/      棋盘坐标、布阵规则、魔网                      │
 │  Sim/        确定性战斗模拟、指挥官技能                        │
 │  Analysis/   战前推演                                         │
-│  Expedition/ 远征：星图、舰队与合成、奖励、自动布阵、远征配置   │
+│  Expedition/ 远征：地图、远征军与合成、奖励、自动布阵、远征配置   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 读取
 ┌───────────────▼──────────────────────────────────────────────┐
@@ -40,11 +40,11 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 | 文件 | 内容 |
 |---|---|
-| `units.json` | 舰船和敌方单位的固有属性（结构、护盾、伤害、射程、弹药、索敌偏好等） |
+| `units.json` | 部队和敌方单位的固有属性（生命、护盾、伤害、射程、法力、索敌偏好等） |
 | `counters.json` | 克制表：攻击方定位对目标定位的伤害倍率 |
 | `skills.json` | 指挥官技能；星级倍率 |
-| `encounters.json` | 敌方阵容：共用的母巢底座 + 各自的单位 |
-| `expedition.json` | 远征规则（耐久、指挥点、信标上限）、每一幕的开局舰队、星图层、敌人分档、奖池和剧情文本 |
+| `encounters.json` | 敌方阵容：共用的亡灵祭坛底座 + 各自的单位 |
+| `expedition.json` | 远征规则（耐久、指挥点、水晶上限）、每一幕的开局远征军、地图层、敌人分档、奖池和剧情文本 |
 
 - 数值写成十进制小数（最多 4 位），内核按分数精确转换成定点数，同样的数据在任何电脑上算出同样的结果。
 - 数据出错时会报告文件名、行号和字段路径，例如 `units.json 第 12 行：应为 '}'`、`$.units[3].hp：缺少字段`。
@@ -53,7 +53,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 ## 3. 界面（UI Toolkit）
 
-- 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：舰船头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
+- 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：部队头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
 - 每个界面是 `UiScreen` 的子类，布局在 `Resources/StarlineUI/<名字>.uxml`，样式统一在 `Theme.uss`。可以用 Unity 的 UI Builder 直接打开 UXML 调整。
 - 设计分辨率 1600 × 900，按屏幕高度缩放。
 - 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
@@ -65,7 +65,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ```
 MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy ──开战──▶ Battle ──结果弹窗──┐
    ▲                  │  ▲                                                    │
-   │                  │  └──────────── 返回星图 / 选完奖励 ◀── Reward ◀──胜利──┤
+   │                  │  └──────────── 返回地图 / 选完奖励 ◀── Reward ◀──胜利──┤
    │                  └─选补给站：弹窗二选一（留在 Map）                         │
    │                                                Boss 战失败且有耐久 ──▶ Deploy
    └──────────────── RunEnd ◀──── 通关 / 耐久归零 ────────────────────────────┘
@@ -74,7 +74,7 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 | 界面 | 类 | 布局 |
 |---|---|---|
 | 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
-| 星图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
+| 地图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
 | 布阵 | `DeployScreen` + `DeployController` | `Deploy.uxml` |
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
 | 战利品 | `RewardScreen` | `Reward.uxml` |
@@ -102,4 +102,4 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
 | M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
 | M4 | 美术：舰船模型、星空背景、特效、界面美术 | |
-| M5 | 设计文档的 P3：扩展组件、商店、事件、剧情对话系统 | |
+| M5 | 设计文档的 P3：符文、商店、事件、剧情对话系统 | |
