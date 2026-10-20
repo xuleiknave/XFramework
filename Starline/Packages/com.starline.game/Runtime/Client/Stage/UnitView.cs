@@ -135,7 +135,7 @@ namespace Starline.Client
             _glow = ModelLibrary.CreateGlowMaterial();
             ModelLibrary.AssignMaterials(model, _hull, _glow);
             _glowColor = Def.Id == "brood_mother" ? ViewUtil.HiddenColor
-                : Side == BoardLayout.EnemySide ? ViewUtil.EnemyColor
+                : Side == BoardLayout.EnemySide ? ViewUtil.UndeadGlowColor
                 : Def.IsStructure ? ViewUtil.SupplyColor
                 : ViewUtil.PlayerColor;
         }
@@ -151,8 +151,8 @@ namespace Starline.Client
         }
 
         /// <summary>
-        /// Model look (design: glow strips show supply state): steady side colour when supplied,
-        /// dim pulsing red when cut off, blinking yellow while a strike craft is off-grid.
+        /// Model look (art direction: the base ring and magic glow show mana network state): steady side colour when supplied,
+        /// dim pulsing red when cut off, blinking yellow while a griffin squad is off-grid.
         /// </summary>
         private void LateUpdate()
         {
