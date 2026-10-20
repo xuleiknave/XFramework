@@ -1,0 +1,22 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="login" class="screen backdrop login" picking-mode="Ignore">
+        <ui:VisualElement class="login-head" picking-mode="Ignore">
+            <ui:Label text="STARLINE" class="logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row divider" picking-mode="Ignore">
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+                <ui:VisualElement class="diamond" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="星 线" class="logo-sub" picking-mode="Ignore" />
+            <ui:Label text="选择你的指挥官，回到灯塔城。" class="tagline" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="slots" class="row login-slots" picking-mode="Ignore" />
+        <ui:Button name="enter" text="进入灯塔城" class="btn btn-primary btn-large login-enter" />
+        <ui:Label text="双击存档也可以直接进入" class="small muted" picking-mode="Ignore" />
+        <ui:Label name="version" class="login-version small muted" picking-mode="Ignore" />
+        <ui:VisualElement class="row login-corner" picking-mode="Ignore">
+            <ui:Button name="settings" text="设置（下一阶段）" class="btn btn-secondary btn-small" />
+            <ui:Button name="quit" text="退出游戏" class="btn btn-secondary btn-small" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

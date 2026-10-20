@@ -252,6 +252,204 @@ Label {
     bottom: 34px;
 }
 
+.commander {
+    font-size: 34px;
+    color: var(--gold-bright);
+    -unity-text-align: middle-center;
+    margin: -34px 0 34px 0;
+}
+
+/* ---- Login (save slots) ------------------------------------------------- */
+
+.login {
+    align-items: center;
+    justify-content: center;
+}
+
+.login-head {
+    align-items: center;
+    margin-bottom: 115px;
+}
+
+.login .logo {
+    font-size: 154px;
+    letter-spacing: 34px;
+}
+
+.login .logo-sub {
+    font-size: 86px;
+    letter-spacing: 48px;
+    margin: 14px 0 10px 48px;
+}
+
+.login .tagline {
+    margin-bottom: 0;
+}
+
+.divider {
+    width: 1056px;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.divider-line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: var(--supply);
+    opacity: 0.7;
+}
+
+.diamond {
+    width: 17px;
+    height: 17px;
+    margin: 0 29px;
+    background-color: var(--gold-bright);
+    rotate: 45deg;
+}
+
+.eyebrow {
+    letter-spacing: 10px;
+}
+
+.login-slots {
+    margin-bottom: 72px;
+}
+
+.slot-card {
+    width: 816px;
+    height: 720px;
+    margin: 0 43px;
+    padding: 58px 62px 34px 62px;
+    border-radius: 5px;
+    transition-duration: 0.12s;
+}
+
+.slot-card:hover {
+    border-color: var(--gold-bright);
+}
+
+.slot-card--selected {
+    border-color: var(--gold-bright);
+    background-color: var(--panel-raised);
+    translate: 0 -14px;
+}
+
+.slot-card--empty {
+    background-color: rgba(10, 16, 32, 0.7);
+    border-color: rgba(184, 149, 79, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+
+.slot-name {
+    font-size: 72px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin: 10px 0;
+}
+
+.slot-line {
+    height: 2px;
+    background-color: var(--supply);
+    opacity: 0.6;
+    margin: 14px 0 24px 0;
+}
+
+.slot-row {
+    justify-content: space-between;
+    font-size: 34px;
+    margin-bottom: 14px;
+}
+
+.slot-foot {
+    justify-content: flex-end;
+}
+
+.slot-plus {
+    font-size: 106px;
+    color: var(--gold);
+    margin: 24px 0 10px 0;
+}
+
+.slot-new {
+    font-size: 53px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin-bottom: 14px;
+}
+
+.btn-text {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--muted);
+}
+
+.btn-text:hover {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--bad);
+}
+
+.login-enter {
+    min-width: 840px;
+    letter-spacing: 14px;
+}
+
+.login-version {
+    position: absolute;
+    left: 115px;
+    bottom: 77px;
+}
+
+.login-corner {
+    position: absolute;
+    right: 115px;
+    bottom: 62px;
+}
+
+.name-dialog {
+    width: 1440px;
+}
+
+.name-field {
+    margin: 10px 0;
+}
+
+.name-field .unity-base-text-field__input,
+.name-field .unity-text-field__input {
+    background-color: var(--bg);
+    border-width: 2px;
+    border-color: var(--gold-bright);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 58px;
+    letter-spacing: 10px;
+    padding: 24px 38px;
+    min-height: 130px;
+}
+
+.name-hints {
+    justify-content: space-between;
+}
+
+.name-error {
+    min-height: 43px;
+}
+
+.name-buttons {
+    margin-top: 24px;
+}
+
+.name-buttons .btn {
+    margin: 0;
+}
+
+.name-buttons .btn-primary {
+    margin-right: 38px;
+}
+
 /* ---- Star map ------------------------------------------------------------ */
 
 .sidebar {

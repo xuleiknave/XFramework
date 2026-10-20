@@ -8,7 +8,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ┌──────────────────────────────────────────────────────────────┐
 │ Unity 客户端  Starline.Client（Runtime/Client）               │
 │                                                              │
-│  App/       GameApp：入口、界面切换、持有当前远征              │
+│  App/       GameApp：入口、界面切换、持有当前存档和远征        │
+│  Profiles/  存档位：指挥官名字、游戏时长、远征次数（本地 JSON）│
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
 │  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
@@ -64,6 +65,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ### 界面流程
 
 ```
+Login ──选择 / 新建存档──▶ MainMenu（“切换存档”回到 Login）
+
 MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy ──开战──▶ Battle ──结果弹窗──┐
    ▲                  │  ▲                                                    │
    │                  │  └──────────── 返回地图 / 选完奖励 ◀── Reward ◀──胜利──┤
@@ -74,12 +77,20 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 
 | 界面 | 类 | 布局 |
 |---|---|---|
+| 登录页（存档位，含新建指挥官、删除存档弹窗） | `LoginScreen` | `Login.uxml`、`NewCommander.uxml` |
 | 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
 | 地图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
 | 布阵 | `DeployScreen` + `DeployController` | `Deploy.uxml` |
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
 | 战利品 | `RewardScreen` | `Reward.uxml` |
 | 远征结束 | `RunEndScreen` | `RunEnd.uxml` |
+
+### 存档位
+
+- 登录页有 3 个存档位，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
+- 现在存档只记指挥官名字、游戏时长、最近游玩时间和远征次数（`CommanderProfile`）；远征进度、角色收集在 M3 加进同一个文件。
+- 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存。
+- 单机买断制，没有账号；以后接入 Steam 时，云存档同步这个 saves 文件夹即可。
 
 ### 新增一个界面
 
@@ -103,6 +114,6 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 |---|---|---|
 | M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
-| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
+| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 进行中：登录页和存档位已完成 |
 | M4 | 美术：角色模型（第一幕 15 个单位已由脚本生成并接入）、场景背景、特效、界面美术 | 进行中 |
 | M5 | 设计文档的 P3：符文、商店、事件、剧情对话系统 | |
