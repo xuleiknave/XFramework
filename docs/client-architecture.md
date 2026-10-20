@@ -13,7 +13,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
 │  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
-│             MenuScene：主菜单和存档界面背后的 3D 夜景          │
+│             MenuScene：主菜单背后的 3D 夜景（预制体，可编辑）  │
 │  UI/        UiRoot（UI Toolkit 根）、主题、字体、角色头顶标签   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
@@ -90,8 +90,22 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 
 ### 主菜单夜景
 
-- 主菜单和存档界面背后是实时 3D 场景 `MenuScene`：灯塔城的源晶塔亮着，远征军围在旁边，往远处的法力水晶只亮了第一座，其余是暗的，最远处有一座燃着绿火的亡灵祭坛；天上是星星和月亮，远处一圈暗色山影。全部用现有部队模型和代码生成的网格拼出来，不需要额外美术资源。
-- 场景放在离棋盘很远的地方（z = 400），界面的 `UsesMenuScene` 为 true 时显示，此时镜头由它控制（缓慢漂移），灯光切到夜间（`SceneLook.SetNight`）；离开时镜头回到布阵位置。
+- 主菜单和存档界面背后是实时 3D 场景：灯塔城的源晶塔亮着，远征军围在旁边，往远处的法力水晶只亮了第一座，最远处有一座燃着绿火的亡灵祭坛；天上是星星和月亮，远处一圈山影。
+- 场景是预制体 `Assets/Resources/StarlineMenuScene.prefab`，在 Unity 里双击就能编辑。第一次打开工程时自动生成（也可以点菜单 `Starline > 生成主菜单夜景预制体` 重新生成，会覆盖修改）。默认布局写在 `MenuSceneDefaults`，预制体缺失时运行时也用它。
+- 预制体里每样东西都是普通物体，用移动、旋转、缩放工具摆位置，在 Inspector 里改参数：
+
+| 组件 | 用在 | 可以改 |
+|---|---|---|
+| `MenuSceneRoot` | 根物体 | 镜头视角、漂移幅度和速度、夜间环境光、天空颜色 |
+| `Camera Anchor`（子物体） | 镜头位置 | 选中后用 `GameObject > Align With View` 对准场景视图；它上面的 Camera 只用来在编辑器里预览画面 |
+| `MenuProp` | 每个部队 / 建筑 | 单位 id（换模型）、发光颜色和强度、呼吸闪烁、上下浮动 |
+| `MenuGlowLine` | 魔网光带 | 起点、终点物体、两端高度、颜色、宽度 |
+| `MenuSky` / `MenuMountains` | 星空 / 山影 | 数量、随机种子、距离、高度、颜色 |
+| `MenuTint` | 地面、月亮 | 颜色、是否自发光 |
+| `Moonlight`、`源晶塔灯光` | 普通 Light | 颜色、强度、方向；`MenuLightPulse` 让塔光缓慢呼吸 |
+
+- 模型、网格和材质都是运行时（编辑器里也会）按参数生成的，不会存进预制体，所以预制体文件很小，改了参数立刻看到效果。
+- 场景放在离棋盘很远的地方（z = 400），界面的 `UsesMenuScene` 为 true 时显示，期间镜头跟着 `Camera Anchor`，棋盘的太阳光和轮廓光关掉（`SceneLook.SetNight`）；离开时镜头回到布阵位置。
 - 界面上用两张小渐变贴图（`StarlineUI/FadeLeft.png`、`FadeBottom.png`）压暗左侧和底部，保证文字清楚；它们的 .meta 设成不重复平铺、无 mipmap，避免边缘出现细线。
 
 ### 存档位

@@ -13,10 +13,7 @@ namespace Starline.Client
     public static class SceneLook
     {
         private static readonly Color DayAmbient = new Color(0.16f, 0.2f, 0.3f);
-        private static readonly Color NightAmbient = new Color(0.07f, 0.09f, 0.16f);
-        private static readonly Quaternion SunRotation = Quaternion.Euler(50f, -35f, 0f);
-        /// <summary>Moonlight comes from behind the menu scene (the moon is up and to the left).</summary>
-        private static readonly Quaternion MoonRotation = Quaternion.Euler(28f, 160f, 0f);
+        private static readonly Color DaySky = new Color(0.02f, 0.03f, 0.06f);
 
         private static Light _sun;
         private static Light _rim;
@@ -24,7 +21,7 @@ namespace Starline.Client
         public static void Apply(Camera camera)
         {
             camera.clearFlags = CameraClearFlags.SolidColor;
-            camera.backgroundColor = new Color(0.02f, 0.03f, 0.06f);
+            camera.backgroundColor = DaySky;
             camera.allowHDR = true;
 
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
@@ -39,7 +36,7 @@ namespace Starline.Client
             sun.color = new Color(0.85f, 0.9f, 1f);
             sun.intensity = 1.3f;
             sun.shadows = LightShadows.Soft;
-            sun.transform.rotation = SunRotation;
+            sun.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
             _sun = sun;
 
             // A warm rim light from the enemy side separates units from the dark floor.
@@ -79,17 +76,20 @@ namespace Starline.Client
         }
 
         /// <summary>
-        /// Night lighting for the menu scene: dim blue moonlight from behind, darker ambient, no
-        /// warm rim. The board lighting comes back when <paramref name="night"/> is false.
+        /// Lighting while the menu scene shows: the board's sun and rim go dark (the menu
+        /// prefab brings its own moonlight), with the scene's ambient and sky colours.
         /// </summary>
-        public static void SetNight(bool night)
+        public static void SetNight(bool night, Color ambient, Color sky)
         {
-            RenderSettings.ambientLight = night ? NightAmbient : DayAmbient;
+            RenderSettings.ambientLight = night ? ambient : DayAmbient;
+            Camera camera = Camera.main;
+            if (camera != null)
+            {
+                camera.backgroundColor = night ? sky : DaySky;
+            }
             if (_sun != null)
             {
-                _sun.color = night ? new Color(0.55f, 0.66f, 1f) : new Color(0.85f, 0.9f, 1f);
-                _sun.intensity = night ? 0.6f : 1.3f;
-                _sun.transform.rotation = night ? MoonRotation : SunRotation;
+                _sun.enabled = !night;
             }
             if (_rim != null)
             {

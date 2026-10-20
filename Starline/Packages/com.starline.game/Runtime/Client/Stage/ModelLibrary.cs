@@ -89,7 +89,7 @@ namespace Starline.Client
                 // (URP Lit, or Standard without URP) and is always included in builds.
                 GameObject probe = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 _lit = probe.GetComponent<Renderer>().sharedMaterial.shader;
-                Object.Destroy(probe);
+                ViewUtil.DestroySafe(probe);
             }
             return _lit;
         }
