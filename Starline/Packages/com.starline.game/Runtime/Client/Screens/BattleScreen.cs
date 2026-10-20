@@ -152,8 +152,8 @@ namespace Starline.Client
             {
                 "用时 " + Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒",
                 "我方损失 " + (sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide))
-                    + " 支，击败敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
-                    + (won ? "（倒下的部队战后全部恢复）" : ""),
+                    + " 名，击败敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
+                    + (won ? "（倒下的角色战后全部恢复）" : ""),
             };
             SideStats stats = sim.Stats[BoardLayout.PlayerSide];
             if (stats.RelaysLost > 0)

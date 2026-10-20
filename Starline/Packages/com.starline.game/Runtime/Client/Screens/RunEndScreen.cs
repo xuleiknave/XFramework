@@ -14,7 +14,7 @@ namespace Starline.Client
             Find<Label>("title").text = won ? story.VictoryTitle : story.DefeatTitle;
             Find<Label>("story").text = won ? story.Victory : story.Defeat;
             Find<Label>("summary").text = "本次远征：战斗 " + run.BattlesWon + " 胜 / " + run.BattlesFought + " 场，剩余耐久 "
-                + run.Durability + "，远征军 " + run.Fleet.Ships.Count + " 支部队。";
+                + run.Durability + "，远征军 " + run.Fleet.Ships.Count + " 名角色。";
             Find<VisualElement>("panel").EnableInClassList("dialog--win", won);
             Find<VisualElement>("panel").EnableInClassList("dialog--loss", !won);
             Button("again", App.StartRun);

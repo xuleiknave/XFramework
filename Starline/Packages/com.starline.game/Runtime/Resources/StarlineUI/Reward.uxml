@@ -1,7 +1,7 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement class="screen backdrop center" picking-mode="Ignore">
         <ui:Label text="战利品：三选一" class="h1" />
-        <ui:Label text="收编一支部队，或者带走一个法力水晶。新部队会自动上阵，可以在布阵时调整。" class="body muted" />
+        <ui:Label text="招募一名角色，或者带走一个法力水晶。新角色会自动上阵，可以在布阵时调整。" class="body muted" />
         <ui:VisualElement name="cards" class="row cards" />
         <ui:Button name="skip" text="跳过" class="btn btn-secondary" />
     </ui:VisualElement>

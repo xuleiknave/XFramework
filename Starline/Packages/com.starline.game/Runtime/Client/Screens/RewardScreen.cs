@@ -43,8 +43,8 @@ namespace Starline.Client
                 if (option.Star < UnitDef.MaxStar && owned > 0)
                 {
                     card.Add(owned >= 2
-                        ? Ui.Label("已有 2 支同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")
-                        : Ui.Label("已有 1 支同星（3 支合成 " + Ui.Stars(option.Star + 1) + "）", "small", "muted"));
+                        ? Ui.Label("已有 2 名同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")
+                        : Ui.Label("已有 1 名同星（3 名合成 " + Ui.Stars(option.Star + 1) + "）", "small", "muted"));
                 }
             }
             card.Add(Ui.Box("spacer"));

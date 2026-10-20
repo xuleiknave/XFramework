@@ -231,13 +231,23 @@ def base(b, r, colour="stone_dark", sides=8, h=0.08):
     b.ring(P(0, 0, h * 0.5), r, 0.03, GLOW, segments=max(12, sides * 2))
 
 
+def scaled(b, k, fn, pivot=(0.0, 0.0, 0.08)):
+    """调用 fn 画出部件，再把新画的部分以底座顶面中心为基点放大 k 倍（单个角色要比原来小队里的小人大，才看得清）。"""
+    before = set(b.bm.verts)
+    fn()
+    c = Vector(pivot)
+    for v in b.bm.verts:
+        if v not in before:
+            v.co = c + (v.co - c) * k
+
+
 def gem(b, centre, radii, colour=GLOW, rot=(0.0, 0.0, 0.0)):
     """双锥形水晶。"""
     b.ball(centre, radii, colour, segments=4, rings=2, rot=rot)
 
 
 def figure(b, f, x, h=0.72, cloth="cloth_blue", armor="steel", head="skin", hat=None, robe=False, z0=0.08):
-    """低多边形小人，面朝前方。返回右手和左手的位置，用来挂武器。"""
+    """低多边形人形，面朝前方。返回右手和左手的位置，用来挂武器。"""
     s = h / 0.75
 
     def z(v):
@@ -285,55 +295,65 @@ def _mounted_knight(b, f, x):
     b.rod(P(f - 0.4, x + 0.2, 1.15), P(f + 1.15, x + 0.2, 1.45), 0.045, 0.012, "wood", 5)
 
 
-def battleship(b):  # 重甲骑士
+def battleship(b):  # 重甲骑士：一名骑白马、披蓝马衣的骑士
     base(b, 1.65, sides=10)
-    _mounted_knight(b, 0.2, -0.6)
-    _mounted_knight(b, -0.25, 0.6)
+    scaled(b, 1.25, lambda: _mounted_knight(b, 0.0, 0.0))
+
+
+def _ranger(b):
+    right, left = figure(b, 0.0, 0.0, cloth="cloth_navy", armor="leather", hat="hood")
+    b.chain([left + Vector((0, 0, -0.25)), left + Vector((0, -0.06, 0)), left + Vector((0, 0, 0.3))],
+            0.022, 0.018, "wood", 4)
+    b.box(P(-0.1, 0.05, 0.6), (0.06, 0.08, 0.26), "leather")
+    b.ball(right + Vector((0, -0.05, 0)), (0.03, 0.03, 0.03), GLOW, 4, 2)
 
 
 def frigate(b):  # 游侠
     base(b, 0.75)
-    for f, x in ((0.22, 0.0), (-0.18, -0.3), (-0.18, 0.3)):
-        right, left = figure(b, f, x, cloth="cloth_navy", armor="leather", hat="hood")
-        b.chain([left + Vector((0, 0, -0.25)), left + Vector((0, -0.06, 0)), left + Vector((0, 0, 0.3))],
-                0.022, 0.018, "wood", 4)
-        b.box(P(f - 0.1, x + 0.05, 0.6), (0.06, 0.08, 0.26), "leather")
-        b.ball(right + Vector((0, -0.05, 0)), (0.03, 0.03, 0.03), GLOW, 4, 2)
+    scaled(b, 1.7, lambda: _ranger(b))
+
+
+def _mage(b):
+    right, _ = figure(b, 0.0, 0.0, h=0.78, cloth="cloth_blue", armor="white", hat="wizard", robe=True)
+    b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.05)), 0.022, 0.02, "wood", 5)
+    gem(b, Vector((right.x, right.y, 1.13)), (0.06, 0.06, 0.11))
 
 
 def missile_ship(b):  # 奥术法师：法杖水晶和环绕的法力球表示剩余法力
     base(b, 0.75)
-    for f, x in ((0.12, -0.22), (-0.12, 0.25)):
-        right, _ = figure(b, f, x, h=0.78, cloth="cloth_blue", armor="white", hat="wizard", robe=True)
-        b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.05)), 0.022, 0.02, "wood", 5)
-        gem(b, Vector((right.x, right.y, 1.13)), (0.06, 0.06, 0.11))
+    scaled(b, 1.6, lambda: _mage(b))
     for a in (0.4, 2.5, 4.6):
-        b.ball(P(0.45 * math.cos(a), 0.45 * math.sin(a), 0.95), (0.05, 0.05, 0.05), GLOW, 6, 4)
+        b.ball(P(0.55 * math.cos(a), 0.55 * math.sin(a), 1.3), (0.06, 0.06, 0.06), GLOW, 6, 4)
+
+
+def _crossbowman(b):
+    right, _ = figure(b, 0.0, 0.0, armor="steel", hat="helm")
+    tip = right + Vector((0, -0.25, 0.32))
+    b.rod(right, tip, 0.025, 0.02, "wood", 4)
+    b.rod(tip + Vector((-0.12, 0.04, -0.04)), tip + Vector((0.12, 0.04, -0.04)), 0.015, 0.015, "steel_dark", 4)
+    b.ball(tip, (0.025, 0.025, 0.025), GLOW, 4, 2)
+    b.box(P(0.22, -0.08, 0.3), (0.22, 0.04, 0.42), "cloth_blue")
 
 
 def pd_ship(b):  # 弩手：弩斜指天空，专打狮鹫
     base(b, 0.75)
-    for f, x in ((0.2, 0.0), (-0.18, -0.3), (-0.18, 0.3)):
-        right, _ = figure(b, f, x, armor="steel", hat="helm")
-        tip = right + Vector((0, -0.25, 0.32))
-        b.rod(right, tip, 0.025, 0.02, "wood", 4)
-        b.rod(tip + Vector((-0.12, 0.04, -0.04)), tip + Vector((0.12, 0.04, -0.04)), 0.015, 0.015, "steel_dark", 4)
-        b.ball(tip, (0.025, 0.025, 0.025), GLOW, 4, 2)
-        b.box(P(f + 0.22, x - 0.08, 0.3), (0.22, 0.04, 0.42), "cloth_blue")
+    scaled(b, 1.7, lambda: _crossbowman(b))
 
 
-def strike_craft(b):  # 狮鹫骑队（悬空，高度由客户端另加）
-    for f, x, z in ((0.25, -0.35, 0.05), (-0.25, 0.35, -0.05)):
-        b.ball(P(f, x, z), (0.17, 0.4, 0.17), "griffin")
-        b.ball(P(f + 0.42, x, z + 0.12), (0.12, 0.12, 0.12), "feather", 6, 4)
-        b.rod(P(f + 0.5, x, z + 0.12), P(f + 0.66, x, z + 0.07), 0.045, 0.005, "gold", 4)
-        mirror(lambda s, f=f, x=x, z=z: b.box(P(f + 0.05, x + s * 0.4, z + 0.12), (0.62, 0.3, 0.025), "feather",
-                                              rot=(0, s * 25, 0)))
-        b.rod(P(f - 0.35, x, z), P(f - 0.68, x, z + 0.1), 0.045, 0.01, "griffin", 4)
-        b.box(P(f, x, z + 0.24), (0.14, 0.14, 0.2), "cloth_blue")
-        b.ball(P(f, x, z + 0.4), (0.07, 0.07, 0.07), "steel", 6, 4)
-        b.rod(P(f - 0.1, x + 0.1, z + 0.28), P(f + 0.55, x + 0.1, z + 0.36), 0.02, 0.01, "wood", 4)
-        b.ball(P(f + 0.56, x + 0.1, z + 0.36), (0.03, 0.03, 0.03), GLOW, 4, 2)
+def _griffin(b, f, x, z):
+    b.ball(P(f, x, z), (0.17, 0.4, 0.17), "griffin")
+    b.ball(P(f + 0.42, x, z + 0.12), (0.12, 0.12, 0.12), "feather", 6, 4)
+    b.rod(P(f + 0.5, x, z + 0.12), P(f + 0.66, x, z + 0.07), 0.045, 0.005, "gold", 4)
+    mirror(lambda s: b.box(P(f + 0.05, x + s * 0.4, z + 0.12), (0.62, 0.3, 0.025), "feather", rot=(0, s * 25, 0)))
+    b.rod(P(f - 0.35, x, z), P(f - 0.68, x, z + 0.1), 0.045, 0.01, "griffin", 4)
+    b.box(P(f, x, z + 0.24), (0.14, 0.14, 0.2), "cloth_blue")
+    b.ball(P(f, x, z + 0.4), (0.07, 0.07, 0.07), "steel", 6, 4)
+    b.rod(P(f - 0.1, x + 0.1, z + 0.28), P(f + 0.55, x + 0.1, z + 0.36), 0.02, 0.01, "wood", 4)
+    b.ball(P(f + 0.56, x + 0.1, z + 0.36), (0.03, 0.03, 0.03), GLOW, 4, 2)
+
+
+def strike_craft(b):  # 狮鹫骑士（悬空，高度由客户端另加）
+    scaled(b, 1.35, lambda: _griffin(b, 0.0, 0.0, 0.0), pivot=(0.0, 0.0, 0.0))
 
 
 def supply_ship(b):  # 源晶塔：魔网源头，正面的光环是源口
@@ -406,8 +426,7 @@ def _ghoul(b, f, x):
 
 def ripper(b):  # 食尸鬼
     base(b, 0.75)
-    for f, x in ((0.2, 0.0), (-0.2, -0.3), (-0.15, 0.32)):
-        _ghoul(b, f, x)
+    scaled(b, 1.9, lambda: _ghoul(b, -0.1, 0.0))
 
 
 def crawler(b):  # 憎恶
@@ -425,13 +444,16 @@ def crawler(b):  # 憎恶
     b.chain([P(0.22, -0.46, 0.5), P(0.3, -0.5, 0.3), P(0.4, -0.46, 0.38)], 0.025, 0.015, "iron", 4)
 
 
-def locust(b):  # 怨灵群（悬空）
-    for f, x, z in ((0.35, 0.0, 0.1), (0.0, -0.42, 0.0), (0.05, 0.42, -0.05), (-0.35, 0.05, 0.08)):
-        b.rod(P(f, x, z + 0.2), P(f - 0.18, x, z - 0.38), 0.13, 0.01, "ghost", 6)
-        b.ball(P(f + 0.01, x, z + 0.27), (0.11, 0.12, 0.12), "rot_dark", 6, 4)
-        b.ball(P(f + 0.08, x, z + 0.26), (0.05, 0.03, 0.03), GLOW, 4, 2)
-        mirror(lambda s, f=f, x=x, z=z: b.rod(P(f + 0.02, x + s * 0.1, z + 0.15),
-                                              P(f + 0.28, x + s * 0.16, z - 0.02), 0.03, 0.005, "ghost", 4))
+def _wraith(b, f, x, z):
+    b.rod(P(f, x, z + 0.2), P(f - 0.18, x, z - 0.38), 0.13, 0.01, "ghost", 6)
+    b.ball(P(f + 0.01, x, z + 0.27), (0.11, 0.12, 0.12), "rot_dark", 6, 4)
+    b.ball(P(f + 0.08, x, z + 0.26), (0.05, 0.03, 0.03), GLOW, 4, 2)
+    mirror(lambda s: b.rod(P(f + 0.02, x + s * 0.1, z + 0.15), P(f + 0.28, x + s * 0.16, z - 0.02), 0.03, 0.005,
+                           "ghost", 4))
+
+
+def locust(b):  # 怨灵（悬空）
+    scaled(b, 2.3, lambda: _wraith(b, 0.0, 0.0, 0.0), pivot=(0.0, 0.0, 0.0))
 
 
 def acid_turret(b):  # 毒雾骨塔

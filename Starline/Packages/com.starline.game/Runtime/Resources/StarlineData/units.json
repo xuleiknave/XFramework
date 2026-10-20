@@ -1,18 +1,18 @@
 {
-  "_说明": "我方部队和敌方单位的固有属性（设计文档 8.1）。距离单位：1 格 = 2；时间单位：秒。缺省字段为 0 / false。",
+  "_说明": "我方角色和敌方单位的固有属性（设计文档 8.1）。距离单位：1 格 = 2；时间单位：秒。缺省字段为 0 / false。",
   "units": [
     {"id": "supply_ship", "description": "远征军随行的法力源头。前沿中点是源口，魔网连线从这里出发。", "name": "源晶塔", "role": "Structure", "size": 2, "commandCost": 0, "hp": 900, "shield": 200, "shieldRegen": 10, "radius": 1.8, "supplySource": true},
     {"id": "relay", "description": "魔网节点。覆盖周围 2 格，同一条格线上 3 格内的节点自动连线。", "name": "法力水晶", "role": "Structure", "size": 0, "commandCost": 1, "hp": 160, "shield": 40, "shieldRegen": 4, "radius": 0.6, "relay": true},
-    {"id": "battleship", "description": "披重甲的骑士方阵，顶在前排吸收伤害，专克轻装单位。", "name": "重甲骑士", "role": "Heavy", "size": 2, "commandCost": 4, "hp": 700, "shield": 200, "shieldRegen": 12, "damage": 30, "fireInterval": 1.2, "range": 4, "speed": 2.2, "radius": 1.6},
+    {"id": "battleship", "description": "骑着战马的重甲骑士，顶在前排吸收伤害，专克轻装单位。", "name": "重甲骑士", "role": "Heavy", "size": 2, "commandCost": 4, "hp": 700, "shield": 200, "shieldRegen": 12, "damage": 30, "fireInterval": 1.2, "range": 4, "speed": 2.2, "radius": 1.6},
     {"id": "frigate", "description": "身手敏捷的游侠，突进去切掉敌方远程单位。", "name": "游侠", "role": "Light", "commandCost": 2, "hp": 260, "shield": 60, "shieldRegen": 6, "damage": 14, "fireInterval": 0.6, "range": 3, "speed": 4.5, "radius": 0.8, "prefers": ["Artillery"]},
-    {"id": "pd_ship", "description": "密集的弩箭火网，专门射落狮鹫和怨灵群。", "name": "弩手", "role": "PointDefense", "commandCost": 1, "hp": 200, "shield": 40, "shieldRegen": 5, "damage": 10, "fireInterval": 0.4, "range": 7, "speed": 3, "radius": 0.8, "ammo": 40, "ammoRefill": 0.5, "prefers": ["Craft"]},
+    {"id": "pd_ship", "description": "密集的弩箭火网，专门射落狮鹫和怨灵。", "name": "弩手", "role": "PointDefense", "commandCost": 1, "hp": 200, "shield": 40, "shieldRegen": 5, "damage": 10, "fireInterval": 0.4, "range": 7, "speed": 3, "radius": 0.8, "ammo": 40, "ammoRefill": 0.5, "prefers": ["Craft"]},
     {"id": "missile_ship", "description": "超远射程的奥术轰击，自身法力有限，必须待在魔网覆盖内。", "name": "奥术法师", "role": "Artillery", "commandCost": 2, "hp": 160, "shield": 30, "shieldRegen": 4, "damage": 34, "fireInterval": 1.5, "range": 12, "speed": 2.5, "radius": 0.8, "ammo": 12, "ammoRefill": 1, "prefers": ["Heavy"]},
-    {"id": "strike_craft", "description": "机动的空中骑队，可以离网 10 秒绕后，优先攻击魔网节点和远程单位。", "name": "狮鹫骑队", "role": "Craft", "commandCost": 1, "hp": 120, "shield": 30, "shieldRegen": 4, "damage": 9, "fireInterval": 0.5, "range": 2.5, "speed": 7, "radius": 0.6, "ammo": 30, "ammoRefill": 0.5, "offGridGrace": 10, "prefers": ["Structure", "Artillery"]},
+    {"id": "strike_craft", "description": "骑狮鹫的空中骑士，可以离网 10 秒绕后，优先攻击魔网节点和远程单位。", "name": "狮鹫骑士", "role": "Craft", "commandCost": 1, "hp": 120, "shield": 30, "shieldRegen": 4, "damage": 9, "fireInterval": 0.5, "range": 2.5, "speed": 7, "radius": 0.6, "ammo": 30, "ammoRefill": 0.5, "offGridGrace": 10, "prefers": ["Structure", "Artillery"]},
     {"id": "hive", "name": "亡灵祭坛", "role": "Structure", "size": 2, "hp": 900, "shield": 200, "shieldRegen": 10, "radius": 1.8, "supplySource": true},
     {"id": "hive_node", "name": "骨碑", "role": "Structure", "size": 0, "hp": 160, "shield": 40, "shieldRegen": 4, "radius": 0.6, "relay": true},
     {"id": "ripper", "name": "食尸鬼", "role": "Light", "hp": 220, "shield": 20, "shieldRegen": 4, "damage": 16, "fireInterval": 0.6, "range": 1.8, "speed": 5, "radius": 0.8, "prefers": ["Artillery"]},
     {"id": "crawler", "name": "憎恶", "role": "Heavy", "hp": 480, "shield": 60, "shieldRegen": 6, "damage": 20, "fireInterval": 1, "range": 2.5, "speed": 2.5, "radius": 1},
-    {"id": "locust", "name": "怨灵群", "role": "Craft", "hp": 110, "damage": 9, "fireInterval": 0.5, "range": 2.5, "speed": 7, "radius": 0.6, "ammo": 30, "ammoRefill": 0.5, "offGridGrace": 10, "prefers": ["Structure", "Artillery"]},
+    {"id": "locust", "name": "怨灵", "role": "Craft", "hp": 110, "damage": 9, "fireInterval": 0.5, "range": 2.5, "speed": 7, "radius": 0.6, "ammo": 30, "ammoRefill": 0.5, "offGridGrace": 10, "prefers": ["Structure", "Artillery"]},
     {"id": "acid_turret", "name": "毒雾骨塔", "role": "Artillery", "hp": 300, "shield": 40, "shieldRegen": 4, "damage": 30, "fireInterval": 1.6, "range": 13, "radius": 1, "ammo": 10, "ammoRefill": 1.2, "prefers": ["Heavy"]},
     {"id": "brood_mother", "name": "缝合巨怪", "role": "Heavy", "size": 2, "hp": 1100, "shield": 200, "shieldRegen": 10, "damage": 40, "fireInterval": 1.5, "range": 4, "heavySalvoEvery": 4, "speed": 1.8, "radius": 1.6},
     {"id": "wreck_fortress", "name": "骸骨要塞", "role": "Heavy", "size": 2, "hp": 2000, "shield": 400, "shieldRegen": 12, "damage": 34, "fireInterval": 1.2, "range": 9, "heavySalvoEvery": 3, "radius": 1.8}

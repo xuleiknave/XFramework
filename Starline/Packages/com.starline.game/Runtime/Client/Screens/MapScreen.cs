@@ -106,7 +106,7 @@ namespace Starline.Client
             }
             _infoTitle.text = TypeName(node.Type) + " · " + _names[node.Id];
             _infoBody.text = _briefings[node.Id];
-            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一个 ★★ 部队"
+            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一名 ★★ 角色"
                 : node.Type == NodeType.Boss ? "胜利：通关本幕    失败：耐久 −" + ExpeditionConfig.Current.BossLoss + "，可以重打"
                 : node.Type == NodeType.Supply ? ""
                 : "胜利：三选一    失败：耐久 −" + ExpeditionConfig.Current.NormalLoss;
