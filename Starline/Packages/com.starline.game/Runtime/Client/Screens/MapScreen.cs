@@ -187,9 +187,10 @@ namespace Starline.Client
         private const float NodeWidth = 317f;
         private const float NodeHeight = 134f;
 
-        private static readonly Color LineIdle = new Color(0.3f, 0.36f, 0.45f);
-        private static readonly Color LineOpen = new Color(0.55f, 0.8f, 1f);
-        private static readonly Color LineTravelled = new Color(0.45f, 0.9f, 0.6f);
+        // 星夜金边: unvisited roads dim, open roads gold, travelled roads lit in mana teal.
+        private static readonly Color LineIdle = new Color(0.23f, 0.28f, 0.4f);
+        private static readonly Color LineOpen = new Color(0.91f, 0.78f, 0.48f);
+        private static readonly Color LineTravelled = new Color(0.44f, 0.82f, 0.71f);
 
         private readonly ExpeditionRun _run;
         private readonly Dictionary<int, Button> _buttons = new Dictionary<int, Button>();

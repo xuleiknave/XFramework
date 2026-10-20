@@ -1,17 +1,23 @@
 /*
  * Starline UI theme. Every screen uses these classes; layouts are designed for 3840 x 2160 (4K)
  * and scaled to the screen height (see Ui.ConfigurePanel).
+ * Style "星夜金边" (docs/art-direction.md): night-blue panels with thin gold borders, gold titles,
+ * gold primary buttons, and the mana teal for selection and progress.
  */
 
 :root, .starline {
-    --bg: #0B111B;
-    --bg-dim: rgba(5, 8, 14, 0.72);
-    --panel: rgba(18, 26, 39, 0.94);
-    --panel-solid: #121A27;
-    --panel-raised: #1A2536;
-    --border: #2C3A50;
-    --text: #E3E9F2;
-    --muted: #93A1B5;
+    --bg: #0A1020;
+    --bg-dim: rgba(5, 8, 16, 0.75);
+    --panel: rgba(17, 26, 46, 0.94);
+    --panel-solid: #111A2E;
+    --panel-raised: #18233B;
+    --border: #26314A;
+    --gold: #B8954F;
+    --gold-bright: #E8C77A;
+    --gold-button: #D9B46A;
+    --gold-ink: #1A1408;
+    --text: #EDE6D6;
+    --muted: #9AA5B8;
     --primary: #5AB8FF;
     --primary-dark: #13243A;
     --good: #6FD08C;
@@ -80,8 +86,8 @@
 .panel {
     background-color: var(--panel);
     border-width: 2px;
-    border-color: var(--border);
-    border-radius: 14px;
+    border-color: var(--gold);
+    border-radius: 5px;
     padding: 34px 38px;
 }
 
@@ -94,12 +100,15 @@ Label {
 .h1 {
     font-size: 67px;
     -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
     margin-bottom: 14px;
 }
 
 .h2 {
     font-size: 48px;
     -unity-font-style: bold;
+    color: var(--gold-bright);
     margin-bottom: 10px;
 }
 
@@ -122,7 +131,7 @@ Label {
 .big {
     font-size: 115px;
     -unity-font-style: bold;
-    color: var(--primary);
+    color: var(--text);
 }
 
 .stat {
@@ -142,7 +151,7 @@ Label {
     background-color: var(--panel-raised);
     border-width: 2px;
     border-color: var(--border);
-    border-radius: 12px;
+    border-radius: 5px;
     color: var(--text);
     font-size: 34px;
     padding: 14px 29px;
@@ -154,12 +163,12 @@ Label {
 }
 
 .btn:hover {
-    border-color: var(--primary);
-    background-color: #22324A;
+    border-color: var(--gold-bright);
+    background-color: #202D48;
 }
 
 .btn:active {
-    background-color: var(--primary-dark);
+    background-color: #0E1628;
 }
 
 .btn:disabled {
@@ -167,17 +176,26 @@ Label {
 }
 
 .btn-primary {
-    background-color: #1D4E7A;
-    border-color: var(--primary);
+    background-color: var(--gold-button);
+    border-color: #F3DDA0;
+    color: var(--gold-ink);
     -unity-font-style: bold;
+    letter-spacing: 5px;
 }
 
 .btn-primary:hover {
-    background-color: #2A649A;
+    background-color: var(--gold-bright);
+    border-color: #FFF0C8;
+}
+
+.btn-primary:active {
+    background-color: #B8954F;
 }
 
 .btn-secondary {
     background-color: transparent;
+    border-color: var(--gold);
+    color: var(--gold-bright);
 }
 
 .btn-large {
@@ -192,9 +210,9 @@ Label {
 }
 
 .btn-toggled {
-    background-color: var(--primary-dark);
-    border-color: var(--primary);
-    color: var(--primary);
+    background-color: #0E1628;
+    border-color: var(--gold-bright);
+    color: var(--gold-bright);
 }
 
 /* ---- Main menu ----------------------------------------------------------- */
@@ -207,14 +225,16 @@ Label {
 .logo {
     font-size: 134px;
     -unity-font-style: bold;
-    color: var(--primary);
+    color: var(--gold-bright);
     -unity-text-align: middle-center;
     letter-spacing: 29px;
 }
 
 .logo-sub {
     font-size: 53px;
-    color: var(--muted);
+    -unity-font-style: bold;
+    color: var(--text);
+    letter-spacing: 38px;
     -unity-text-align: middle-center;
     margin-bottom: 24px;
 }
@@ -261,13 +281,14 @@ Label {
     border-radius: 19px;
 }
 
-.node--battle { border-color: var(--primary); }
+.node--battle { border-color: var(--gold); }
 .node--elite { border-color: var(--elite); }
 .node--supply { border-color: var(--supply); }
 .node--boss { border-color: var(--enemy); background-color: #3A1F17; }
 
 .node--open {
-    background-color: #1D3550;
+    background-color: #2A2410;
+    border-color: var(--gold-bright);
 }
 
 .node--closed {
@@ -280,19 +301,21 @@ Label {
 
 .node--visited {
     opacity: 0.8;
-    background-color: #1C3326;
-    border-color: var(--good);
+    background-color: #0F2A28;
+    border-color: var(--supply);
 }
 
 .node--current {
     opacity: 1;
-    border-color: var(--good);
-    background-color: #24503A;
+    border-color: var(--supply);
+    background-color: #164038;
 }
 
 .info-box {
     background-color: var(--panel-raised);
-    border-radius: 12px;
+    border-left-width: 5px;
+    border-color: var(--gold);
+    border-radius: 2px;
     padding: 24px 29px;
     margin-bottom: 19px;
 }
@@ -310,7 +333,7 @@ Label {
     padding: 0 38px;
     background-color: var(--panel);
     border-bottom-width: 2px;
-    border-color: var(--border);
+    border-color: var(--gold);
 }
 
 .topbar .h2 {
@@ -364,8 +387,8 @@ Label {
 }
 
 .roster-card--selected {
-    border-color: var(--primary);
-    background-color: var(--primary-dark);
+    border-color: var(--supply);
+    background-color: #102A2A;
 }
 
 .count {
@@ -388,7 +411,7 @@ Label {
     padding: 24px 38px;
     background-color: var(--panel);
     border-top-width: 2px;
-    border-color: var(--border);
+    border-color: var(--gold);
 }
 
 .supply-box {
@@ -408,7 +431,7 @@ Label {
 }
 
 .pip--full {
-    background-color: var(--good);
+    background-color: var(--supply);
 }
 
 .net-box {
