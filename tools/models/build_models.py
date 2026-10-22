@@ -50,6 +50,11 @@ PALETTE = [
     ("rot_dark", "4E5A42"),
     ("ghost", "B8C9B0"),
     ("crystal_dead", "5E6E7A"),
+    ("robe_black", "2B2A33"),
+    ("bark", "5E4630"),
+    ("leaf", "4F7A4A"),
+    ("elf_purple", "6A4C9C"),
+    ("elf_dark", "3A2D5C"),
 ]
 PALETTE_CELLS = 8
 PALETTE_CELL_PX = 32
@@ -503,17 +508,134 @@ def wreck_fortress(b):  # 骸骨要塞：守军尸骨和碎水晶垒成，顶上
     b.ball(P(1.45, 0, 2.32), (0.07, 0.07, 0.07), GLOW, 4, 2)
 
 
+# ---- 第二批角色（8.3 节名单，每个阵营先做一名样品） ------------------------------------
+
+def _shield_guard(b):
+    right, left = figure(b, 0.0, 0.0, h=0.76, cloth="cloth_blue", armor="steel", hat="helm")
+    b.box(P(0.0, 0.0, 0.52), (0.32, 0.2, 0.12), "steel_dark")  # 肩甲
+    b.rod(P(-0.02, 0, 0.82), P(-0.12, 0, 0.98), 0.03, 0.01, "cloth_blue", 4)  # 盔缨
+    b.box(P(0.2, -0.1, 0.42), (0.34, 0.05, 0.62), "white")  # 塔盾
+    b.box(P(0.225, -0.1, 0.44), (0.05, 0.02, 0.44), "cloth_blue")
+    b.box(P(0.225, -0.1, 0.5), (0.22, 0.02, 0.05), "cloth_blue")
+    gem(b, P(0.235, -0.1, 0.5), (0.03, 0.05, 0.05))
+    b.rod(right, right + Vector((0, -0.18, 0.12)), 0.02, 0.012, "steel", 4)  # 短剑
+
+
+def shield_guard(b):  # 布兰 · 盾卫：身前一面塔盾
+    base(b, 0.75)
+    scaled(b, 1.7, lambda: _shield_guard(b))
+
+
+def _shadow_assassin(b):
+    # 压低身形前倾，兜帽和拖在身后的围巾
+    for s in (-1, 1):
+        b.chain([P(-0.04 + s * 0.06, s * 0.07, 0.08), P(0.06, s * 0.08, 0.2), P(-0.02, s * 0.06, 0.32)],
+                0.04, 0.045, "robe_black", 5)
+    b.rod(P(-0.02, 0, 0.32), P(0.08, 0, 0.54), 0.11, 0.12, "cloth_navy", 6)
+    b.ball(P(0.12, 0, 0.6), (0.08, 0.08, 0.08), "skin", 6, 4)
+    b.rod(P(0.1, 0, 0.56), P(0.04, 0, 0.78), 0.1, 0.015, "robe_black", 6)
+    b.box(P(0.18, 0, 0.6), (0.02, 0.1, 0.03), GLOW)  # 兜帽下的眼光
+    b.chain([P(0.06, 0, 0.55), P(-0.12, 0.02, 0.5), P(-0.28, 0.05, 0.42)], 0.04, 0.01, "cloth_blue", 4)
+    for s in (-1, 1):
+        hand = P(0.26, s * 0.17, 0.32)
+        b.chain([P(0.08, s * 0.11, 0.5), P(0.16, s * 0.17, 0.4), hand], 0.03, 0.025, "robe_black", 5)
+        b.rod(hand, hand + Vector((0, -0.3, -0.05)), 0.026, 0.004, GLOW, 4)  # 双匕首
+
+
+def shadow_assassin(b):  # 夜莺 · 影刃刺客：前倾的兜帽身影，双手发光匕首
+    base(b, 0.75)
+    scaled(b, 1.8, lambda: _shadow_assassin(b))
+
+
+def _storm_mage(b):
+    right, left = figure(b, 0.0, 0.0, h=0.78, cloth="white", armor="cloth_navy", hat="hood", robe=True)
+    b.box(P(0.0, 0.0, 0.56), (0.32, 0.18, 0.08), "gold")  # 立领披肩
+    b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.0)), 0.02, 0.018, "steel_dark", 5)
+    top = Vector((right.x, right.y, 1.1))
+    b.ring(top, 0.09, 0.015, "gold", axis="f", segments=10)
+    pts = [top + Vector((0, 0, 0.0)), top + Vector((0.03, 0, 0.1)), top + Vector((-0.03, 0, 0.16)),
+           top + Vector((0.02, 0, 0.28))]
+    b.chain(pts, 0.025, 0.006, GLOW, 4)  # 杖顶的折线闪电
+    b.ball(left + Vector((0, 0, 0.12)), (0.05, 0.05, 0.05), GLOW, 6, 4)
+
+
+def storm_mage(b):  # 泽恩 · 风暴法师：兜帽长袍，杖顶跳着闪电，周围三道电弧
+    base(b, 0.75)
+    scaled(b, 1.6, lambda: _storm_mage(b))
+    for a in (0.9, 3.0, 5.1):
+        c = P(0.55 * math.cos(a), 0.55 * math.sin(a), 1.25)
+        b.chain([c + Vector((0, 0, 0.12)), c + Vector((0.05, 0, 0.02)), c + Vector((-0.04, 0, -0.04)),
+                 c + Vector((0.02, 0, -0.14))], 0.025, 0.008, GLOW, 4)
+
+
+def _necromancer(b):
+    right, left = figure(b, 0.0, 0.0, h=0.8, cloth="robe_black", armor="rot_dark", head="bone", robe=True)
+    b.rod(P(-0.02, 0, 0.62), P(-0.05, 0, 0.92), 0.12, 0.02, "robe_black", 6)  # 兜帽
+    mirror(lambda s: b.ball(P(0.08, s * 0.03, 0.7), (0.018, 0.018, 0.018), GLOW, 4, 2))
+    for i in range(5):  # 骨刺领
+        a = math.pi * (0.15 + 0.7 * i / 4)
+        o = P(-0.08 * math.sin(a), 0.16 * math.cos(a), 0.6)
+        b.rod(o, o + Vector((0.0, 0.0, 0.12)) + (o - P(0, 0, 0.6)) * 0.5, 0.025, 0.004, "bone", 4)
+    b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.02)), 0.022, 0.018, "bone_dark", 5)
+    b.ball(Vector((right.x, right.y, 1.08)), (0.06, 0.065, 0.06), "bone", 6, 4)
+    b.ball(Vector((right.x, right.y, 1.08)) + Vector((0, -0.05, 0)), (0.025, 0.02, 0.02), GLOW, 4, 2)
+    b.ball(left + Vector((0, 0, 0.1)), (0.05, 0.05, 0.05), GLOW, 6, 4)
+
+
+def necromancer(b):  # 维克多 · 死灵法师：骷髅脸、黑袍骨领、骷髅法杖，身边飘着两颗绿火骷髅
+    base(b, 0.75)
+    scaled(b, 1.6, lambda: _necromancer(b))
+    for a in (1.2, 4.0):
+        c = P(0.55 * math.cos(a), 0.55 * math.sin(a), 1.15)
+        b.ball(c, (0.08, 0.09, 0.08), "bone", 6, 4)
+        b.rod(c + Vector((0, 0.03, 0.04)), c + Vector((0, 0.1, 0.32)), 0.07, 0.005, GLOW, 5)  # 头顶的绿火
+
+
+def treant_guard(b):  # 老橡 · 树人守卫：粗树干身躯、枝条手臂、树冠，紫色眼光
+    base(b, 0.8, colour="bark")
+    for i in range(5):  # 扎进底座的树根
+        a = i * 2 * math.pi / 5 + 0.3
+        b.chain([P(0.2 * math.cos(a), 0.2 * math.sin(a), 0.5), P(0.45 * math.cos(a), 0.45 * math.sin(a), 0.2),
+                 P(0.68 * math.cos(a), 0.68 * math.sin(a), 0.08)], 0.08, 0.02, "bark", 5)
+    b.rod(P(0, 0, 0.08), P(0, 0, 1.45), 0.34, 0.24, "bark", 7)
+    b.box(P(0.24, 0, 1.05), (0.06, 0.24, 0.06), "wood")  # 眉骨
+    mirror(lambda s: b.ball(P(0.27, s * 0.09, 0.97), (0.035, 0.035, 0.035), GLOW, 4, 2))
+    b.box(P(0.26, 0, 0.75), (0.04, 0.18, 0.05), "bark")
+    for s in (-1, 1):
+        hand = P(0.3, s * 0.62, 0.45)
+        b.chain([P(0, s * 0.26, 1.2), P(0.15, s * 0.55, 0.95), hand], 0.11, 0.06, "bark", 6)
+        for k in (-1, 0, 1):
+            b.rod(hand, hand + Vector((k * 0.06, -0.14, -0.1)), 0.03, 0.005, "wood", 4)
+    b.ball(P(-0.05, 0, 1.7), (0.5, 0.48, 0.34), "leaf", 7, 4)
+    for f, x, z in ((0.2, 0.32, 1.85), (-0.25, -0.3, 1.9), (0.0, 0.0, 2.0)):
+        b.ball(P(f, x, z), (0.26, 0.26, 0.2), "leaf", 6, 4)
+    b.ball(P(0.1, -0.2, 2.05), (0.06, 0.06, 0.06), GLOW, 4, 2)  # 树冠里的星光
+
+
 UNITS = [
     ("supply_ship", supply_ship), ("relay", relay), ("battleship", battleship), ("frigate", frigate),
     ("missile_ship", missile_ship), ("pd_ship", pd_ship), ("strike_craft", strike_craft),
     ("hive", hive), ("hive_node", hive_node), ("ripper", ripper), ("crawler", crawler),
     ("locust", locust), ("acid_turret", acid_turret), ("brood_mother", brood_mother),
     ("wreck_fortress", wreck_fortress),
+    ("shield_guard", shield_guard), ("shadow_assassin", shadow_assassin), ("storm_mage", storm_mage),
+    ("necromancer", necromancer), ("treant_guard", treant_guard),
 ]
 
 # 预览图里发光部位的颜色（游戏里由客户端设置，这里只为看效果）
-PLAYER_GLOW, UNDEAD_GLOW = "5AB8FF", "8EE06A"
+PLAYER_GLOW, UNDEAD_GLOW, ELF_GLOW = "5AB8FF", "8EE06A", "B48CFF"
 PREVIEW_GLOW = {"supply_ship": "6FD0B4", "relay": "6FD0B4", "brood_mother": "C48CFF"}
+
+# 预览图：名字 → (单位 id, 默认发光色)
+PREVIEW_SHEETS = [
+    ("morningstar", ["supply_ship", "relay", "battleship", "frigate", "missile_ship", "pd_ship", "strike_craft"],
+     PLAYER_GLOW),
+    ("undead", ["hive", "hive_node", "ripper", "crawler", "locust", "acid_turret", "brood_mother",
+                "wreck_fortress"], UNDEAD_GLOW),
+]
+# 第二批样品分属不同阵营，单独排一张
+PREVIEW_SAMPLES = [("shield_guard", PLAYER_GLOW), ("shadow_assassin", PLAYER_GLOW), ("storm_mage", PLAYER_GLOW),
+                   ("necromancer", UNDEAD_GLOW), ("treant_guard", ELF_GLOW)]
 
 
 # ---- 材质、导出、预览 -------------------------------------------------------------
@@ -552,17 +674,16 @@ def export_fbx(obj, path):
         path_mode="STRIP", embed_textures=False)
 
 
-def render_sheet(objects, path):
-    """把一组模型排成一排，从战斗镜头的角度（侧前方斜看）渲染一张预览图。"""
+def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height_px=480):
+    """把一组模型排成一排，从战斗镜头的角度（侧前方斜看）渲染一张预览图。turn=90 时正面朝画面右侧。"""
     scene = bpy.context.scene
-    spacing = 4.6
     for i, obj in enumerate(objects):
         obj.location = Vector((i * spacing, 0, 0))
-        obj.rotation_euler = (0, 0, math.radians(90))  # 船首朝向画面右侧
+        obj.rotation_euler = (0, 0, math.radians(turn))
     width = (len(objects) - 1) * spacing
     cam_data = bpy.data.cameras.new("PreviewCam")
     cam_data.type = "ORTHO"
-    cam_data.ortho_scale = width + 4.5
+    cam_data.ortho_scale = width + margin
     cam_data.shift_y = 0.06
     cam = bpy.data.objects.new("PreviewCam", cam_data)
     scene.collection.objects.link(cam)
@@ -580,8 +701,8 @@ def render_sheet(objects, path):
     scene.render.engine = "CYCLES"
     scene.cycles.samples = 24
     scene.cycles.device = "CPU"
-    scene.render.resolution_x = int(320 * len(objects))
-    scene.render.resolution_y = 480
+    scene.render.resolution_x = int(px * len(objects))
+    scene.render.resolution_y = height_px
     scene.render.filepath = path
     scene.view_settings.view_transform = "Standard"
     bpy.ops.render.render(write_still=True)
@@ -614,17 +735,23 @@ def main():
 
     if preview_dir:
         os.makedirs(preview_dir, exist_ok=True)
-        ids = [u for u, _ in UNITS]
+        sheets = PREVIEW_SHEETS + [("samples", [u for u, _ in PREVIEW_SAMPLES], None)]
+        side_glow = dict(PREVIEW_SAMPLES)
+        for _, group, colour in PREVIEW_SHEETS:
+            side_glow.update((u, colour) for u in group)
         for unit_id, (obj, glow) in built.items():
-            side_glow = PLAYER_GLOW if ids.index(unit_id) < 7 else UNDEAD_GLOW
-            set_preview_glow(glow, PREVIEW_GLOW.get(unit_id, side_glow))
-        for name, group in (("morningstar", ids[:7]), ("undead", ids[7:])):
+            set_preview_glow(glow, PREVIEW_GLOW.get(unit_id, side_glow[unit_id]))
+        for name, group, _ in sheets:
             for obj, _ in built.values():
                 obj.hide_render = True
             objects = [built[u][0] for u in group]
             for obj in objects:
                 obj.hide_render = False
-            render_sheet(objects, os.path.join(preview_dir, name + ".png"))
+            if name == "samples":  # 1 格角色的近景，侧前方 3/4 视角
+                render_sheet(objects, os.path.join(preview_dir, name + ".png"), spacing=2.2, turn=35, margin=1.6,
+                             px=440, height_px=760)
+            else:
+                render_sheet(objects, os.path.join(preview_dir, name + ".png"))
             print("已渲染预览", name)
 
 
