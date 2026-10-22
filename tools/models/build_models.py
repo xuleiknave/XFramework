@@ -152,6 +152,20 @@ class Builder:
         bmesh.ops.create_cube(self.bm, size=1.0, matrix=m)
         self._paint(self._new_faces(before), colour)
 
+    def rbox(self, centre, size, colour, roundness=0.3, rot=(0.0, 0.0, 0.0), segments=2):
+        """圆角方块：roundness 是圆角半径占最短边一半的比例。"""
+        before_v, before_f = set(self.bm.verts), set(self.bm.faces)
+        bmesh.ops.create_cube(self.bm, size=1.0, matrix=Matrix.Diagonal((size[0], size[1], size[2], 1.0)))
+        verts = [v for v in self.bm.verts if v not in before_v]
+        edges = list({e for v in verts for e in v.link_edges})
+        bmesh.ops.bevel(self.bm, geom=verts + edges, offset=min(size) * 0.5 * min(roundness, 0.95),
+                        segments=segments, profile=0.5, affect="EDGES", clamp_overlap=True)
+        m = Matrix.Translation(centre) @ _euler(rot)
+        for v in self.bm.verts:
+            if v not in before_v:
+                v.co = m @ v.co
+        self._paint(self._new_faces(before_f), colour)
+
     def ball(self, centre, radii, colour, segments=8, rings=6, rot=(0.0, 0.0, 0.0)):
         before = set(self.bm.faces)
         m = (Matrix.Translation(centre) @ _euler(rot) @ Matrix.Diagonal((radii[0], radii[1], radii[2], 1.0)))
@@ -202,14 +216,18 @@ class Builder:
                 self.bm.faces.new((a[k], b[k], b[kk], a[kk]))
         self._paint(self._new_faces(before), colour)
 
-    def finish(self, name, hull_mat, glow_mat):
+    def finish(self, name, hull_mat, glow_mat, smooth=False):
         bmesh.ops.remove_doubles(self.bm, verts=self.bm.verts, dist=0.0001)
         bmesh.ops.recalc_face_normals(self.bm, faces=self.bm.faces)
         mesh = bpy.data.meshes.new(name)
         self.bm.to_mesh(mesh)
         self.bm.free()
-        for poly in mesh.polygons:
-            poly.use_smooth = False
+        if smooth:  # 卡通角色：平滑着色，折角大的边保持硬边
+            mesh.shade_smooth()
+            mesh.set_sharp_from_angle(angle=math.radians(50))
+        else:
+            for poly in mesh.polygons:
+                poly.use_smooth = False
         mesh.materials.append(hull_mat)
         mesh.materials.append(glow_mat)
         obj = bpy.data.objects.new(name, mesh)
@@ -508,109 +526,343 @@ def wreck_fortress(b):  # 骸骨要塞：守军尸骨和碎水晶垒成，顶上
     b.ball(P(1.45, 0, 2.32), (0.07, 0.07, 0.07), GLOW, 4, 2)
 
 
-# ---- 第二批角色（8.3 节名单，每个阵营先做一名样品） ------------------------------------
+# ---- 第二批角色：圆润卡通风格 -------------------------------------------------------
+# 和上面的低多边形单位不同，这一批用高分段的球、圆柱和圆角方块拼成，平滑着色（折角大于 50° 的边保留硬边），
+# 头身比约 1:3，大头、大手、大眼睛；细节靠铆钉、饰边、扣环、褶边等小零件补。
+
+SEG = 16  # 卡通角色的圆周分段
+
+
+def S(b, centre, radii, colour, segments=SEG, rings=10, rot=(0.0, 0.0, 0.0)):
+    """平滑球（椭球）。"""
+    b.ball(centre, radii, colour, segments, rings, rot)
+
+
+def R(b, a, c, r1, r2, colour, segments=SEG):
+    b.rod(a, c, r1, r2, colour, segments)
+
+
+def limb(b, points, r1, r2, colour, segments=12):
+    """关节处补一个球，让手臂和腿弯折处圆润。"""
+    b.chain(points, r1, r2, colour, segments)
+    n = len(points) - 1
+    for i in range(1, n):
+        r = r1 + (r2 - r1) * i / n
+        S(b, points[i], (r, r, r), colour, 12, 8)
+
+
+def posed(b, fn, lean=0.0, pivot_z=0.1):
+    """画出 fn 的部件后整体前倾：越高的点越往前（f 方向）挪。"""
+    before = set(b.bm.verts)
+    fn()
+    for v in b.bm.verts:
+        if v not in before:
+            v.co.y -= lean * (v.co.z - pivot_z)
+
+
+def face(b, c, r, eye="iron", glow_eyes=False, nose=True, brows=None):
+    """在头部球体 c、半径 r 的正面画五官：大眼睛带高光、小鼻子、可选眉毛。"""
+    f, x, z = -c.y, c.x, c.z
+    for s in (-1, 1):
+        ex, ez = x + s * r * 0.36, z + r * 0.02
+        ef = f + r * 0.86
+        if glow_eyes:
+            S(b, P(ef, ex, ez), (r * 0.15, r * 0.08, r * 0.13), GLOW, 10, 6)
+        else:
+            S(b, P(ef, ex, ez), (r * 0.13, r * 0.08, r * 0.19), eye, 10, 8)
+            S(b, P(ef + r * 0.07, ex + r * 0.04, ez + r * 0.07), (r * 0.045, r * 0.03, r * 0.045), "white", 6, 4)
+        if brows:
+            b.rbox(P(f + r * 0.9, ex, z + r * 0.3), (r * 0.3, r * 0.07, r * 0.07), brows, 0.5,
+                   rot=(0, s * -12, 0))
+    if nose:
+        S(b, P(f + r * 0.98, x, z - r * 0.18), (r * 0.09, r * 0.08, r * 0.08), "skin", 8, 6)
+
+
+def hero(b, z0=0.1, legs="leather", boots="leather", body="cloth_blue", skin="skin", belt="leather",
+         robe=None, head_r=0.25, eye="iron", glow_eyes=False, brows=None, has_face=True):
+    """卡通人形的腿、靴、躯干、腰带和头。手臂由各角色自己画（姿势不同）。返回关键点。"""
+    if robe:
+        # 长袍：下摆张开的放样，下沿一圈饰边
+        R(b, P(0, 0, z0), P(0, 0, z0 + 0.62), 0.3, 0.17, robe)
+        b.ring(P(0, 0, z0 + 0.04), 0.29, 0.035, boots, segments=24, sides=8)  # 下摆饰边
+    else:
+        for s in (-1, 1):
+            b.rbox(P(0.04, s * 0.1, z0 + 0.06), (0.15, 0.24, 0.12), boots, 0.45)
+            b.rbox(P(0.0, s * 0.1, z0 + 0.17), (0.15, 0.15, 0.14), boots, 0.45)  # 靴筒
+            R(b, P(0, s * 0.1, z0 + 0.2), P(0, s * 0.1, z0 + 0.44), 0.06, 0.075, legs, 12)
+        S(b, P(0, 0, z0 + 0.45), (0.19, 0.14, 0.1), legs)
+    S(b, P(0, 0, z0 + 0.68), (0.21, 0.16, 0.24), body)
+    R(b, P(0, 0, z0 + 0.48), P(0, 0, z0 + 0.56), 0.2, 0.2, belt)
+    b.rbox(P(0.19, 0, z0 + 0.52), (0.09, 0.03, 0.08), "gold", 0.4)
+    head = P(0, 0, z0 + 0.88 + head_r * 0.9)
+    S(b, head, (head_r, head_r * 0.95, head_r * 0.95), skin, 20, 12)
+    if has_face:
+        face(b, head, head_r, eye=eye, glow_eyes=glow_eyes, brows=brows)
+    return {
+        "head": head, "head_r": head_r,
+        "shoulder": (P(0, 0.22, z0 + 0.82), P(0, -0.22, z0 + 0.82)),  # 右、左
+        "chest": P(0.15, 0, z0 + 0.7), "back": P(-0.15, 0, z0 + 0.72), "z0": z0,
+    }
+
+
+def arm(b, shoulder, elbow, hand, sleeve, glove="skin", r=0.06):
+    limb(b, [shoulder, elbow, hand], r, r * 0.85, sleeve)
+    S(b, hand, (0.065, 0.065, 0.065), glove, 12, 8)
+
+
+def rivets(b, points, colour="gold", r=0.02):
+    for p in points:
+        S(b, p, (r, r, r), colour, 8, 6)
+
 
 def _shield_guard(b):
-    right, left = figure(b, 0.0, 0.0, h=0.76, cloth="cloth_blue", armor="steel", hat="helm")
-    b.box(P(0.0, 0.0, 0.52), (0.32, 0.2, 0.12), "steel_dark")  # 肩甲
-    b.rod(P(-0.02, 0, 0.82), P(-0.12, 0, 0.98), 0.03, 0.01, "cloth_blue", 4)  # 盔缨
-    b.box(P(0.2, -0.1, 0.42), (0.34, 0.05, 0.62), "white")  # 塔盾
-    b.box(P(0.225, -0.1, 0.44), (0.05, 0.02, 0.44), "cloth_blue")
-    b.box(P(0.225, -0.1, 0.5), (0.22, 0.02, 0.05), "cloth_blue")
-    gem(b, P(0.235, -0.1, 0.5), (0.03, 0.05, 0.05))
-    b.rod(right, right + Vector((0, -0.18, 0.12)), 0.02, 0.012, "steel", 4)  # 短剑
+    k = hero(b, legs="steel_dark", boots="steel", body="steel", belt="leather", brows="leather")
+    h, hr = k["head"], k["head_r"]
+    z0 = k["z0"]
+    # 蓝色罩袍：前后两片，金色滚边
+    for f in (0.17, -0.17):
+        b.rbox(P(f, 0, z0 + 0.42), (0.26, 0.04, 0.3), "cloth_blue", 0.3)
+        b.rbox(P(f, 0, z0 + 0.27), (0.27, 0.045, 0.03), "gold", 0.4)
+    # 头盔：半球盔顶 + 帽檐 + 护鼻 + 羽饰
+    S(b, h + Vector((0, hr * 0.3, hr * 0.28)), (hr * 1.05, hr * 1.05, hr * 0.88), "steel", 20, 12)
+    b.ring(h + Vector((0, hr * 0.22, hr * 0.22)), hr * 1.0, 0.025, "steel_dark", segments=24, sides=6)
+    for s in (-1, 1):  # 护颊
+        b.rbox(h + Vector((s * hr * 0.82, hr * 0.05, -hr * 0.35)), (0.05, hr * 0.9, hr * 0.7), "steel", 0.5)
+    R(b, h + Vector((0, 0, hr * 0.85)), h + Vector((0, 0, hr * 1.1)), 0.03, 0.03, "gold", 10)
+    limb(b, [h + Vector((0, 0, hr * 1.1)), h + Vector((0, 0.1, hr * 1.35)), h + Vector((0, 0.3, hr * 1.3)),
+             h + Vector((0, 0.42, hr * 0.95))], 0.07, 0.025, "cloth_blue", 10)
+    # 肩甲：叠两层圆片，铆钉
+    for s, sh in zip((1, -1), k["shoulder"]):
+        S(b, sh + Vector((0, 0, 0.04)), (0.13, 0.12, 0.09), "steel", 14, 8)
+        S(b, sh + Vector((0, 0, 0.0)), (0.12, 0.13, 0.06), "steel_dark", 14, 8)
+        rivets(b, [sh + Vector((s * 0.05, -0.08, 0.08)), sh + Vector((s * 0.05, 0.08, 0.08))])
+    rs, ls = k["shoulder"]
+    # 右手持剑
+    rh = P(0.18, 0.3, z0 + 0.5)
+    arm(b, rs, P(0.05, 0.3, z0 + 0.62), rh, "steel", "leather")
+    tip = rh + Vector((0, -0.45, 0.22))
+    b.rbox((rh + tip) / 2 + Vector((0, -0.04, 0.02)), (0.02, 0.07, 0.46), "white", 0.3,
+           rot=(62, 0, 0))
+    b.rbox(rh + Vector((0, -0.05, 0.03)), (0.2, 0.04, 0.04), "gold", 0.5, rot=(62, 0, 0))
+    S(b, rh + Vector((0, 0.07, -0.03)), (0.035, 0.035, 0.035), "gold", 10, 6)
+    # 左手持塔盾：金边白盾、蓝十字、中央水晶、四颗铆钉
+    lh = P(0.24, -0.26, z0 + 0.55)
+    arm(b, ls, P(0.12, -0.33, z0 + 0.6), lh, "steel", "leather")
+    sc = P(0.34, -0.2, z0 + 0.55)
+    rot = (0, 0, -18)
+    b.rbox(sc, (0.48, 0.07, 0.82), "gold", 0.18, rot=rot)
+    b.rbox(sc + Vector((0, -0.01, 0)) + Vector((-0.012, -0.025, 0)), (0.42, 0.06, 0.76), "white", 0.18, rot=rot)
+    front = Vector((-0.012, -0.06, 0))
+    b.rbox(sc + front, (0.09, 0.04, 0.6), "cloth_blue", 0.3, rot=rot)
+    b.rbox(sc + front + Vector((0, 0, 0.1)), (0.34, 0.04, 0.09), "cloth_blue", 0.3, rot=rot)
+    gem(b, sc + front * 1.25 + Vector((0, 0, 0.1)), (0.055, 0.05, 0.075))
+    b.ring(sc + front * 1.15 + Vector((0, 0, 0.1)), 0.08, 0.014, "gold", axis="f", segments=16, sides=6)
+    rivets(b, [sc + front + Vector((dx, 0, dz)) for dx in (-0.15, 0.15) for dz in (-0.3, 0.3)])
 
 
-def shield_guard(b):  # 布兰 · 盾卫：身前一面塔盾
-    base(b, 0.75)
-    scaled(b, 1.7, lambda: _shield_guard(b))
+def shield_guard(b):  # 布兰 · 盾卫：戴羽饰头盔的骑士，身前一面金边塔盾
+    base(b, 0.75, sides=32)
+    _shield_guard(b)
 
 
 def _shadow_assassin(b):
-    # 压低身形前倾，兜帽和拖在身后的围巾
-    for s in (-1, 1):
-        b.chain([P(-0.04 + s * 0.06, s * 0.07, 0.08), P(0.06, s * 0.08, 0.2), P(-0.02, s * 0.06, 0.32)],
-                0.04, 0.045, "robe_black", 5)
-    b.rod(P(-0.02, 0, 0.32), P(0.08, 0, 0.54), 0.11, 0.12, "cloth_navy", 6)
-    b.ball(P(0.12, 0, 0.6), (0.08, 0.08, 0.08), "skin", 6, 4)
-    b.rod(P(0.1, 0, 0.56), P(0.04, 0, 0.78), 0.1, 0.015, "robe_black", 6)
-    b.box(P(0.18, 0, 0.6), (0.02, 0.1, 0.03), GLOW)  # 兜帽下的眼光
-    b.chain([P(0.06, 0, 0.55), P(-0.12, 0.02, 0.5), P(-0.28, 0.05, 0.42)], 0.04, 0.01, "cloth_blue", 4)
-    for s in (-1, 1):
-        hand = P(0.26, s * 0.17, 0.32)
-        b.chain([P(0.08, s * 0.11, 0.5), P(0.16, s * 0.17, 0.4), hand], 0.03, 0.025, "robe_black", 5)
-        b.rod(hand, hand + Vector((0, -0.3, -0.05)), 0.026, 0.004, GLOW, 4)  # 双匕首
+    def body():
+        k = hero(b, legs="robe_black", boots="leather", body="cloth_navy", belt="leather", glow_eyes=True,
+                 head_r=0.23)
+        h, hr, z0 = k["head"], k["head_r"], k["z0"]
+        # 兜帽：比头大一圈，帽尖拖向后方；面巾遮住下半张脸
+        S(b, h + Vector((0, hr * 0.32, hr * 0.12)), (hr * 1.1, hr * 1.05, hr * 1.08), "robe_black", 20, 12)
+        limb(b, [h + Vector((0, 0.12, hr * 0.7)), h + Vector((0, 0.3, hr * 0.6)), h + Vector((0, 0.42, hr * 0.2))],
+             0.1, 0.02, "robe_black", 12)
+        S(b, h + Vector((0, -hr * 0.55, -hr * 0.35)), (hr * 0.82, hr * 0.5, hr * 0.42), "cloth_blue", 16, 8)
+        # 围巾两条长尾飘在身后
+        for s in (-1, 1):
+            limb(b, [P(-0.12, s * 0.06, z0 + 0.86), P(-0.3, s * 0.1, z0 + 0.8), P(-0.46, s * 0.14, z0 + 0.72)],
+                 0.045, 0.02, "cloth_blue", 10)
+        # 腰间小包和交叉的皮带
+        for s in (-1, 1):
+            b.rbox(P(0.05, s * 0.2, z0 + 0.46), (0.08, 0.1, 0.1), "leather", 0.4)
+        b.rbox(P(0.15, 0, z0 + 0.7), (0.06, 0.03, 0.4), "leather", 0.4, rot=(0, 35, 0))
+        rivets(b, [P(0.17, 0, z0 + 0.7)], "steel")
+        # 双手反握匕首
+        for s, sh in zip((1, -1), k["shoulder"]):
+            hand = P(0.32, s * 0.28, z0 + 0.5)
+            arm(b, sh, P(0.12, s * 0.33, z0 + 0.62), hand, "cloth_navy", "robe_black")
+            b.rbox(hand + Vector((0, -0.02, 0)), (0.03, 0.05, 0.1), "leather", 0.4)
+            b.rbox(hand + Vector((0, -0.02, 0.06)), (0.12, 0.03, 0.03), "gold", 0.5)
+            b.rbox(hand + Vector((0, -0.06, -0.18)), (0.015, 0.06, 0.3), GLOW, 0.3, rot=(-25, 0, 0))
+
+    # 压低身形：膝盖弯曲由整体下压 + 前倾表现
+    posed(b, body, lean=0.18)
 
 
-def shadow_assassin(b):  # 夜莺 · 影刃刺客：前倾的兜帽身影，双手发光匕首
-    base(b, 0.75)
-    scaled(b, 1.8, lambda: _shadow_assassin(b))
+def shadow_assassin(b):  # 夜莺 · 影刃刺客：兜帽面巾、围巾飘尾，双手反握发光匕首
+    base(b, 0.75, sides=32)
+    _shadow_assassin(b)
 
 
 def _storm_mage(b):
-    right, left = figure(b, 0.0, 0.0, h=0.78, cloth="white", armor="cloth_navy", hat="hood", robe=True)
-    b.box(P(0.0, 0.0, 0.56), (0.32, 0.18, 0.08), "gold")  # 立领披肩
-    b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.0)), 0.02, 0.018, "steel_dark", 5)
-    top = Vector((right.x, right.y, 1.1))
-    b.ring(top, 0.09, 0.015, "gold", axis="f", segments=10)
-    pts = [top + Vector((0, 0, 0.0)), top + Vector((0.03, 0, 0.1)), top + Vector((-0.03, 0, 0.16)),
-           top + Vector((0.02, 0, 0.28))]
-    b.chain(pts, 0.025, 0.006, GLOW, 4)  # 杖顶的折线闪电
-    b.ball(left + Vector((0, 0, 0.12)), (0.05, 0.05, 0.05), GLOW, 6, 4)
+    k = hero(b, body="white", robe="white", belt="gold", boots="cloth_navy", brows="steel_dark", head_r=0.25)
+    h, hr, z0 = k["head"], k["head_r"], k["z0"]
+    # 袍子前襟的深蓝饰带和金扣
+    b.rbox(P(0.2, 0, z0 + 0.32), (0.1, 0.04, 0.55), "cloth_navy", 0.4, rot=(0, -14, 0))
+    rivets(b, [P(0.21 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i) for i in range(3)])
+    # 兜帽：翻在脑后的厚兜帽 + 前额的银发
+    S(b, h + Vector((0, hr * 0.3, 0.02)), (hr * 1.08, hr * 1.0, hr * 1.06), "cloth_navy", 20, 12)
+    S(b, h + Vector((0, -hr * 0.5, hr * 0.55)), (hr * 0.7, hr * 0.4, hr * 0.3), "steel", 14, 8)
+    # 胡子：三束向下的白须
+    for dx, l in ((-0.06, 0.2), (0, 0.26), (0.06, 0.2)):
+        R(b, P(-h.y + hr * 0.8, dx, h.z - hr * 0.45), P(-h.y + hr * 0.7, dx * 1.3, h.z - hr * 0.45 - l),
+          0.05, 0.01, "steel", 10)
+    # 高立领
+    b.ring(P(0, 0, z0 + 0.88), 0.17, 0.04, "gold", segments=20, sides=6)
+    for s in (-1, 1):
+        b.rbox(P(-0.03, s * 0.14, z0 + 0.98), (0.12, 0.04, 0.2), "cloth_navy", 0.4, rot=(0, 0, s * 20))
+    # 肩上披肩
+    for sh in k["shoulder"]:
+        S(b, sh + Vector((0, 0, 0.02)), (0.12, 0.13, 0.08), "cloth_navy", 14, 8)
+    rs, ls = k["shoulder"]
+    # 右手持法杖：金环里一颗水晶，周围是折线闪电
+    rh = P(0.15, 0.32, z0 + 0.62)
+    arm(b, rs, P(0.05, 0.32, z0 + 0.65), rh, "white")
+    R(b, Vector((rh.x, rh.y, z0)), Vector((rh.x, rh.y, z0 + 1.45)), 0.025, 0.022, "wood", 10)
+    for dz in (0.35, 0.95):
+        R(b, Vector((rh.x, rh.y, z0 + dz)), Vector((rh.x, rh.y, z0 + dz + 0.05)), 0.035, 0.035, "gold", 10)
+    top = Vector((rh.x, rh.y, z0 + 1.58))
+    b.ring(top, 0.13, 0.02, "gold", axis="f", segments=20, sides=6)
+    gem(b, top, (0.05, 0.05, 0.09))
+    for s in (-1, 1):
+        pts = [top + Vector((s * 0.13, 0, 0)), top + Vector((s * 0.2, 0, 0.08)), top + Vector((s * 0.16, 0, 0.13)),
+               top + Vector((s * 0.26, 0, 0.24))]
+        b.chain(pts, 0.022, 0.006, GLOW, 6)
+    # 左手托一团小雷云，下面挂一道闪电
+    lh = P(0.16, -0.4, z0 + 0.98)
+    arm(b, ls, P(0.06, -0.4, z0 + 0.76), lh, "white")
+    cloud = lh + Vector((0, -0.02, 0.2))
+    for dx, dz, r in ((-0.07, 0, 0.08), (0.06, 0.01, 0.07), (0, 0.05, 0.09)):
+        S(b, cloud + Vector((dx, 0, dz)), (r * 1.2, r, r), "steel_dark", 12, 8)
+    b.chain([cloud + Vector((0, -0.02, -0.05)), cloud + Vector((0.04, -0.02, -0.12)),
+             cloud + Vector((-0.02, -0.02, -0.16))], 0.02, 0.006, GLOW, 6)
 
 
-def storm_mage(b):  # 泽恩 · 风暴法师：兜帽长袍，杖顶跳着闪电，周围三道电弧
-    base(b, 0.75)
-    scaled(b, 1.6, lambda: _storm_mage(b))
-    for a in (0.9, 3.0, 5.1):
-        c = P(0.55 * math.cos(a), 0.55 * math.sin(a), 1.25)
-        b.chain([c + Vector((0, 0, 0.12)), c + Vector((0.05, 0, 0.02)), c + Vector((-0.04, 0, -0.04)),
-                 c + Vector((0.02, 0, -0.14))], 0.025, 0.008, GLOW, 4)
+def storm_mage(b):  # 泽恩 · 风暴法师：白袍金立领、白胡子，金环法杖上跳着闪电，左手托雷云
+    base(b, 0.75, sides=32)
+    _storm_mage(b)
+
+
+def _skull(b, c, r, glow=True):
+    S(b, c, (r, r * 1.05, r * 0.95), "bone", 16, 10)
+    b.rbox(c + Vector((0, -r * 0.55, -r * 0.65)), (r * 1.1, r * 0.7, r * 0.45), "bone", 0.5)  # 下颌
+    for s in (-1, 1):
+        S(b, c + Vector((s * r * 0.38, -r * 0.82, r * 0.05)), (r * 0.26, r * 0.12, r * 0.3), "iron", 10, 6)
+        if glow:
+            S(b, c + Vector((s * r * 0.38, -r * 0.9, r * 0.05)), (r * 0.1, r * 0.06, r * 0.1), GLOW, 6, 4)
+    S(b, c + Vector((0, -r * 0.92, -r * 0.3)), (r * 0.1, r * 0.06, r * 0.1), "iron", 6, 4)
+    for i in range(4):
+        b.rbox(c + Vector(((i - 1.5) * r * 0.2, -r * 0.88, -r * 0.55)), (r * 0.12, r * 0.06, r * 0.16), "white",
+               0.4)
 
 
 def _necromancer(b):
-    right, left = figure(b, 0.0, 0.0, h=0.8, cloth="robe_black", armor="rot_dark", head="bone", robe=True)
-    b.rod(P(-0.02, 0, 0.62), P(-0.05, 0, 0.92), 0.12, 0.02, "robe_black", 6)  # 兜帽
-    mirror(lambda s: b.ball(P(0.08, s * 0.03, 0.7), (0.018, 0.018, 0.018), GLOW, 4, 2))
-    for i in range(5):  # 骨刺领
-        a = math.pi * (0.15 + 0.7 * i / 4)
-        o = P(-0.08 * math.sin(a), 0.16 * math.cos(a), 0.6)
-        b.rod(o, o + Vector((0.0, 0.0, 0.12)) + (o - P(0, 0, 0.6)) * 0.5, 0.025, 0.004, "bone", 4)
-    b.rod(Vector((right.x, right.y, 0.08)), Vector((right.x, right.y, 1.02)), 0.022, 0.018, "bone_dark", 5)
-    b.ball(Vector((right.x, right.y, 1.08)), (0.06, 0.065, 0.06), "bone", 6, 4)
-    b.ball(Vector((right.x, right.y, 1.08)) + Vector((0, -0.05, 0)), (0.025, 0.02, 0.02), GLOW, 4, 2)
-    b.ball(left + Vector((0, 0, 0.1)), (0.05, 0.05, 0.05), GLOW, 6, 4)
-
-
-def necromancer(b):  # 维克多 · 死灵法师：骷髅脸、黑袍骨领、骷髅法杖，身边飘着两颗绿火骷髅
-    base(b, 0.75)
-    scaled(b, 1.6, lambda: _necromancer(b))
-    for a in (1.2, 4.0):
-        c = P(0.55 * math.cos(a), 0.55 * math.sin(a), 1.15)
-        b.ball(c, (0.08, 0.09, 0.08), "bone", 6, 4)
-        b.rod(c + Vector((0, 0.03, 0.04)), c + Vector((0, 0.1, 0.32)), 0.07, 0.005, GLOW, 5)  # 头顶的绿火
-
-
-def treant_guard(b):  # 老橡 · 树人守卫：粗树干身躯、枝条手臂、树冠，紫色眼光
-    base(b, 0.8, colour="bark")
-    for i in range(5):  # 扎进底座的树根
-        a = i * 2 * math.pi / 5 + 0.3
-        b.chain([P(0.2 * math.cos(a), 0.2 * math.sin(a), 0.5), P(0.45 * math.cos(a), 0.45 * math.sin(a), 0.2),
-                 P(0.68 * math.cos(a), 0.68 * math.sin(a), 0.08)], 0.08, 0.02, "bark", 5)
-    b.rod(P(0, 0, 0.08), P(0, 0, 1.45), 0.34, 0.24, "bark", 7)
-    b.box(P(0.24, 0, 1.05), (0.06, 0.24, 0.06), "wood")  # 眉骨
-    mirror(lambda s: b.ball(P(0.27, s * 0.09, 0.97), (0.035, 0.035, 0.035), GLOW, 4, 2))
-    b.box(P(0.26, 0, 0.75), (0.04, 0.18, 0.05), "bark")
+    k = hero(b, body="robe_black", robe="robe_black", belt="bone_dark", boots="rot_dark", skin="bone", head_r=0.24,
+             has_face=False)
+    h, hr, z0 = k["head"], k["head_r"], k["z0"]
+    # 头部换成骷髅：先盖掉 hero 画的脸
+    _skull(b, h + Vector((0, -0.01, 0)), hr * 1.0)
+    # 绿色饰带和骨扣
+    b.rbox(P(0.19, 0, z0 + 0.32), (0.08, 0.04, 0.55), "rot_dark", 0.4, rot=(0, -14, 0))
+    for i in range(3):
+        S(b, P(0.21 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i), (0.03, 0.03, 0.03), "bone", 8, 6)
+    # 兜帽：尖顶垂在脑后
+    S(b, h + Vector((0, hr * 0.3, 0.04)), (hr * 1.15, hr * 1.05, hr * 1.12), "robe_black", 20, 12)
+    limb(b, [h + Vector((0, 0.15, hr * 0.8)), h + Vector((0, 0.32, hr * 0.8)), h + Vector((0, 0.45, hr * 0.3))],
+         0.11, 0.02, "robe_black", 12)
+    # 骨刺领和骷髅肩甲
+    for i in range(7):
+        a = math.pi * (-0.1 + 1.2 * i / 6)
+        o = P(-0.1 * math.sin(a) + 0.02, 0.2 * math.cos(a), z0 + 0.86)
+        out = (o - P(0.02, 0, z0 + 0.86)).normalized()
+        R(b, o, o + out * 0.1 + Vector((0, 0, 0.16)), 0.035, 0.005, "bone", 8)
+    for s, sh in zip((1, -1), k["shoulder"]):
+        S(b, sh + Vector((0, 0, 0.02)), (0.13, 0.13, 0.08), "rot_dark", 14, 8)
+        _skull(b, sh + Vector((0, -0.02, 0.1)), 0.075, glow=False)
+    rs, ls = k["shoulder"]
+    # 右手骷髅法杖：骨杖、骷髅杖头、两只角、绿火
+    rh = P(0.15, 0.32, z0 + 0.62)
+    arm(b, rs, P(0.05, 0.32, z0 + 0.65), rh, "robe_black", "bone")
+    R(b, Vector((rh.x, rh.y, z0)), Vector((rh.x, rh.y, z0 + 1.42)), 0.025, 0.02, "bone_dark", 10)
+    for dz in (0.3, 0.7, 1.1):
+        S(b, Vector((rh.x, rh.y, z0 + dz)), (0.04, 0.04, 0.03), "bone", 10, 6)
+    top = Vector((rh.x, rh.y, z0 + 1.55))
+    _skull(b, top, 0.1)
     for s in (-1, 1):
-        hand = P(0.3, s * 0.62, 0.45)
-        b.chain([P(0, s * 0.26, 1.2), P(0.15, s * 0.55, 0.95), hand], 0.11, 0.06, "bark", 6)
-        for k in (-1, 0, 1):
-            b.rod(hand, hand + Vector((k * 0.06, -0.14, -0.1)), 0.03, 0.005, "wood", 4)
-    b.ball(P(-0.05, 0, 1.7), (0.5, 0.48, 0.34), "leaf", 7, 4)
-    for f, x, z in ((0.2, 0.32, 1.85), (-0.25, -0.3, 1.9), (0.0, 0.0, 2.0)):
-        b.ball(P(f, x, z), (0.26, 0.26, 0.2), "leaf", 6, 4)
-    b.ball(P(0.1, -0.2, 2.05), (0.06, 0.06, 0.06), GLOW, 4, 2)  # 树冠里的星光
+        limb(b, [top + Vector((s * 0.08, 0, 0.04)), top + Vector((s * 0.17, 0.02, 0.1)),
+                 top + Vector((s * 0.18, 0.05, 0.22))], 0.03, 0.006, "bone_dark", 8)
+    for dz, r in ((0.14, 0.07), (0.24, 0.05), (0.32, 0.025)):
+        S(b, top + Vector((0, 0.02, dz)), (r, r, r * 1.3), GLOW, 10, 6)
+    # 左手掌心一团绿火
+    lh = P(0.24, -0.3, z0 + 0.72)
+    arm(b, ls, P(0.08, -0.36, z0 + 0.62), lh, "robe_black", "bone")
+    for dz, r in ((0.1, 0.06), (0.18, 0.04), (0.25, 0.02)):
+        S(b, lh + Vector((0, 0, dz)), (r, r, r * 1.3), GLOW, 10, 6)
 
+
+def necromancer(b):  # 维克多 · 死灵法师：骷髅头、尖兜帽、骨刺领、骷髅法杖，身边飘着两颗绿火骷髅
+    base(b, 0.75, sides=32)
+    _necromancer(b)
+    for a in (2.0, 4.2):
+        c = P(0.6 * math.cos(a), 0.6 * math.sin(a), 1.25)
+        _skull(b, c, 0.09)
+        for dz, r in ((0.1, 0.06), (0.18, 0.04), (0.25, 0.02)):
+            S(b, c + Vector((0, 0.02, dz)), (r, r, r * 1.3), GLOW, 10, 6)
+
+
+def treant_guard(b):  # 老橡 · 树人守卫：粗树干身躯带树皮纹、苔藓和蘑菇，枝条手臂，茂密树冠里开着紫花
+    base(b, 0.8, colour="bark", sides=32)
+    # 树根
+    for i in range(6):
+        a = i * 2 * math.pi / 6 + 0.3
+        c, s = math.cos(a), math.sin(a)
+        limb(b, [P(0.22 * c, 0.22 * s, 0.4), P(0.45 * c, 0.45 * s, 0.18), P(0.66 * c, 0.66 * s, 0.09)], 0.1, 0.03,
+             "bark", 10)
+    # 树干：下粗上细，竖向的树皮棱
+    R(b, P(0, 0, 0.08), P(0, 0, 1.0), 0.36, 0.3, "bark", 20)
+    S(b, P(0, 0, 1.0), (0.3, 0.3, 0.32), "bark", 20, 12)
+    for i in range(10):
+        a = i * 2 * math.pi / 10
+        c, s = math.cos(a), math.sin(a)
+        R(b, P(0.35 * c, 0.35 * s, 0.12), P(0.3 * c, 0.3 * s, 1.05), 0.035, 0.025, "wood", 8)
+    # 脸：深陷的眼窝、紫色眼光、眉骨、树结嘴、木须
+    for s in (-1, 1):
+        S(b, P(0.3, s * 0.11, 0.95), (0.07, 0.04, 0.06), "iron", 12, 8)
+        S(b, P(0.315, s * 0.11, 0.95), (0.04, 0.03, 0.035), GLOW, 10, 6)
+        b.rbox(P(0.32, s * 0.12, 1.04), (0.16, 0.08, 0.06), "wood", 0.5, rot=(0, s * -15, 0))
+    S(b, P(0.33, 0, 0.88), (0.04, 0.05, 0.06), "wood", 10, 6)
+    S(b, P(0.33, 0, 0.74), (0.09, 0.03, 0.045), "iron", 12, 6)
+    for dx in (-0.08, 0, 0.08):
+        R(b, P(0.32, dx, 0.7), P(0.3, dx * 1.3, 0.48), 0.035, 0.008, "leaf", 8)
+    # 苔藓和小蘑菇
+    for f, x, z, r in ((0.2, 0.25, 0.4, 0.09), (-0.2, -0.28, 0.6, 0.1), (0.05, -0.33, 0.25, 0.07)):
+        S(b, P(f, x, z), (r, r, r * 0.6), "leaf", 12, 6)
+    for f, x in ((0.5, 0.3), (0.45, -0.4)):
+        R(b, P(f, x, 0.08), P(f, x, 0.2), 0.025, 0.02, "white", 8)
+        S(b, P(f, x, 0.21), (0.07, 0.07, 0.04), "elf_purple", 12, 6)
+    # 枝条手臂和三根指头
+    for s in (-1, 1):
+        hand = P(0.3, s * 0.62, 0.42)
+        limb(b, [P(0, s * 0.27, 0.95), P(0.12, s * 0.55, 0.8), hand], 0.11, 0.07, "bark", 12)
+        for k in (-1, 0, 1):
+            limb(b, [hand, hand + Vector((k * 0.06, -0.08, -0.08)), hand + Vector((k * 0.09, -0.16, -0.06))],
+                 0.035, 0.012, "wood", 8)
+        S(b, P(0.12, s * 0.5, 0.95), (0.08, 0.08, 0.05), "leaf", 10, 6)  # 肩上的苔
+    # 树冠：一大团加周围几团，点缀紫花和星光
+    S(b, P(-0.05, 0, 1.55), (0.5, 0.46, 0.36), "leaf", 20, 12)
+    for f, x, z, r in ((0.25, 0.3, 1.6, 0.26), (-0.25, -0.32, 1.65, 0.28), (0.05, 0.05, 1.85, 0.3),
+                       (-0.3, 0.3, 1.5, 0.24), (0.3, -0.25, 1.5, 0.22)):
+        S(b, P(f, x, z), (r, r, r * 0.85), "leaf", 16, 10)
+    for f, x, z in ((0.45, 0.2, 1.6), (0.35, -0.38, 1.65), (0.2, 0.1, 2.0), (-0.1, 0.5, 1.7)):
+        S(b, P(f, x, z), (0.05, 0.05, 0.05), "elf_purple", 10, 6)
+        S(b, P(f, x, z + 0.025), (0.02, 0.02, 0.02), GLOW, 6, 4)
 
 UNITS = [
     ("supply_ship", supply_ship), ("relay", relay), ("battleship", battleship), ("frigate", frigate),
@@ -621,6 +873,9 @@ UNITS = [
     ("shield_guard", shield_guard), ("shadow_assassin", shadow_assassin), ("storm_mage", storm_mage),
     ("necromancer", necromancer), ("treant_guard", treant_guard),
 ]
+
+# 用卡通风格（平滑着色）的单位
+SMOOTH_UNITS = {"shield_guard", "shadow_assassin", "storm_mage", "necromancer", "treant_guard"}
 
 # 预览图里发光部位的颜色（游戏里由客户端设置，这里只为看效果）
 PLAYER_GLOW, UNDEAD_GLOW, ELF_GLOW = "5AB8FF", "8EE06A", "B48CFF"
@@ -694,6 +949,10 @@ def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height
     sun.data.energy = 3.5
     sun.rotation_euler = (math.radians(50), math.radians(10), math.radians(-35))
     scene.collection.objects.link(sun)
+    fill = bpy.data.objects.new("Fill", bpy.data.lights.new("Fill", "SUN"))
+    fill.data.energy = 1.2
+    fill.rotation_euler = (math.radians(60), 0, math.radians(150))  # 从背后打的轮廓光
+    scene.collection.objects.link(fill)
     scene.world = bpy.data.worlds.new("World")
     scene.world.use_nodes = True
     scene.world.node_tree.nodes["Background"].inputs["Color"].default_value = (0.004, 0.006, 0.012, 1)
@@ -708,6 +967,7 @@ def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height
     bpy.ops.render.render(write_still=True)
     bpy.data.objects.remove(cam)
     bpy.data.objects.remove(sun)
+    bpy.data.objects.remove(fill)
 
 
 def main():
@@ -728,7 +988,7 @@ def main():
         hull, glow = make_materials(palette)
         b = Builder()
         fn(b)
-        obj = b.finish(unit_id, hull, glow)
+        obj = b.finish(unit_id, hull, glow, smooth=unit_id in SMOOTH_UNITS)
         export_fbx(obj, os.path.join(OUT_DIR, unit_id + ".fbx"))
         built[unit_id] = (obj, glow)
         print("已导出 %s（%d 个三角面）" % (unit_id, sum(len(p.vertices) - 2 for p in obj.data.polygons)))
@@ -749,7 +1009,7 @@ def main():
                 obj.hide_render = False
             if name == "samples":  # 1 格角色的近景，侧前方 3/4 视角
                 render_sheet(objects, os.path.join(preview_dir, name + ".png"), spacing=2.2, turn=35, margin=1.6,
-                             px=440, height_px=760)
+                             px=600, height_px=1000)
             else:
                 render_sheet(objects, os.path.join(preview_dir, name + ".png"))
             print("已渲染预览", name)
