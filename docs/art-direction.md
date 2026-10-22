@@ -121,6 +121,21 @@ blender --background --python tools/models/build_models.py -- --preview docs/art
 - 客户端按单位 id 加载模型（`ModelLibrary`），某个单位没有模型时自动退回几何体占位。
 - 新增单位：在脚本里加一个函数并登记到 `UNITS`，重新运行即可。也可以在 Blender 里打开导出的 FBX 手工修改，但下次运行脚本会覆盖同名文件。
 
+### 制作流程：外部模型导入（AI 生成或美术交付）
+
+开发者的目标是“云顶之弈的清晰度，但更卡通”。脚本拼几何体到不了这个水平（没有手绘贴图），所以正式角色改为用 AI 3D 生成（首选 Tripo）或美术交付带贴图的模型，再用脚本统一成工程规格：
+
+```
+python3 tools/models/import_model.py 模型.glb 单位id [--turn 角度] [--cells 1|2] [--no-base] [--faces 20000] [--preview 预览.png]
+```
+
+- 支持 .glb / .gltf / .fbx / .obj，需要一张接在 Base Color 上的颜色贴图
+- 合并网格；`--turn` 把正面转到 Blender -Y（Unity +Z）；轴心放到底面中心；按高度缩放（1 格 1.6、2×2 3.2，`--height` 可改），并保证不超出底座
+- 超过 `--faces` 时减面；加棋子底座和魔网发光环（悬空单位加 `--no-base`），底座颜色写进贴图顶部新加的色带，所以仍是一张贴图
+- 输出 `StarlineModels/<单位 id>.fbx` 和 `<单位 id>_tex.png`；客户端 `ModelLibrary` 发现 `_tex` 贴图时用它，否则用共享的 `Palette.png`
+- 商用要求：Tripo 免费版生成的模型不能商用，要用付费版或 API
+
+
 当前预览：
 
 ![晨星远征军](art/models/morningstar.png)

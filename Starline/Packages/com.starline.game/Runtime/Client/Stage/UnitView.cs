@@ -131,7 +131,7 @@ namespace Starline.Client
 
         private void UseModel(GameObject model)
         {
-            _hull = ModelLibrary.CreateHullMaterial();
+            _hull = ModelLibrary.CreateHullMaterial(Def.Id);
             _glow = ModelLibrary.CreateGlowMaterial();
             ModelLibrary.AssignMaterials(model, _hull, _glow);
             _glowColor = Def.Id == "brood_mother" ? ViewUtil.HiddenColor
