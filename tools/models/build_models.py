@@ -893,6 +893,167 @@ PREVIEW_SAMPLES = [("shield_guard", PLAYER_GLOW), ("shadow_assassin", PLAYER_GLO
                    ("necromancer", UNDEAD_GLOW), ("treant_guard", ELF_GLOW)]
 
 
+# ---- 卡通角色的烘焙贴图和描边 ------------------------------------------------------
+# 色块贴图只有平涂颜色。卡通角色另外展开一套 UV，把“颜色 × 环境光遮蔽（AO）”烘焙进角色专属贴图
+# <单位 id>_tex.png（客户端 ModelLibrary 优先用它），缝隙、腋下、帽檐下会自然变暗，体积感更强。
+# 描边用“反向外壳”：沿法线外扩一层、翻转朝向的网格，用深色；Unity 默认剔除背面，所以只在轮廓处露出一圈线。
+
+BAKE_SIZE = 1024
+OUTLINE_STRIP = 0.03  # 贴图顶部留给描边颜色的色带高度（占比）
+OUTLINE_COLOUR = "1C1A26"
+OUTLINE_WIDTH = 0.012
+AO_STRENGTH = 0.5  # 0 = 不加阴影，1 = 缝隙全黑
+AO_DISTANCE = 0.12  # 只算这个距离内的遮挡：缝隙变暗，兜帽下的脸不至于整片发黑
+
+
+def _image_node(mat, image):
+    node = mat.node_tree.nodes.new("ShaderNodeTexImage")
+    node.image = image
+    for n in mat.node_tree.nodes:
+        n.select = False
+    node.select = True
+    mat.node_tree.nodes.active = node
+    return node
+
+
+def _pixels(image):
+    import numpy as np
+    buf = np.empty(image.size[0] * image.size[1] * 4, dtype=np.float32)
+    image.pixels.foreach_get(buf)
+    return buf.reshape(image.size[1], image.size[0], 4)
+
+
+def bake_texture(obj, unit_id, out_dir):
+    """展开 UV、烘焙颜色和 AO，合成角色贴图；返回贴图（Hull 材质改为用它）。"""
+    import numpy as np
+    scene = bpy.context.scene
+    scene.render.engine = "CYCLES"
+    scene.cycles.device = "CPU"
+    scene.cycles.samples = 128
+    if scene.world is None:
+        scene.world = bpy.data.worlds.new("BakeWorld")
+    scene.world.light_settings.distance = AO_DISTANCE
+    # 之前生成的角色也都摆在原点，烘焙时要藏起来，否则会互相遮出阴影
+    others = [o for o in scene.objects if o is not obj and not o.hide_render]
+    for o in others:
+        o.hide_render = True
+    mesh = obj.data
+    palette_name = mesh.uv_layers[0].name
+    mesh.uv_layers[0].active_render = True
+    mesh.uv_layers.new(name="Bake")
+    mesh.uv_layers.active = mesh.uv_layers["Bake"]
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode="EDIT")
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=0.004)
+    bpy.ops.object.mode_set(mode="OBJECT")
+    hull, glow = mesh.materials[0], mesh.materials[1]
+    # 色块贴图走原来的 UV
+    uvnode = hull.node_tree.nodes.new("ShaderNodeUVMap")
+    uvnode.uv_map = palette_name
+    tex_node = next(n for n in hull.node_tree.nodes if n.type == "TEX_IMAGE")
+    hull.node_tree.links.new(uvnode.outputs["UV"], tex_node.inputs["Vector"])
+
+    results = {}
+    for kind in ("DIFFUSE", "AO"):
+        image = bpy.data.images.new(unit_id + "_" + kind, BAKE_SIZE, BAKE_SIZE, alpha=False)
+        for mat in (hull, glow):
+            _image_node(mat, image)
+        if kind == "DIFFUSE":
+            bpy.ops.object.bake(type="DIFFUSE", pass_filter={"COLOR"}, margin=6, use_clear=True)
+        else:
+            bpy.ops.object.bake(type="AO", margin=6, use_clear=True)
+        results[kind] = _pixels(image)
+
+    for o in others:
+        o.hide_render = False
+    colour = results["DIFFUSE"][:, :, :3]
+    ao = np.sqrt(results["AO"][:, :, :1])  # 开方让过渡更柔和，只有真正的深缝才明显变暗
+    final = colour * (1.0 - AO_STRENGTH + AO_STRENGTH * ao)
+    rows = BAKE_SIZE
+    strip = max(4, int(rows * OUTLINE_STRIP))
+    out = np.ones((rows + strip, BAKE_SIZE, 4), dtype=np.float32)
+    out[:rows, :, :3] = final
+    out[rows:, :, :3] = [srgb_to_linear(c) for c in hex_rgb(OUTLINE_COLOUR)]
+    tex = bpy.data.images.new(unit_id + "_tex", BAKE_SIZE, rows + strip, alpha=False)
+    tex.pixels.foreach_set(out.ravel())
+    tex.filepath_raw = os.path.join(out_dir, unit_id + "_tex.png")
+    tex.file_format = "PNG"
+    tex.save()
+
+    # 角色 UV 压到下方，只留 Bake 这一套 UV
+    scale = rows / (rows + strip)
+    for d in mesh.uv_layers["Bake"].data:
+        d.uv = (d.uv[0], d.uv[1] * scale)
+    mesh.uv_layers.remove(mesh.uv_layers[palette_name])
+    mesh.uv_layers["Bake"].active_render = True
+    for mat in (hull, glow):
+        nodes = mat.node_tree.nodes
+        for n in list(nodes):
+            if n.type in ("TEX_IMAGE", "UVMAP"):
+                nodes.remove(n)
+    tex_node = hull.node_tree.nodes.new("ShaderNodeTexImage")
+    tex_node.image = tex
+    hull.node_tree.links.new(tex_node.outputs["Color"], hull.node_tree.nodes["Principled BSDF"].inputs["Base Color"])
+    return (rows + strip / 2) / (rows + strip)
+
+
+def add_outline(obj, outline_v):
+    """加反向外壳描边；返回外壳的面索引范围（预览时换成背面透明的材质）。"""
+    mesh = obj.data
+    b = bmesh.new()
+    b.from_mesh(mesh)
+    uv = b.loops.layers.uv.active
+    first = len(b.faces)
+    src = list(b.faces)
+    vmap = {}
+    for v in list(b.verts):
+        vmap[v] = b.verts.new(v.co + v.normal * OUTLINE_WIDTH)
+    for f in src:
+        nf = b.faces.new([vmap[v] for v in reversed(f.verts)])
+        nf.material_index = 0
+        nf.smooth = True
+        for loop in nf.loops:
+            loop[uv].uv = (0.5, outline_v)
+    b.to_mesh(mesh)
+    b.free()
+    return first, len(mesh.polygons)
+
+
+def outline_preview_material(obj, span):
+    """Cycles 不剔除背面：预览时外壳用“背面透明”的深色材质，模拟游戏里的效果。"""
+    mat = bpy.data.materials.new("OutlinePreview")
+    mat.use_nodes = True
+    nodes, links = mat.node_tree.nodes, mat.node_tree.links
+    bsdf = nodes["Principled BSDF"]
+    rgb = [srgb_to_linear(c) for c in hex_rgb(OUTLINE_COLOUR)]
+    bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
+    bsdf.inputs["Roughness"].default_value = 1.0
+    geo = nodes.new("ShaderNodeNewGeometry")
+    clear = nodes.new("ShaderNodeBsdfTransparent")
+    mix = nodes.new("ShaderNodeMixShader")
+    out = nodes["Material Output"]
+    # 只在镜头光线、而且看到外壳正面时才显示；阴影光线一律穿过，免得外壳把角色整个罩进阴影
+    path = nodes.new("ShaderNodeLightPath")
+    not_cam = nodes.new("ShaderNodeMath")
+    not_cam.operation = "SUBTRACT"
+    not_cam.inputs[0].default_value = 1.0
+    links.new(path.outputs["Is Camera Ray"], not_cam.inputs[1])
+    hide = nodes.new("ShaderNodeMath")
+    hide.operation = "MAXIMUM"
+    links.new(geo.outputs["Backfacing"], hide.inputs[0])
+    links.new(not_cam.outputs[0], hide.inputs[1])
+    links.new(hide.outputs[0], mix.inputs[0])
+    links.new(bsdf.outputs[0], mix.inputs[1])  # 外壳翻转过：朝向镜头的一侧是背面，要透明
+    links.new(clear.outputs[0], mix.inputs[2])
+    links.new(mix.outputs[0], out.inputs["Surface"])
+    obj.data.materials.append(mat)
+    for poly in obj.data.polygons[span[0]:span[1]]:
+        poly.material_index = 2
+
+
 # ---- 材质、导出、预览 -------------------------------------------------------------
 
 def make_materials(palette):
@@ -975,6 +1136,7 @@ def main():
     preview_dir = None
     if "--preview" in argv:
         preview_dir = os.path.abspath(argv[argv.index("--preview") + 1])
+    only = set(argv[argv.index("--only") + 1].split(",")) if "--only" in argv else None
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -984,11 +1146,17 @@ def main():
     palette.save()
 
     built = {}
+    outlines = {}
     for unit_id, fn in UNITS:
+        if only and unit_id not in only:
+            continue
         hull, glow = make_materials(palette)
         b = Builder()
         fn(b)
         obj = b.finish(unit_id, hull, glow, smooth=unit_id in SMOOTH_UNITS)
+        if unit_id in SMOOTH_UNITS:
+            outline_v = bake_texture(obj, unit_id, OUT_DIR)
+            outlines[unit_id] = add_outline(obj, outline_v)
         export_fbx(obj, os.path.join(OUT_DIR, unit_id + ".fbx"))
         built[unit_id] = (obj, glow)
         print("已导出 %s（%d 个三角面）" % (unit_id, sum(len(p.vertices) - 2 for p in obj.data.polygons)))
@@ -1001,7 +1169,11 @@ def main():
             side_glow.update((u, colour) for u in group)
         for unit_id, (obj, glow) in built.items():
             set_preview_glow(glow, PREVIEW_GLOW.get(unit_id, side_glow[unit_id]))
+            if unit_id in outlines:
+                outline_preview_material(obj, outlines[unit_id])
         for name, group, _ in sheets:
+            if any(u not in built for u in group):
+                continue
             for obj, _ in built.values():
                 obj.hide_render = True
             objects = [built[u][0] for u in group]
