@@ -612,7 +612,7 @@ Unity 客户端（Starline/Packages/com.starline.game）
 | 定点数 + 固定种子 | 结果在任何电脑上一致：推演、回放、在线对战都依赖它 |
 | 数据驱动 | 角色、敌人、技能、地图、奖池、剧情文本都在 JSON 配置表里，内核和测试读同一份 |
 | 存档在服务器上，必须联网登录 | 防作弊、录像和排行榜都依赖服务器为准的数据；换电脑登录即可继续 |
-| 服务端 C# + MySQL（表结构见 [server-database.md](server-database.md)） | 和内核同语言，服务端能直接引用内核重跑战斗；账号用 Steam 登录，养成数据按存档位存，设置和录像按账号存；战斗在服务端重跑结算 |
+| 服务端 C# 云函数托管在 UOS，数据库先用 CRUD Save、后换 MySQL（见 [server-design.md](server-design.md)、[server-database.md](server-database.md)） | 和内核同语言，服务端能直接引用内核重跑战斗；账号用 Steam 登录，养成数据按存档位存，设置和录像按账号存；战斗在服务端重跑结算 |
 
 ### 14.3 仓库结构
 

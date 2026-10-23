@@ -1,4 +1,5 @@
 -- Starline 服务端数据库表结构（MySQL 8.0 / 8.4 LTS）
+-- 用于第二阶段（UOS CRUD Storage，托管 MySQL）；第一阶段用 CRUD Save 文档存储，结构见 docs/server-database.md 第 11 节
 -- 说明文档：docs/server-database.md
 --
 -- 约定
@@ -39,7 +40,7 @@ CREATE TABLE account (
 CREATE TABLE account_auth (
   auth_id         BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
   account_id      BIGINT UNSIGNED  NOT NULL,
-  provider        VARCHAR(16)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'steam / dev（开发测试用）',
+  provider        VARCHAR(16)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'steam / wechat / apple / passport / dev（开发测试用）',
   provider_uid    VARCHAR(64)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'SteamID64 等',
   created_at      DATETIME(3)      NOT NULL,
   last_used_at    DATETIME(3)      NULL,

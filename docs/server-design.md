@@ -2,6 +2,8 @@
 
 开发者选定（决策 49）：**玩家必须连接服务器、登录后才能玩，养成数据全部以服务端为准。** 原来“不联网也能玩全部内容”的设定去掉了；决策 48 里“离线照常玩、联网后补交”的做法也随之作废。
 
+**服务端全部托管在 UOS**（团结引擎的云服务，决策 42 见 PR #6，决策 50）：业务代码是 C# 云函数（Func Stateless），数据库起步用 CRUD Save（按用量计费的文档存储），玩家多了再换 CRUD Storage（托管 MySQL）。**只有云函数能读写数据库**，客户端不直接连。
+
 本文是服务端的整体设计：怎么登录、战斗怎么结算、养成操作怎么提交、工程怎么分、有哪些接口。表结构见 [server-database.md](server-database.md)，通关录像的规则见 [replay-server.md](replay-server.md)（PR #6，其中“断网时先存本地队列”的部分不再需要）。
 
 这一步仍是设计，还没有服务端代码。
@@ -65,14 +67,17 @@ POST /v1/battles/{battle_id}/finish  结束：带帧号的指令、客户端算�
 每种操作一个接口（第 7 节），处理方式相同：
 
 ```
-开事务，SELECT … FOR UPDATE 锁住这个存档（save_slot 那一行）
-查 save_action：这个 Idempotency-Key 处理过 → 直接返回上次的结果
-读出相关数据，按配置表校验（碎片够不够、等级上限、槽位是否解锁……）
-  通过 → 写各表、economy_log，revision + 1
+读出存档（带 revision）
+这个 Idempotency-Key 处理过 → 直接返回上次的结果
+按配置表校验（碎片够不够、等级上限、槽位是否解锁……）
+  通过 → 算出新存档，revision + 1
   不通过 → 返回错误码，不改数据
-写 save_action（成功和失败都记）
-提交事务，返回变化后的实体和新 revision
+写回存档：只有 revision 还是刚才读到的值才写入（乐观锁），否则重读重做（最多 3 次）
+记操作日志，返回变化后的内容和新 revision
 ```
+
+- **同一个存档的修改必须一个接一个**。CRUD Save 阶段整个存档是一份文档，用 revision 做条件写（乐观锁）；换到 MySQL 后改为事务 + `SELECT … FOR UPDATE` 行锁。两种写法都藏在数据层后面（第 6 节），规则代码不变。
+- 一个账号同时只能在一台电脑登录，客户端也一次只发一个修改请求，所以冲突本来就很少，乐观锁只是兜底。
 
 - **规则代码只在服务端**（`Starline.Server.Game`），读和客户端同一份 JSON 配置表。客户端也读这些配置表，但只用来**显示**（升星要多少碎片、等级上限是多少、按钮能不能点），不做结算。
 - 客户端每次拿到返回的 `revision`。如果发现和自己缓存的对不上（比如在别的电脑上玩过），就重新拉完整快照。
@@ -103,43 +108,63 @@ POST /v1/battles/{battle_id}/finish  结束：带帧号的指令、客户端算�
 
 ---
 
-## 6. 服务端工程结构
+## 6. 部署在 UOS 和工程结构
+
+### 6.1 用到的 UOS 服务
+
+| 职责 | UOS 服务 | 说明 |
+|---|---|---|
+| 所有接口（登录、存档、战斗结算、养成、远征、录像榜） | Func Stateless（C# 云函数，HTTP 触发） | 战斗重跑单场几毫秒，按 GB·秒计费；上限 100 QPS，个人项目起步够用 |
+| 数据库 | CRUD Save → CRUD Storage（托管 MySQL） | 两个阶段见 [server-database.md](server-database.md) 第 0 节；只有云函数能读写 |
+| 账号 | Passport：微信小游戏直接登录；Steam、iOS 走“外部 ID 登录”，由云函数先校验 Steam 票据再映射 | 计费口径待确认，太贵就由云函数自己处理登录（replay-server.md 第 12 节） |
+| 配置表、客户端资源 | CDN | 配置表 JSON 跟云函数一起打包，客户端的随包发 |
+
+**不用 UOS 的 Cloud Save 存游戏存档**：Cloud Save 是客户端直接读写的，玩家能改，做不到“服务端为准”。存档只放在 CRUD 里，只经过云函数。
+
+### 6.2 工程结构
 
 ```
 server/
   Starline.Server.sln
   src/
-    Starline.Server.Api/       ASP.NET Core（.NET 8）最小 API：路由、登录鉴权、限流、序列化
     Starline.Server.Game/      游戏规则：战斗登记和结算、养成、商店、工坊、远征、录像榜（引用 src/Starline.Battle）
-    Starline.Server.Data/      MySQL 访问：MySqlConnector + Dapper，每张表一个仓储类
+                               纯 .NET 类库，不依赖 UOS，也不直接碰数据库
+    Starline.Server.Data/      数据层接口（IAccountStore、ISaveStore、IBattleStore、IReplayStore……）
+      CrudSave/                CRUD Save 实现（第一阶段）
+      MySql/                   MySQL 实现（第二阶段，MySqlConnector + Dapper，表结构见 db/schema.sql）
+    Starline.Server.Uos/       UOS 云函数入口：路由、鉴权、参数解析，调 Game 层；很薄
   tests/
-    Starline.Server.Tests/     规则、结算、重试幂等、并发的测试（用 Docker 起 MySQL）
+    Starline.Server.Tests/     规则、结算、重试幂等、乐观锁冲突的测试（数据层用内存实现）
   db/
-    schema.sql                 第一版表结构
-    migrations/                之后的改动：0002_xxx.sql……启动时按序号执行（DbUp）
-  deploy/
-    Dockerfile、docker-compose.yml
+    schema.sql                 第二阶段（CRUD Storage / MySQL）的表结构
 ```
 
 | 选择 | 理由 |
 |---|---|
-| ASP.NET Core 最小 API | 和内核同语言，直接引用 `src/Starline.Battle` 重跑战斗、推进远征 |
-| Dapper 而不是 EF Core | 表结构是手写 SQL 定的，查询简单；行锁和批量写更好控制 |
-| MySqlConnector | 异步、性能好，MIT 协议 |
-| DbUp 按序号执行 SQL | 迁移就是普通 SQL 文件，和 `schema.sql` 一个风格 |
-| 不加 Redis | 个人项目先少一个组件：限流用内存（单实例），会话在 MySQL；以后多实例再加 |
+| 规则写成普通类库，云函数只是入口 | UOS 有什么限制都只影响最外面一层。万一 C# 云函数带不上内核，同一个类库可以包成 ASP.NET 程序部署到 Func Stateful（UOS 托管的 Docker）或自建服务器，游戏和内核代码不用改 |
+| 数据层接口 + 两套实现 | 先用便宜的 CRUD Save，换 MySQL 时只换实现；测试用内存实现，不依赖 UOS |
+| 存档整份读写 | CRUD Save 阶段一个存档一份文档，读一次、写一次，调用次数最少（按次计费也最省） |
+
+### 6.3 部署和备份
+
+- 云函数用 UOS 后台或 `usf-cli` 部署；配置表按 `data/<data_hash>/` 一起打进函数包。
+- 每天由一个定时云函数把 CRUD 里的数据导出成 JSON 存档备份，防误删，也方便以后迁出 UOS 或换到 MySQL。
+- 开发和正式环境分开两个 UOS 应用。UOS 的试用额度不能用于正式商用。
 
 ---
 
 ## 7. 接口
 
-全部 HTTPS + JSON，路径以 `/v1` 开头。除了登录，都要带 `Authorization: Bearer <访问令牌>`；修改类请求还要带 `Idempotency-Key: <UUID>`。
+全部 HTTPS + JSON，由 UOS 云函数的 HTTP 触发器提供，路径以 `/v1` 开头。除了登录，都要带 `Authorization: Bearer <访问令牌>`；修改类请求还要带 `Idempotency-Key: <UUID>`。
 
 ### 登录与账号
 
+令牌由云函数自己签发（里面带会话 id），不直接用 Passport 的令牌：这样“一个账号只能在一台电脑上登录”和踢下线都由我们控制，以后不用 Passport 也不影响客户端。Passport 只负责“这个人是谁”。
+
 | 方法 | 路径 | 用途 |
 |---|---|---|
-| POST | `/v1/auth/steam` | Steam 票据换访问令牌（15 分钟）和刷新令牌（30 天）；第一次登录自动建账号；**作废这个账号的其他会话** |
+| POST | `/v1/auth/steam` | 云函数校验 Steam 票据 → 用 Passport 外部 ID 登录换出玩家 id → 签发访问令牌（15 分钟）和刷新令牌（30 天）；第一次登录自动建账号；**作废这个账号的其他会话** |
+| POST | `/v1/auth/wechat` | 微信小游戏：Passport 微信登录，之后同上 |
 | POST | `/v1/auth/refresh` | 用刷新令牌换新的一对令牌 |
 | POST | `/v1/auth/logout` | 作废当前会话 |
 | GET | `/v1/me` | 账号信息、已购内容、设置、存档列表 |
@@ -206,7 +231,8 @@ server/
 
 | 阶段 | 内容 |
 |---|---|
-| S1 服务端骨架 | `server/` 工程、Steam 登录（开发期用 `dev` 登录方式免 Steam）、存档接口、Docker 部署 |
+| S0 UOS 验证 | 在 UOS 后台部署一个最小的 C# 云函数：带上内核和配置表跑一场战斗、读写一份 CRUD Save 文档（试条件写）、访问 Steam Web API。第 9 节列的问题在这一步得到答案 |
+| S1 服务端骨架 | `server/` 工程、登录（开发期用 `dev` 登录方式免 Steam）、存档接口、CRUD Save 数据层、部署到 UOS |
 | S2 战斗结算 | 战斗登记和重跑、关卡进度、经验和掉落；配置表新增 `progression.json`（经验曲线、升星消耗、等级上限）、`stages.json`（主线关卡、掉落） |
 | S3 客户端联网 | 登录界面、网络层（令牌刷新、重试、断线重连）、存档从本地 JSON 改为服务端快照；主菜单和存档界面改为读服务端 |
 | S4 养成和玩法 | 召唤、升星、符文、商店、炼金工坊、星辉高塔；远征改为服务端推进 |
@@ -218,9 +244,15 @@ server/
 
 ## 9. 还没定的事
 
-1. **部署地点**：玩家必须联网，服务器延迟和稳定性更重要了。默认沿用 replay-server.md 的香港（不用备案）；放大陆要 ICP 备案（游戏还可能涉及版号）。
-2. **Steam 商店页要标明“需要联网”**。买断制游戏强制联网容易招差评，商店页和首发说明里要写清楚原因（防作弊、录像和排行榜）。
-3. **停服预案**：买断制游戏强制联网，以后如果停服，玩家就玩不了了。建议现在先定一句承诺（比如停服前发布离线补丁），写进商店页或 FAQ。
+1. **UOS 要实际部署才能确认的事**（S0 阶段做，需要你的 UOS 账号）：
+   - C# 云函数能不能带上内核源码和配置表；冷启动多久（玩家每个操作都要等它）
+   - CRUD Save 支不支持条件写（按 revision 更新），单个文档最大多大（一个存档估计 30~80 KB），能不能按字段查询和排序
+   - 国内云函数能不能稳定访问 Steam Web API
+   - Passport 的计费口径
+2. **海外玩家的延迟**：UOS 在国内，现在每个操作都要请求服务器，海外 Steam 玩家每次点击会多等几百毫秒。界面要做到先显示“处理中”、不卡住；真不行再考虑海外节点。
+3. **ICP 备案和版号**：UOS 在国内，对外提供服务的域名要备案；国内手机端和小游戏收费要版号。
+4. **Steam 商店页要标明“需要联网”**。买断制游戏强制联网容易招差评，商店页和首发说明里要写清楚原因（防作弊、录像和排行榜）。
+5. **停服预案**：买断制游戏强制联网，以后如果停服，玩家就玩不了了。建议现在先定一句承诺（比如停服前发布离线补丁），写进商店页或 FAQ。
 
 ---
 
@@ -244,7 +276,7 @@ server/
 |---|---|---|
 | #4 主菜单与本地存档位 | `ProfileStore` 把存档存在本机 `saves/slot<N>.json`；启动读取最近玩过的本地存档；`GameApp.Update` 本地累计游戏时长 | 存档位、新建指挥官、删除存档改为调服务端接口（`/v1/saves`）；界面和三个存档位的设计可以保留；游戏时长定期报给服务端 |
 | #5 设置界面 | 设置全部存在本机 `settings.json` | 画质、分辨率等仍然留在本机（跟着电脑走）；语言和以后的“分享我的通关录像”等同步到服务端 `account_settings` |
-| #6 通关录像方案 | 断网时录像先存本地队列；有单独的上传接口，上传后服务端再重跑 | 不需要本地队列和上传接口：战斗本来就要在服务端结算，结算后直接收进录像榜（第 3 节）；PostgreSQL 改为 MySQL |
+| #6 通关录像方案 | 断网时录像先存本地队列；有单独的上传接口，上传后服务端再重跑 | 不需要本地队列和上传接口：战斗本来就要在服务端结算，结算后直接收进录像榜（第 3 节）；录像校验类库（`Starline.Replay`）并入本文的 `Starline.Server.Game`，或者由它引用，避免两份重跑代码；录像相关的 UOS 部署和本文第 6 节共用一套 |
 
 ### 文档
 

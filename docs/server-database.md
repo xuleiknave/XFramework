@@ -1,8 +1,22 @@
-# 服务端数据库表结构（MySQL）
+# 服务端数据结构（UOS CRUD Save / MySQL）
 
-开发者要求：服务端用 C# 开发，数据库用 MySQL（云端环境已准备好），先设计表结构。本文说明每张表的用途和设计取舍，建表语句在 [`server/db/schema.sql`](../server/db/schema.sql)。
+开发者要求：服务端用 C# 开发，数据库用 MySQL，先设计表结构。之后定为服务端全部托管在 UOS（决策 50）：数据库起步用 CRUD Save（文档存储），量大后换 CRUD Storage（托管 MySQL）。本文第 0 节说明两个阶段，第 11 节是 CRUD Save 阶段的文档结构；第 1~10 节是 MySQL 阶段的表，建表语句在 [`server/db/schema.sql`](../server/db/schema.sql)。
 
-这一步只有表结构，还没有服务端代码。玩家必须联网登录才能玩（决策 49），服务端怎么登录、怎么结算、有哪些接口，见 [server-design.md](server-design.md)。通关录像的业务规则（重跑验证、榜单）见 [replay-server.md](replay-server.md)（PR #6 的方案草案）；那份方案原来选的是 PostgreSQL，现在按开发者的决定改用 MySQL，录像相关的表收在本文第 6 节。
+这一步只有数据结构设计，还没有服务端代码。玩家必须联网登录才能玩（决策 49），服务端怎么登录、怎么结算、有哪些接口，见 [server-design.md](server-design.md)。通关录像的业务规则（重跑验证、榜单）见 [replay-server.md](replay-server.md)（PR #6 的方案草案）；录像相关的表收在本文第 6 节，CRUD Save 阶段的放法见第 11 节。
+
+---
+
+## 0. 两个阶段
+
+| 阶段 | 数据库 | 什么时候 | 数据怎么放 |
+|---|---|---|---|
+| 一：上线初期 | UOS **CRUD Save**（按用量计费的文档存储，起步每月几块钱） | 现在起 | 一个存档一份文档，整份读写（第 11 节） |
+| 二：玩家多了 | UOS **CRUD Storage**（托管 MySQL，1 核约 3.20 元/天） | 出现下面任一情况：要做跨玩家的排行和天梯查询；运营要按条件查数据；日志量让按次计费变贵；碰到 CRUD Save 的限制（文档大小、查询能力） | 本文第 1~10 节的 27 张表 |
+
+- **两个阶段的数据内容完全一样**，只是放法不同：第 11 节给出了每份文档对应哪几张表。
+- **只有云函数能读写数据库**，客户端不直接连。
+- 服务端的规则代码只通过数据层接口读写（[server-design.md](server-design.md) 第 6 节），换阶段时只换数据层的实现。
+- 迁移：停服维护，导出 CRUD Save 的全部文档，用一个导入脚本拆成表写进 MySQL，切换数据层配置后开服。每天的 JSON 备份也是同一种格式，可以先拿备份演练。
 
 ---
 
@@ -10,7 +24,7 @@
 
 | 项目 | 约定 | 理由 |
 |---|---|---|
-| 版本 | MySQL 8.0 以上（已在 8.4 LTS 上建表验证） | 要用 `JSON`、`CHECK` 约束和生成列 |
+| 版本 | MySQL 8.0 以上（已在 8.4 LTS 上建表验证；CRUD Storage 的 MySQL 版本到时确认） | 要用 `JSON`、`CHECK` 约束和生成列 |
 | 引擎 / 字符集 | InnoDB，`utf8mb4` | 昵称、指挥官名字是中文，也可能有 emoji |
 | 配置表 id | `VARCHAR(32) CHARACTER SET ascii COLLATE ascii_bin` | 角色、关卡、符文的 id 来自 `StarlineData` 的 JSON，只有英文；ascii 索引更小，区分大小写和内核一致 |
 | 时间 | `DATETIME(3)`，一律 UTC，由服务端写入 | 炼金工坊的研究计时以服务端时间为准，不信任客户端时钟 |
@@ -49,12 +63,12 @@ account（账号）
 | 表 | 用途 |
 |---|---|
 | `account` | 一个玩家一行：昵称、状态（正常 / 封禁 / 注销）、最后登录时间和 IP |
-| `account_auth` | 登录方式。现在只有 `steam`（`provider_uid` 存 SteamID64），`(provider, provider_uid)` 唯一。以后移植手机或小游戏（设计文档 1.4）就加一种 provider，同一账号可以绑多个 |
+| `account_auth` | 登录方式：`steam`（`provider_uid` 存 SteamID64）、`wechat`（微信小游戏）、`apple` 等，`(provider, provider_uid)` 唯一，同一账号可以绑多个。经过 Passport 登录时，`passport` 这一行存 Passport 的玩家 id |
 | `account_session` | 刷新令牌，只存 SHA-256；访问令牌用短期 JWT，不落库。**一个账号同一时间只有一个有效会话**：新登录时作废旧会话，旧电脑被踢下线，这样不会有两台电脑同时改一个存档 |
 | `account_entitlement` | 已购内容（`base`、以后的 DLC），登录时按 Steam 的拥有情况同步 |
 | `account_settings` | 跨设备有意义的设置 |
 
-**登录流程**（沿用 replay-server.md 第 6 节）：客户端用 Steamworks 取 Web API 票据 → 服务端调 Steam `AuthenticateUserTicket` 换出 SteamID → 查 `account_auth`，没有就新建 `account` → 发访问令牌和刷新令牌。不做用户名密码注册；`dev` 这个 provider 只给开发测试用。
+**登录流程**（沿用 replay-server.md 第 6、12 节）：客户端用 Steamworks 取 Web API 票据 → 云函数调 Steam `AuthenticateUserTicket` 换出 SteamID → Passport 外部 ID 登录 → 查 `account_auth`，没有就新建 `account` → 云函数签发自己的访问令牌和刷新令牌。微信小游戏直接走 Passport 的微信登录。不做用户名密码注册；`dev` 这个 provider 只给开发测试用。
 
 **设置只同步一部分**：客户端的 `settings.json` 里大部分是画质、分辨率、显示模式，跟着电脑走，换一台电脑不该照搬，所以不上传。服务端只存：
 
@@ -208,3 +222,55 @@ docker exec starline-db sh -c 'mysql -uroot -ppw < /sql/schema.sql'
 ## 10. 下一步
 
 见 [server-design.md](server-design.md) 第 8 节：先搭服务端骨架（登录、存档），再做战斗结算。
+
+---
+
+## 11. 第一阶段：CRUD Save 的文档结构
+
+CRUD Save 是文档存储，没有多表事务和行锁。按“一次操作尽量只读写一份文档”来放数据：**一个存档的全部养成数据放在一份文档里**，整份读、整份写。
+
+### 集合
+
+| 集合 | 文档键 | 内容 | 对应第二阶段的表 |
+|---|---|---|---|
+| `accounts` | 账号 id | 昵称、状态和封禁、登录方式列表、已购内容、设置、**当前会话**（会话 id、刷新令牌哈希、过期时间、客户端版本）、存档位摘要（存档 id、位置、指挥官名字、时长、最近游玩） | `account`、`account_auth`、`account_session`、`account_entitlement`、`account_settings`、`save_slot` 的摘要列 |
+| `identities` | `{provider}:{uid}`，如 `steam:7656119…` | 账号 id | `account_auth` 的唯一索引：登录时按键直接查，不用条件查询 |
+| `saves` | 存档 id | 见下面的“存档文档” | `save_slot` 及其下全部 `save_*` 表 |
+| `battles` | 战斗 id | 和 `save_battle` 的列一样：登记的布阵、种子、版本、战力、状态、指令、重跑结果、有效期 | `save_battle` |
+| `logs` | 自动 id | 一次操作一条：存档 id、类型、参数、结果或错误码、revision、时间，以及这次的资源变化列表（货币、碎片、经验各变了多少、变化后余额） | `save_action`、`economy_log`、`save_hero_star_log`、`save_expedition_record` |
+| `replays` | 录像 public_id | 和 `replay` 的列一样 | `replay` |
+| `boards` | `{关卡 id}:{data_hash}` | 本关最低战力榜：排好序的前 20 份录像摘要、上榜门槛；“只看未用技能”另存一份前 20 | 替代 `idx_replay_board` 的排序查询 |
+| `replayVotes` | `{public_id}:{账号 id}` | 点了赞没有、举报原因和处理状态 | `replay_like`、`replay_report` |
+| `gameVersions` | data_hash | 内核版本、状态、发布时间 | `game_data_version` |
+
+### 存档文档
+
+```json
+{
+  "saveId": "…", "accountId": "…", "slot": 1, "revision": 128,
+  "commander": { "name": "加文", "playSeconds": 36000, "runsStarted": 12, "runsWon": 5,
+                 "createdAt": "…", "lastPlayedAt": "…", "deletedAt": null },
+  "currencies": { "gold": 3200, "meta": 40 },
+  "items": { "remains_ghoul": 6 },
+  "heroes": { "knight_aldric": { "level": 25, "exp": 120, "star": 2, "shards": 14,
+                                 "affinity": 30, "skin": null, "recruitedAt": "…", "source": "story" } },
+  "runes": [ { "uid": 17, "id": "r_guard_1", "hero": "knight_aldric", "slot": 1 } ],
+  "stages": { "ch1-03": { "stars": 7, "clears": 9, "fails": 0, "sweeps": 4, "bestPower": 1840, "firstClearedAt": "…" } },
+  "flags": { "story:ch1:intro": 1 },
+  "unlocks": { "hero": ["frigate"], "rune": [], "commander": [], "skill": [] },
+  "codex": { "enemy:ghoul": 2 },
+  "tower": { "highest": 23, "stars": 61, "checkpoint": 20, "blessings": [], "floors": { "1": 7, "2": 7 } },
+  "lab": [ { "id": 3, "slot": 1, "target": "ghoul", "baseSeconds": 43200, "reduced": 3600,
+             "claimed": 25, "startedAt": "…", "completedAt": null } ],
+  "expedition": null,
+  "runningBattleId": null,
+  "recentRequests": [ { "key": "…", "type": "hero.star_up", "revision": 127, "result": { } } ]
+}
+```
+
+- **大小**：45 名角色、约 100 关、150 条图鉴、几十枚符文、一局远征快照、最近 50 个请求，估计 30~80 KB。要确认 CRUD Save 的单文档上限。
+- **并发**：写回时带上读到的 `revision` 做条件写，revision 变了就重读重做（乐观锁）。如果 CRUD Save 不支持条件写，就靠“一个账号只在一台电脑登录 + 客户端一次只发一个修改请求”保证不冲突，这一点 S0 阶段要先验证。
+- **幂等**：`recentRequests` 保留最近 50 个请求的 `Idempotency-Key` 和结果，和存档在同一次写入里更新，所以“执行了但没记下”或“记下了但没执行”都不会发生。完整的历史在 `logs` 里。
+- **跨文档的操作**（结算战斗要写 `saves` 和 `battles` 两份）：先写存档（`recentRequests` 里记下战斗 id），再把战斗标为已结算。中间失败时，客户端用同一个 key 重发，云函数在 `recentRequests` 里看到已经结算过，直接返回结果并补上战斗的状态。
+- **录像榜**：如果 CRUD Save 不能“按关卡筛选、按战力排序取前 20”，就由云函数维护 `boards` 里排好序的榜单文档（新录像进榜时条件写更新）。即使能查，`boards` 也让读榜只要一次读取，CDN 缓存也方便。
+- **不做的事**：跨玩家的排行（高塔最高层、天梯）在第一阶段只做“每个榜一份排好序的文档”的简单版本；需要复杂查询时就是升级到第二阶段的时机。
