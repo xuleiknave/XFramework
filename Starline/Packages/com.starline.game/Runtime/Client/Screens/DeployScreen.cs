@@ -24,7 +24,6 @@ namespace Starline.Client
             _run = app.Run;
             _encounter = _run.CurrentEncounter;
             _deploy = new DeployController(_run, _encounter, app.Stage);
-            _deploy.Changed += Refresh;
 
             Find<Label>("title").text = _run.Act.Title + " · 第 " + (_run.Current.Layer + 1) + " 跳    " + _encounter.Name;
             Find<Label>("enc-name").text = _encounter.Name;
@@ -32,13 +31,31 @@ namespace Starline.Client
             _roster = Find<ScrollView>("roster");
             Button("auto", _deploy.AutoFill);
             Button("clear", _deploy.ClearFormation);
+            SetUpReplay();
             _forecastButton = Button("forecast", _deploy.RunForecast);
             _fightButton = Button("fight", Fight);
+        }
+
+        /// <summary>This stage's best saved replay: copy its formation, or watch it and come back.</summary>
+        private void SetUpReplay()
+        {
+            Replay replay = _encounter.Id != null ? App.Replays.Load(_encounter.Id) : null;
+            Find<VisualElement>("replay-box").SetVisible(replay != null);
+            if (replay == null)
+            {
+                return;
+            }
+            Find<Label>("replay-info").text = "本关录像：战力 " + replay.Power + (replay.UsesSkills ? " · 用了技能" : " · 没用技能");
+            Button("copy-replay", () => _deploy.CopyFormation(replay.Player));
+            // Coming back re-shows this same screen, so intel points and forecasts are kept.
+            Button watch = Button("watch-replay", () => App.ShowReplay(replay, "返回布阵", () => App.ShowDeploy(this)));
+            watch.SetEnabled(replay.IsPlayable);
         }
 
         public override void Enter()
         {
             App.Overlay.SetBattleMode(false);
+            _deploy.Changed += Refresh;
             _deploy.Begin();
         }
 

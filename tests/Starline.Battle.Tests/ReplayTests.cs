@@ -1,4 +1,5 @@
 using System;
+using Starline.Expedition;
 using Starline.Battle;
 
 namespace Starline.Battle.Tests
@@ -23,6 +24,8 @@ namespace Starline.Battle.Tests
             Run("录像校验：真录像通过，并重算战力", VerifierAcceptsGenuineReplay);
             Run("录像校验：篡改过的录像被拒", VerifierRejectsTamperedReplays);
             Run("录像：本关最佳只保留战力更低的胜局", BestReplayRules);
+            Run("照抄布阵：用自己的角色按原位置摆，缺的留空", CopyFormation);
+            Run("照抄布阵：指挥点不够时角色优先、水晶后放", CopyFormationRespectsCommandLimit);
             Run("录像：黄金录像哈希不变", GoldenReplay);
         }
 
@@ -155,6 +158,46 @@ namespace Starline.Battle.Tests
             Assert(lower.IsBetterThan(win), "战力更低的胜局应替换");
             Assert(!win.IsBetterThan(lower) && !win.IsBetterThan(win), "战力更高或相同的胜局不替换");
             Assert(win.IsBetterThan(stale) && win.IsBetterThan(loss), "旧版本或败局应被胜局替换");
+        }
+
+        private static Fleet CopyTestFleet()
+        {
+            var fleet = new Fleet { Relays = 2 };
+            fleet.Formation.Add("supply_ship", 0, 0);
+            fleet.Add("battleship", 2);
+            fleet.Add("frigate");
+            fleet.Add("pd_ship");
+            fleet.Add("missile_ship");
+            return fleet;
+        }
+
+        private static void CopyFormation()
+        {
+            Formation source = Fixtures.WreckFieldAmbush().SuggestedPlayer;
+            Fleet fleet = CopyTestFleet();
+            FormationCopyResult result = FormationCopy.Apply(fleet, source, 22);
+            Formation f = fleet.Formation;
+
+            Assert(f.Source() != null && f.Source().Depth == 4 && f.Source().Row == 3, "源晶塔应放到录像里的位置");
+            Assert(f.UnitAt(0, 3)?.UnitId == "battleship" && f.UnitAt(0, 3).Star == 2, "重甲骑士应用自己的 ★2 放到原位置");
+            Assert(result.StarDiffers.Count == 1, "星级不同的应记下来");
+            Assert(result.Placed == 4, "有的 4 名角色都应放下，实际 " + result.Placed);
+            Assert(result.Missing.Count == 6, "没有的角色留空，实际缺 " + result.Missing.Count);
+            Assert(result.RelaysPlaced == 2 && result.RelaysMissing == 1, "水晶只放得下自己有的 2 个");
+            foreach (Placement p in f.Placements)
+            {
+                Assert(p.Def.IsStructure || fleet.Get(p.ShipId) != null, "上阵的必须是自己的角色");
+            }
+            Assert(FormationRules.Validate(f, 22).Count == 0, "照抄后的布阵应合法");
+        }
+
+        private static void CopyFormationRespectsCommandLimit()
+        {
+            Formation source = Fixtures.WreckFieldAmbush().SuggestedPlayer;
+            Fleet fleet = CopyTestFleet();
+            FormationCopyResult result = FormationCopy.Apply(fleet, source, 6);
+            Assert(fleet.Formation.CommandPointsUsed() <= 6, "不能超过指挥点上限");
+            Assert(result.Placed == 2 && result.RelaysPlaced == 0, "6 点指挥点应放下骑士和游侠、不放水晶，实际 " + result.Placed + " / " + result.RelaysPlaced);
         }
 
         private static void GoldenReplay()

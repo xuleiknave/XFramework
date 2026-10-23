@@ -131,6 +131,29 @@ namespace Starline.Client
             Refresh();
         }
 
+        /// <summary>
+        /// "照抄布阵": rebuilds the formation from <paramref name="source"/> (a replay's) with the
+        /// fleet's own characters, and says in the notice what could not be copied.
+        /// </summary>
+        public void CopyFormation(Formation source)
+        {
+            CancelSelection();
+            FormationCopyResult result = FormationCopy.Apply(Fleet, source, CommandLimit);
+            var gaps = new List<string>();
+            foreach (Placement p in result.Missing)
+            {
+                gaps.Add(p.Def.DisplayName + " " + Ui.Stars(p.Star));
+            }
+            if (result.RelaysMissing > 0)
+            {
+                gaps.Add("法力水晶 × " + result.RelaysMissing);
+            }
+            Notice = "已照抄布阵：放下 " + result.Placed + " 名角色"
+                + (result.StarDiffers.Count > 0 ? "（" + result.StarDiffers.Count + " 名星级和录像不同）" : "")
+                + (gaps.Count > 0 ? "；空着的位置：" + string.Join("、", gaps) : "；全部照抄成功");
+            Refresh();
+        }
+
         public void ClearFormation()
         {
             CancelSelection();

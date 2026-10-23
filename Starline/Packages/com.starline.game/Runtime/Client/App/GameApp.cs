@@ -108,11 +108,12 @@ namespace Starline.Client
             }
         }
 
-        public void ShowDeploy()
+        /// <summary>Opens deployment for the current battle; pass <paramref name="screen"/> to return to an existing one (after watching a replay).</summary>
+        public void ShowDeploy(DeployScreen screen = null)
         {
             Stage.SetVisible(true);
             Stage.Rig.GoToDeploy();
-            Show(new DeployScreen(this));
+            Show(screen ?? new DeployScreen(this));
         }
 
         public void ShowBattle(Encounter encounter, Formation formation)
