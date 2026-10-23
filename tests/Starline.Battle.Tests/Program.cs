@@ -37,6 +37,7 @@ namespace Starline.Battle.Tests
             Run("远征：失败扣耐久，Boss 失败扣 2，归零结束", DurabilityRules);
             Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
             Run("敌方阵容都合法", EncountersAreValid);
+            RunReplayTests();
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
 
             Console.WriteLine();

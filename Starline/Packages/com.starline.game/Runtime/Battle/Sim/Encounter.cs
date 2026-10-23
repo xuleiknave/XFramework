@@ -20,6 +20,8 @@ namespace Starline.Battle
     /// <summary>A single battle node: the enemy formation plus what the player may deploy.</summary>
     public sealed class Encounter
     {
+        /// <summary>Stage id from the data files (null for hand-built encounters); also picks the battle seed, see <see cref="StageSeed"/>.</summary>
+        public string Id;
         public string Name;
         /// <summary>One or two sentences shown before deployment.</summary>
         public string Briefing;

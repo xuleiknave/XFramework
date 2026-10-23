@@ -96,4 +96,17 @@ namespace Starline.Battle
         public static Command Cast(int side, CommanderSkill skill, FixVec2 point = default(FixVec2)) =>
             new Command { Side = side, Skill = skill, Point = point };
     }
+
+    /// <summary>A command together with the tick at whose start it was applied.</summary>
+    public readonly struct IssuedCommand
+    {
+        public readonly int Tick;
+        public readonly Command Command;
+
+        public IssuedCommand(int tick, Command command)
+        {
+            Tick = tick;
+            Command = command;
+        }
+    }
 }

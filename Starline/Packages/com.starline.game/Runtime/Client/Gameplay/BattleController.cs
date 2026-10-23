@@ -23,8 +23,10 @@ namespace Starline.Client
         {
             _stage = stage;
             Encounter = encounter;
-            // Any seed outside the forecast range, so the real fight is not one the player previewed.
-            ulong seed = (ulong)DateTime.Now.Ticks % 900000UL + 1UL;
+            // Stage battles use the stage's fixed seed so they can be recorded and shared as replays
+            // (replay-server.md section 4); hand-built encounters fall back to a time-based seed outside
+            // the forecast range.
+            ulong seed = encounter.Id != null ? StageSeed.For(encounter.Id) : (ulong)DateTime.Now.Ticks % 900000UL + 1UL;
             Battle = new BattleSim(encounter.CreateSetup(player, seed));
             _stage.BeginBattle(Battle);
             _stage.Rig.GoToBattle();

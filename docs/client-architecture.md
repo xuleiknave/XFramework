@@ -22,11 +22,12 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  Sim/        确定性战斗模拟、指挥官技能                        │
 │  Analysis/   战前推演                                         │
 │  Expedition/ 远征：地图、远征军与合成、奖励、自动布阵、远征配置   │
+│  Replay/     录像录制与回放、录像校验、上阵战力、关卡种子     │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 读取
 ┌───────────────▼──────────────────────────────────────────────┐
 │ 配置表  Runtime/Resources/StarlineData/*.json                 │
-│  units · counters · skills · encounters · expedition         │
+│  units · counters · skills · encounters · expedition · power │
 └──────────────────────────────────────────────────────────────┘
 ```
 

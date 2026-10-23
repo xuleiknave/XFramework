@@ -600,6 +600,7 @@ Unity 客户端（Starline/Packages/com.starline.game）
     ├── Sim            战斗模拟、指挥官技能
     ├── Analysis       战前推演
     ├── Expedition     远征：地图、远征军与合成、奖励、自动布阵
+    ├── Replay         录像（录制、JSON、回放、校验）、上阵战力、关卡固定种子
     └── Math           定点数、确定性随机数
 ```
 
