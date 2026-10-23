@@ -217,11 +217,149 @@ Label {
 
 /* ---- Main menu ----------------------------------------------------------- */
 
-.menu-card {
-    width: 1104px;
-    padding: 86px 96px;
+/* Shades over the 3D menu scene (MenuScene) so the text stays readable; USS has no
+   gradients, so they are small textures stretched to fit. */
+.shade-left {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 62%;
+    background-image: resource("StarlineUI/FadeLeft");
+    -unity-background-scale-mode: stretch-to-fill;
 }
 
+.shade-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 22%;
+    background-image: resource("StarlineUI/FadeBottom");
+    -unity-background-scale-mode: stretch-to-fill;
+}
+
+/* Left column over the 3D background (design: 1600 x 900 artboard, x2.4 here). */
+.menu-column {
+    position: absolute;
+    left: 230px;
+    top: 221px;
+    width: 960px;
+}
+
+.menu-logo {
+    font-size: 130px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 24px;
+    margin: 0;
+}
+
+.menu-divider {
+    align-items: center;
+    margin: 34px 0;
+}
+
+.diamond--start {
+    margin: 0 34px 0 0;
+}
+
+.menu-title {
+    font-size: 82px;
+    -unity-font-style: bold;
+    letter-spacing: 38px;
+    margin: 0 0 34px 0;
+}
+
+.menu-tagline {
+    font-size: 36px;
+    color: var(--muted);
+    margin: 0 0 86px 0;
+}
+
+/* A menu entry: title on the left, a short status on the right; gold bar on the left when highlighted. */
+.menu-item {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 0 14px 0;
+    padding: 34px 43px;
+    background-color: transparent;
+    border-width: 0;
+    border-left-width: 5px;
+    border-color: transparent;
+    border-radius: 0;
+    transition-duration: 0.12s;
+}
+
+.menu-item:hover,
+.menu-item--on {
+    border-color: var(--gold-bright);
+    background-color: rgba(232, 199, 122, 0.12);
+}
+
+.menu-item:active {
+    background-color: rgba(232, 199, 122, 0.2);
+}
+
+.menu-item-title {
+    font-size: 50px;
+    -unity-font-style: bold;
+    color: var(--text);
+    letter-spacing: 5px;
+    margin: 0;
+}
+
+.menu-item:hover .menu-item-title,
+.menu-item--on .menu-item-title {
+    color: var(--gold-bright);
+}
+
+.menu-item-sub {
+    font-size: 31px;
+    color: var(--muted);
+    margin: 0;
+}
+
+.menu-item:disabled {
+    border-color: transparent;
+    background-color: transparent;
+}
+
+.menu-item:disabled .menu-item-title {
+    color: #5D6678;
+}
+
+.menu-small {
+    margin-top: 53px;
+}
+
+.menu-small .btn-small {
+    margin: 0 29px 0 0;
+}
+
+.menu-version {
+    position: absolute;
+    left: 230px;
+    bottom: 77px;
+    color: #5D6678;
+}
+
+.menu-place {
+    position: absolute;
+    right: 115px;
+    bottom: 77px;
+    align-items: flex-end;
+}
+
+.menu-place-title {
+    font-size: 38px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    margin: 0;
+}
+
+/* Logo used by the save-slot screen. */
 .logo {
     font-size: 134px;
     -unity-font-style: bold;
@@ -246,10 +384,203 @@ Label {
     margin-bottom: 58px;
 }
 
-.version {
+.commander {
     position: absolute;
-    right: 48px;
-    bottom: 34px;
+    right: 115px;
+    top: 96px;
+    padding: 24px 43px;
+    background-color: var(--panel);
+    border-width: 2px;
+    border-color: rgba(184, 149, 79, 0.6);
+    border-radius: 5px;
+    font-size: 34px;
+    color: var(--gold-bright);
+}
+
+/* ---- Save slots ---------------------------------------------------------- */
+
+.slots {
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(10, 16, 32, 0.72);
+}
+
+.slots-head {
+    align-items: center;
+    margin-bottom: 115px;
+}
+
+.slots .logo {
+    font-size: 154px;
+    letter-spacing: 34px;
+}
+
+.slots .logo-sub {
+    font-size: 86px;
+    letter-spacing: 48px;
+    margin: 14px 0 10px 48px;
+}
+
+.slots .tagline {
+    margin-bottom: 0;
+}
+
+.divider {
+    width: 1056px;
+    align-items: center;
+    margin-top: 24px;
+}
+
+.divider-line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: var(--supply);
+    opacity: 0.7;
+}
+
+.diamond {
+    width: 17px;
+    height: 17px;
+    margin: 0 29px;
+    background-color: var(--gold-bright);
+    rotate: 45deg;
+}
+
+.eyebrow {
+    letter-spacing: 10px;
+}
+
+.slots-row {
+    margin-bottom: 72px;
+}
+
+.slot-card {
+    width: 816px;
+    height: 720px;
+    margin: 0 43px;
+    padding: 58px 62px 34px 62px;
+    border-radius: 5px;
+    transition-duration: 0.12s;
+}
+
+.slot-card:hover {
+    border-color: var(--gold-bright);
+}
+
+.slot-card--selected {
+    border-color: var(--gold-bright);
+    background-color: var(--panel-raised);
+    translate: 0 -14px;
+}
+
+.slot-card--empty {
+    background-color: rgba(10, 16, 32, 0.7);
+    border-color: rgba(184, 149, 79, 0.55);
+    align-items: center;
+    justify-content: center;
+}
+
+.slot-name {
+    font-size: 72px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin: 10px 0;
+}
+
+.slot-line {
+    height: 2px;
+    background-color: var(--supply);
+    opacity: 0.6;
+    margin: 14px 0 24px 0;
+}
+
+.slot-row {
+    justify-content: space-between;
+    font-size: 34px;
+    margin-bottom: 14px;
+}
+
+.slot-foot {
+    justify-content: flex-end;
+}
+
+.slot-plus {
+    font-size: 106px;
+    color: var(--gold);
+    margin: 24px 0 10px 0;
+}
+
+.slot-new {
+    font-size: 53px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin-bottom: 14px;
+}
+
+.btn-text {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--muted);
+}
+
+.btn-text:hover {
+    background-color: transparent;
+    border-color: transparent;
+    color: var(--bad);
+}
+
+.slots-enter {
+    min-width: 840px;
+    letter-spacing: 14px;
+}
+
+.slots-corner {
+    position: absolute;
+    right: 115px;
+    bottom: 62px;
+}
+
+.name-dialog {
+    width: 1440px;
+}
+
+.name-field {
+    margin: 10px 0;
+}
+
+.name-field .unity-base-text-field__input,
+.name-field .unity-text-field__input {
+    background-color: var(--bg);
+    border-width: 2px;
+    border-color: var(--gold-bright);
+    border-radius: 5px;
+    color: var(--text);
+    font-size: 58px;
+    letter-spacing: 10px;
+    padding: 24px 38px;
+    min-height: 130px;
+}
+
+.name-hints {
+    justify-content: space-between;
+}
+
+.name-error {
+    min-height: 43px;
+}
+
+.name-buttons {
+    margin-top: 24px;
+}
+
+.name-buttons .btn {
+    margin: 0;
+}
+
+.name-buttons .btn-primary {
+    margin-right: 38px;
 }
 
 /* ---- Star map ------------------------------------------------------------ */

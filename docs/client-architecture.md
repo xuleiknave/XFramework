@@ -8,10 +8,12 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ┌──────────────────────────────────────────────────────────────┐
 │ Unity 客户端  Starline.Client（Runtime/Client）               │
 │                                                              │
-│  App/       GameApp：入口、界面切换、持有当前远征              │
+│  App/       GameApp：入口、界面切换、持有当前存档和远征        │
+│  Profiles/  存档位：指挥官名字、游戏时长、远征次数（本地 JSON）│
 │  Screens/   每个界面一个类 + 一个 UXML 布局                    │
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
 │  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
+│             MenuScene：主菜单背后的 3D 夜景（预制体，可编辑）  │
 │  UI/        UiRoot（UI Toolkit 根）、主题、字体、角色头顶标签   │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
@@ -64,6 +66,9 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ### 界面流程
 
 ```
+启动 ──读取最近玩过的存档──▶ MainMenu ◀──使用存档 / 返回── SaveSlots（主菜单“存档”按钮进入）
+              （还没有存档时，点“开始远征”先弹出“新的指挥官”起名）
+
 MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy ──开战──▶ Battle ──结果弹窗──┐
    ▲                  │  ▲                                                    │
    │                  │  └──────────── 返回地图 / 选完奖励 ◀── Reward ◀──胜利──┤
@@ -74,12 +79,42 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 
 | 界面 | 类 | 布局 |
 |---|---|---|
+| 存档（三个存档位，含删除存档弹窗） | `SaveSlotsScreen` | `SaveSlots.uxml` |
+| 新建指挥官弹窗（主菜单和存档界面共用） | `NewCommanderDialog` | `NewCommander.uxml` |
 | 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
 | 地图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
 | 布阵 | `DeployScreen` + `DeployController` | `Deploy.uxml` |
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
 | 战利品 | `RewardScreen` | `Reward.uxml` |
 | 远征结束 | `RunEndScreen` | `RunEnd.uxml` |
+
+### 主菜单夜景
+
+- 主菜单和存档界面背后是实时 3D 场景：灯塔城的源晶塔亮着，远征军（卡通角色，播放待机动画，脚下有发光环）围在旁边，往远处的法力水晶只亮了第一座，最远处有一座燃着绿火的亡灵祭坛；天上是星星和月亮，远处一圈圆润的山丘。
+- 场景是预制体 `Assets/Resources/StarlineMenuScene.prefab`，在 Unity 里双击就能编辑。第一次打开工程时自动生成（也可以点菜单 `Starline > 生成主菜单夜景预制体` 重新生成，会覆盖修改）。默认布局写在 `MenuSceneDefaults`，预制体缺失时运行时也用它。
+- 预制体里每样东西都是普通物体，用移动、旋转、缩放工具摆位置，在 Inspector 里改参数：
+
+| 组件 | 用在 | 可以改 |
+|---|---|---|
+| `MenuSceneRoot` | 根物体 | 镜头视角、漂移幅度和速度、夜间环境光、天空颜色 |
+| `Camera Anchor`（子物体） | 镜头位置 | 选中后用 `GameObject > Align With View` 对准场景视图；它上面的 Camera 只用来在编辑器里预览画面 |
+| `MenuProp` | 每个部队 / 建筑 | 单位 id 和星级（换模型）、脚下光环半径、发光颜色和强度、呼吸闪烁、上下浮动；有动画的角色运行时播放待机 |
+| `MenuGlowLine` | 魔网光带 | 起点、终点物体、两端高度、颜色、宽度 |
+| `MenuSky` / `MenuMountains` | 星空 / 山影 | 数量、随机种子、距离、高度、宽度（山丘还有厚度）、颜色 |
+| `MenuTint` | 地面、月亮 | 颜色、是否自发光 |
+| `Moonlight`、`源晶塔灯光` | 普通 Light | 颜色、强度、方向；`MenuLightPulse` 让塔光缓慢呼吸 |
+
+- 模型、网格和材质都是运行时（编辑器里也会）按参数生成的，不会存进预制体，所以预制体文件很小，改了参数立刻看到效果。
+- 场景放在离棋盘很远的地方（z = 400），界面的 `UsesMenuScene` 为 true 时显示，期间镜头跟着 `Camera Anchor`，棋盘的太阳光和轮廓光关掉（`SceneLook.SetNight`）；离开时镜头回到布阵位置。
+- 界面上用两张小渐变贴图（`StarlineUI/FadeLeft.png`、`FadeBottom.png`）压暗左侧和底部，保证文字清楚；它们的 .meta 设成不重复平铺、无 mipmap，避免边缘出现细线。
+
+### 存档位
+
+- 启动后直接进主菜单，自动读取最近玩过的存档；主菜单显示当前指挥官，“存档”按钮进入存档界面切换、新建或删除。
+- 一共 3 个存档位，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
+- 现在存档只记指挥官名字、游戏时长、最近游玩时间和远征次数（`CommanderProfile`）；远征进度、角色收集在 M3 加进同一个文件。
+- 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存。
+- 单机买断制，没有账号；以后接入 Steam 时，云存档同步这个 saves 文件夹即可。
 
 ### 新增一个界面
 
@@ -103,6 +138,6 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
 |---|---|---|
 | M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
-| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 下一步 |
+| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 进行中：存档位和新建指挥官已完成 |
 | M4 | 美术：角色模型（第一幕 15 个单位已由脚本生成并接入）、场景背景、特效、界面美术 | 进行中 |
 | M5 | 设计文档的 P3：符文、商店、事件、剧情对话系统 | |

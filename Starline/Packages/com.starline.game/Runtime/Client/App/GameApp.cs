@@ -18,8 +18,12 @@ namespace Starline.Client
         public BattleStage Stage { get; private set; }
         public UiRoot Ui { get; private set; }
         public UnitOverlay Overlay { get; private set; }
+        /// <summary>3D night scene behind the main menu and the save slots.</summary>
+        public MenuScene Menu { get; private set; }
         /// <summary>The expedition in progress, or null on the main menu.</summary>
         public ExpeditionRun Run { get; private set; }
+        /// <summary>The save slot in use, or null before the first commander is created.</summary>
+        public CommanderProfile Profile { get; private set; }
 
         private void Awake()
         {
@@ -38,13 +42,19 @@ namespace Starline.Client
             Stage = new BattleStage(transform, camera);
             Ui = UiRoot.Create(transform);
             Overlay = new UnitOverlay(Ui, Stage);
+            Menu = new MenuScene(transform, camera, Stage.Rig);
         }
 
         private void Start() => ShowMainMenu();
 
         private void Update()
         {
+            if (Profile != null)
+            {
+                Profile.playSeconds += Time.unscaledDeltaTime;
+            }
             _screen?.Tick(Time.deltaTime);
+            Menu.Tick(Time.unscaledDeltaTime);
             Stage.Tick();
             Overlay.Update();
         }
@@ -61,6 +71,27 @@ namespace Starline.Client
             go.AddComponent<InputSystemUIInputModule>();
         }
 
+        private void OnApplicationPause(bool paused)
+        {
+            if (paused)
+            {
+                SaveProfile();
+            }
+        }
+
+        private void OnApplicationQuit() => SaveProfile();
+
+        /// <summary>Writes the current profile with an updated "last played" time.</summary>
+        public void SaveProfile()
+        {
+            if (Profile == null)
+            {
+                return;
+            }
+            Profile.lastPlayedTicks = System.DateTime.Now.Ticks;
+            ProfileStore.Save(Profile);
+        }
+
         public bool IsPointerOverUi(Vector2 screenPosition) => Ui.IsPointerOverUi(screenPosition);
 
         // ------------------------------------------------------------------
@@ -70,12 +101,64 @@ namespace Starline.Client
         {
             _screen?.Exit();
             _screen = screen;
+            Menu.SetVisible(screen.UsesMenuScene);
             Ui.SetScreen(screen.Root);
             screen.Enter();
         }
 
+        /// <summary>The save slots, opened from the main menu.</summary>
+        public void ShowSaveSlots()
+        {
+            SaveProfile();
+            Run = null;
+            Stage.Clear();
+            Stage.SetVisible(false);
+            Show(new SaveSlotsScreen(this));
+        }
+
+        /// <summary>Switches to a save slot (saving the one in use first).</summary>
+        public void SignIn(CommanderProfile profile)
+        {
+            SaveProfile();
+            Profile = profile;
+            SaveProfile();
+        }
+
+        /// <summary>Drops the current profile without saving it, e.g. when its slot is being deleted.</summary>
+        public void SignOut() => Profile = null;
+
+        /// <summary>
+        /// Starts an expedition; without a commander yet, first names one in the first empty slot
+        /// (or opens the save slots when all are taken but none could be read).
+        /// </summary>
+        public void StartRunOrCreateCommander()
+        {
+            if (Profile != null)
+            {
+                StartRun();
+                return;
+            }
+            int slot = ProfileStore.FirstEmptySlot();
+            if (slot < 0)
+            {
+                ShowSaveSlots();
+                return;
+            }
+            NewCommanderDialog.Show(this, slot, profile =>
+            {
+                SignIn(profile);
+                StartRun();
+            });
+        }
+
+        /// <summary>The home screen; picks up the most recently played save when none is in use.</summary>
         public void ShowMainMenu()
         {
+            if (Profile == null)
+            {
+                Profile = ProfileStore.LoadLastPlayed();
+            }
+            SaveProfile();
             Run = null;
             Stage.Clear();
             Stage.SetVisible(false);
@@ -85,6 +168,8 @@ namespace Starline.Client
         public void StartRun()
         {
             Run = new ExpeditionRun((ulong)System.DateTime.Now.Ticks % 1000000007UL + 1UL);
+            Profile.runsStarted++;
+            SaveProfile();
             ShowMap(showIntro: true);
         }
 
@@ -143,6 +228,11 @@ namespace Starline.Client
 
         public void ShowRunEnd()
         {
+            if (Run.State == RunState.Victory)
+            {
+                Profile.runsWon++;
+            }
+            SaveProfile();
             Stage.Clear();
             Stage.SetVisible(false);
             Show(new RunEndScreen(this));

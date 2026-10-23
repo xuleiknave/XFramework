@@ -9,7 +9,7 @@ namespace Starline.Editor
 {
     /// <summary>
     /// One-click project setup: the UI Toolkit panel settings (with the default runtime
-    /// theme) and the Main scene, registered in the build settings. The panel settings are
+    /// theme), the menu night scene prefab and the Main scene, registered in the build settings. The panel settings are
     /// also created automatically the first time the project opens.
     /// </summary>
     [InitializeOnLoad]
@@ -38,6 +38,10 @@ namespace Starline.Editor
                 return;
             }
             CreatePanelSettings();
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(MenuScenePrefab.PrefabPath) == null)
+            {
+                MenuScenePrefab.Create();
+            }
             CreateMainScene();
             Debug.Log("Starline：已创建 " + ScenePath + " 并加入构建列表，点击 Play 开始游戏。");
         }

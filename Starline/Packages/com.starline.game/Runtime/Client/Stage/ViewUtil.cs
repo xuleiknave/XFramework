@@ -40,6 +40,23 @@ namespace Starline.Client
             }
         }
 
+        /// <summary>Destroy that also works in edit mode (menu scene components run in the editor).</summary>
+        public static void DestroySafe(Object obj)
+        {
+            if (obj == null)
+            {
+                return;
+            }
+            if (Application.isPlaying)
+            {
+                Object.Destroy(obj);
+            }
+            else
+            {
+                Object.DestroyImmediate(obj);
+            }
+        }
+
         public static GameObject Primitive(PrimitiveType type, Transform parent, Vector3 localPos, Vector3 scale, Color color)
         {
             GameObject go = GameObject.CreatePrimitive(type);

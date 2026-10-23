@@ -1,14 +1,45 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="main-menu" class="screen backdrop center" picking-mode="Ignore">
-        <ui:VisualElement class="panel menu-card">
-            <ui:Label text="STARLINE" class="logo" />
-            <ui:Label text="星 线" class="logo-sub" />
-            <ui:Label text="亡灵吸干了连接人类城邦的星线。重新点亮它。" class="tagline" />
-            <ui:Button name="start" text="开始远征" class="btn btn-primary btn-large" />
-            <ui:Button name="continue" text="继续远征（下一阶段：存档）" class="btn btn-large" />
-            <ui:Button name="settings" text="设置（下一阶段）" class="btn btn-large" />
-            <ui:Button name="quit" text="退出游戏" class="btn btn-large btn-secondary" />
+    <ui:VisualElement name="main-menu" class="screen" picking-mode="Ignore">
+        <ui:VisualElement class="shade-left" picking-mode="Ignore" />
+        <ui:VisualElement class="shade-bottom" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-column" picking-mode="Ignore">
+            <ui:Label text="STARLINE" class="menu-logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row menu-divider" picking-mode="Ignore">
+                <ui:VisualElement class="diamond diamond--start" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="星线" class="menu-title" picking-mode="Ignore" />
+            <ui:Label text="亡灵切断了连接王国各城邦的魔网。&#10;带着远征军，把法力水晶一座座重新点亮。" class="menu-tagline" picking-mode="Ignore" />
+
+            <ui:Button name="start" class="menu-item menu-item--on">
+                <ui:Label text="开始远征" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="第一幕 · 边境行省" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="continue" class="menu-item">
+                <ui:Label text="继续远征" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="没有进行中的远征" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tower" class="menu-item">
+                <ui:Label text="星辉高塔" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="通关第一幕后开放" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="workshop" class="menu-item">
+                <ui:Label text="炼金工坊" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="击败骸骨要塞后开放" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+
+            <ui:VisualElement class="row menu-small" picking-mode="Ignore">
+                <ui:Button name="saves" text="存档" class="btn btn-secondary btn-small" />
+                <ui:Button name="archive" text="档案馆" class="btn btn-secondary btn-small" />
+                <ui:Button name="settings" text="设置" class="btn btn-secondary btn-small" />
+                <ui:Button name="quit" text="退出" class="btn btn-secondary btn-small" />
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label name="version" class="version small muted" picking-mode="Ignore" />
+
+        <ui:Label name="commander" class="commander" picking-mode="Ignore" />
+        <ui:Label name="version" class="menu-version small" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-place" picking-mode="Ignore">
+            <ui:Label text="灯塔城 · 魔网最末端仍在发光的源晶塔" class="menu-place-title" picking-mode="Ignore" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>
