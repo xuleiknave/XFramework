@@ -612,6 +612,7 @@ Unity 客户端（Starline/Packages/com.starline.game）
 | 定点数 + 固定种子 | 结果在任何电脑上一致：推演、回放、在线对战都依赖它 |
 | 数据驱动 | 角色、敌人、技能、地图、奖池、剧情文本都在 JSON 配置表里，内核和测试读同一份 |
 | 本地存档 + Steam 云存档 | 换电脑可继续 |
+| 服务端 C# + MySQL（表结构见 [server-database.md](server-database.md)） | 和内核同语言，服务端能直接引用内核重跑战斗；账号用 Steam 登录，养成数据按存档位存，设置和录像按账号存 |
 
 ### 14.3 仓库结构
 
@@ -621,6 +622,7 @@ XFramework/（仓库）
 │   └── Packages/com.starline.game/   游戏代码
 ├── src/Starline.Battle/              用 .NET 编译战斗内核
 ├── tests/Starline.Battle.Tests/      内核测试与平衡性模拟
+├── server/db/                        服务端 MySQL 建表语句
 └── docs/                             设计文档与原型图
 ```
 

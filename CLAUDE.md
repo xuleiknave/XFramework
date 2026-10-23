@@ -9,6 +9,7 @@
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
+- `docs/server-database.md`：服务端数据库表结构（MySQL）
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明
 
@@ -22,6 +23,7 @@
   - `Editor/`：菜单 `Starline > 初始化工程（场景与界面配置）`、URP 自动配置
 - `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
+- `server/db/schema.sql`：服务端 MySQL 建表语句（服务端用 C#，说明见 `docs/server-database.md`；业务代码还没写）
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟
 
 ## 命令
