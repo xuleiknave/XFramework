@@ -24,7 +24,7 @@ namespace Starline.Client
             settings.match = 1f;
         }
 
-        /// <summary>Instantiates Resources/StarlineUI/{name}.uxml.</summary>
+        /// <summary>Instantiates Resources/StarlineUI/{name}.uxml, with its "#key" texts translated.</summary>
         public static VisualElement Load(string name)
         {
             VisualTreeAsset asset = Resources.Load<VisualTreeAsset>(ResourceFolder + "/" + name);
@@ -35,6 +35,7 @@ namespace Starline.Client
             TemplateContainer tree = asset.Instantiate();
             tree.pickingMode = PickingMode.Ignore;
             tree.AddToClassList("fill");
+            Loc.Localize(tree);
             return tree;
         }
 

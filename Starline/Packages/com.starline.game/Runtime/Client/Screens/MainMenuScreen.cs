@@ -12,7 +12,7 @@ namespace Starline.Client
             Find<Button>("continue").SetEnabled(false);
             Find<Button>("settings").SetEnabled(false);
             Button("quit", App.Quit);
-            Find<Label>("version").text = "版本 " + Application.version + " · 第一幕试玩";
+            Find<Label>("version").text = Loc.Ui("menu.version", Application.version);
         }
     }
 }

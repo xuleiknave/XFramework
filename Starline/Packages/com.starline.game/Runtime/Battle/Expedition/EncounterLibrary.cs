@@ -26,8 +26,7 @@ namespace Starline.Expedition
             }
             return new Encounter
             {
-                Name = e["name"].AsString(),
-                Briefing = e["briefing"].AsString(),
+                Id = e["id"].AsString(),
                 Enemy = enemy,
             };
         }

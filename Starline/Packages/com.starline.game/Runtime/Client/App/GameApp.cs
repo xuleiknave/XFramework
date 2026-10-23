@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
@@ -40,7 +41,12 @@ namespace Starline.Client
             Overlay = new UnitOverlay(Ui, Stage);
         }
 
-        private void Start() => ShowMainMenu();
+        /// <summary>The first screen waits until the language and string tables are ready.</summary>
+        private IEnumerator Start()
+        {
+            yield return Loc.Initialize();
+            ShowMainMenu();
+        }
 
         private void Update()
         {

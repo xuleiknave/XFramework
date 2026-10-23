@@ -31,9 +31,8 @@ namespace Starline.Expedition
         public string UnitId;
         public int Star = 1;
 
-        public string Title => Kind == RewardKind.Relay ? "法力水晶 +1" : UnitCatalog.Get(UnitId).DisplayName + " " + Stars(Star);
-
-        public static string Stars(int star) => new string('★', star);
+        public LocText Title => Kind == RewardKind.Relay ? new LocText("reward.relay")
+            : new LocText("reward.unit", LocText.UnitName(UnitId), LocText.Stars(Star));
     }
 
     /// <summary>
@@ -91,7 +90,7 @@ namespace Starline.Expedition
         public Encounter CurrentEncounter { get; private set; }
         public List<RewardOption> Rewards { get; } = new List<RewardOption>();
         /// <summary>Short messages for the UI about what just happened (merges, durability, ...).</summary>
-        public List<string> Messages { get; } = new List<string>();
+        public List<LocText> Messages { get; } = new List<LocText>();
 
         public int CommandLimit
         {
@@ -176,7 +175,7 @@ namespace Starline.Expedition
 
             int loss = boss ? Rules.BossLoss : Rules.NormalLoss;
             Durability -= loss;
-            Messages.Add("战斗失败，远征军耐久 −" + loss);
+            Messages.Add(new LocText("run.battle_lost", loss));
             if (Durability <= 0)
             {
                 Durability = 0;
@@ -204,7 +203,7 @@ namespace Starline.Expedition
                 {
                     Fleet.Relays++;
                     AutoDeploy.PlaceRelay(Fleet, CommandLimit);
-                    Messages.Add("获得 法力水晶（共 " + Fleet.Relays + " 个）");
+                    Messages.Add(new LocText("run.gain_relay", Fleet.Relays));
                 }
                 else
                 {
@@ -226,13 +225,13 @@ namespace Starline.Expedition
             if (repair)
             {
                 Durability = Durability + 1 > MaxDurability ? MaxDurability : Durability + 1;
-                Messages.Add("远征军休整完毕，耐久 " + Durability + " / " + MaxDurability);
+                Messages.Add(new LocText("run.repaired", Durability, MaxDurability));
             }
             else
             {
                 Fleet.Relays++;
                 AutoDeploy.PlaceRelay(Fleet, CommandLimit);
-                Messages.Add("获得 法力水晶（共 " + Fleet.Relays + " 个）");
+                Messages.Add(new LocText("run.gain_relay", Fleet.Relays));
             }
             State = RunState.Map;
         }
@@ -240,17 +239,17 @@ namespace Starline.Expedition
         private void GainShip(string unitId, int star)
         {
             AddShipResult added = Fleet.Add(unitId, star);
-            string name = added.Ship.Def.DisplayName;
-            Messages.Add("获得 " + UnitCatalog.Get(unitId).DisplayName + " " + RewardOption.Stars(star));
+            LocText name = added.Ship.Def.Name;
+            Messages.Add(new LocText("run.gain_unit", LocText.UnitName(unitId), LocText.Stars(star)));
             foreach (int merged in added.MergedTo)
             {
-                Messages.Add("3 名合成 → " + name + " " + RewardOption.Stars(merged));
+                Messages.Add(new LocText("run.merged", name, LocText.Stars(merged)));
             }
             if (!Fleet.IsDeployed(added.Ship.Id))
             {
                 Messages.Add(AutoDeploy.PlaceShip(Fleet, added.Ship, CommandLimit)
-                    ? name + " 已自动上阵，可在布阵时调整"
-                    : name + " 进入后备（指挥点不够或没有空位）");
+                    ? new LocText("run.auto_deployed", name)
+                    : new LocText("run.reserve", name));
             }
         }
 

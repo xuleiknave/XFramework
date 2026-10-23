@@ -26,9 +26,9 @@ namespace Starline.Client
             _deploy = new DeployController(_run, _encounter, app.Stage);
             _deploy.Changed += Refresh;
 
-            Find<Label>("title").text = _run.Act.Title + " · 第 " + (_run.Current.Layer + 1) + " 跳    " + _encounter.Name;
-            Find<Label>("enc-name").text = _encounter.Name;
-            Find<Label>("enc-briefing").text = _encounter.Briefing;
+            Find<Label>("title").text = Loc.Ui("deploy.title", Loc.T(_run.Act.Title), _run.Current.Layer + 1, Loc.T(_encounter.Name));
+            Find<Label>("enc-name").text = Loc.T(_encounter.Name);
+            Find<Label>("enc-briefing").text = Loc.T(_encounter.Briefing);
             _roster = Find<ScrollView>("roster");
             Button("auto", _deploy.AutoFill);
             Button("clear", _deploy.ClearFormation);
@@ -64,14 +64,14 @@ namespace Starline.Client
         {
             int max = ExpeditionRun.MaxDurability;
             Label durability = Find<Label>("durability");
-            durability.text = "耐久 " + Ui.Hearts(_run.Durability, max);
+            durability.text = Loc.Ui("deploy.durability", Ui.Hearts(_run.Durability, max));
             durability.EnableInClassList("bad", _run.Durability <= 2);
 
-            Find<Label>("command").text = "编队    指挥点 " + _deploy.Formation.CommandPointsUsed() + " / " + _deploy.CommandLimit;
+            Find<Label>("command").text = Loc.Ui("deploy.command", _deploy.Formation.CommandPointsUsed(), _deploy.CommandLimit);
             BuildRoster();
 
             Label supply = Find<Label>("supply");
-            supply.text = "魔网：" + _deploy.SuppliedShips + " / " + _deploy.DeployedShips + " 名角色已接入";
+            supply.text = Loc.Ui("deploy.supply", _deploy.SuppliedShips, _deploy.DeployedShips);
             supply.EnableInClassList("warn", _deploy.SuppliedShips < _deploy.DeployedShips);
             supply.EnableInClassList("good", _deploy.SuppliedShips >= _deploy.DeployedShips);
             Label notice = Find<Label>("notice");
@@ -86,7 +86,7 @@ namespace Starline.Client
             _roster.Clear();
             int relaysLeft = _deploy.Fleet.RelaysLeft;
             bool relaySelected = _deploy.Selection == DeploySelection.Relay;
-            Button relay = RosterCard("法力水晶", "剩 " + relaysLeft + " / " + _deploy.Fleet.Relays + "   指挥 1", "魔网节点 · 放在格子交叉点",
+            Button relay = RosterCard(Loc.T(UnitCatalog.Relay.Name), Loc.Ui("deploy.relays_left", relaysLeft, _deploy.Fleet.Relays), Loc.Ui("deploy.relay_detail"),
                 () =>
                 {
                     if (relaySelected)
@@ -115,9 +115,9 @@ namespace Starline.Client
                 bool selected = _deploy.Selection == DeploySelection.Ship && _deploy.SelectedShipId == ship.Id;
                 int copies = _deploy.Fleet.CopiesOwned(ship.UnitId, ship.Star);
                 int id = ship.Id;
-                Button card = RosterCard(def.DisplayName + " " + Ui.Stars(ship.Star),
-                    (deployed ? "已上阵" : selected ? "放置中" : "后备") + "   指挥 " + def.CommandCost,
-                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxStar ? " · 合成 " + copies + "/3" : ""),
+                Button card = RosterCard(Loc.T(def.Name) + " " + Ui.Stars(ship.Star),
+                    Loc.Ui(deployed ? "deploy.state_deployed" : selected ? "deploy.state_placing" : "deploy.state_reserve", def.CommandCost),
+                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxStar ? Loc.Ui("deploy.merge_progress", copies) : ""),
                     () =>
                     {
                         if (selected)
@@ -148,39 +148,39 @@ namespace Starline.Client
 
         private void RefreshForecast()
         {
-            Find<Label>("intel").text = "战前推演    情报点 " + _deploy.Intel + " / " + _encounter.IntelPoints;
+            Find<Label>("intel").text = Loc.Ui("deploy.intel", _deploy.Intel, _encounter.IntelPoints);
             ForecastResult f = _deploy.Forecast;
             Find<VisualElement>("forecast-empty").SetVisible(f == null);
             Find<VisualElement>("forecast-result").SetVisible(f != null);
             if (f != null)
             {
                 Find<Label>("win-rate").text = UnityEngine.Mathf.RoundToInt((float)f.WinRate * 100f) + "%";
-                Find<Label>("win-detail").text = "胜率（±" + UnityEngine.Mathf.RoundToInt((float)f.Margin * 100f) + "%）    平均 "
-                    + UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds) + " 秒    平均损失 " + f.AverageLosses.ToString("0.0") + " 名";
+                Find<Label>("win-detail").text = Loc.Ui("deploy.win_detail", UnityEngine.Mathf.RoundToInt((float)f.Margin * 100f),
+                    UnityEngine.Mathf.RoundToInt((float)f.AverageSeconds), f.AverageLosses.ToString("0.0"));
                 VisualElement reasons = Find<VisualElement>("reasons");
                 reasons.Clear();
                 if (f.LossReasons.Count > 0)
                 {
-                    reasons.Add(Ui.Label("常见败因", "small", "muted"));
-                    foreach (string reason in f.LossReasons)
+                    reasons.Add(Ui.Label(Loc.Ui("deploy.reasons"), "small", "muted"));
+                    foreach (LocText reason in f.LossReasons)
                     {
-                        reasons.Add(Ui.Label("· " + reason, "small", "warn"));
+                        reasons.Add(Ui.Label("· " + Loc.T(reason), "small", "warn"));
                     }
                 }
                 Label advice = Find<Label>("advice");
-                advice.text = string.IsNullOrEmpty(f.Advice) ? "" : "参谋建议：" + f.Advice;
+                advice.text = f.Advice.IsEmpty ? "" : Loc.Ui("deploy.advice", Loc.T(f.Advice));
                 Find<Label>("history").text = _deploy.ForecastHistory.Count > 1
-                    ? "推演记录：" + string.Join(" → ", _deploy.ForecastHistory.ConvertAll(v => v + "%"))
+                    ? Loc.Ui("deploy.history", string.Join(" → ", _deploy.ForecastHistory.ConvertAll(v => v + "%")))
                     : "";
             }
 
             VisualElement errors = Find<VisualElement>("errors");
             errors.Clear();
-            foreach (string error in _deploy.Errors)
+            foreach (LocText error in _deploy.Errors)
             {
-                errors.Add(Ui.Label("✕ " + error, "small", "bad"));
+                errors.Add(Ui.Label("✕ " + Loc.T(error), "small", "bad"));
             }
-            _forecastButton.text = _deploy.Intel > 0 ? "战前推演（情报 −1）" : "情报点已用完";
+            _forecastButton.text = Loc.Ui(_deploy.Intel > 0 ? "deploy.forecast_button" : "deploy.no_intel");
             _forecastButton.SetEnabled(_deploy.Intel > 0 && _deploy.CanFight);
             _fightButton.SetEnabled(_deploy.CanFight);
         }

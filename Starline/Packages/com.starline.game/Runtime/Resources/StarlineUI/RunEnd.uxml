@@ -5,8 +5,8 @@
             <ui:Label name="story" class="body dialog-body" />
             <ui:Label name="summary" class="small muted" />
             <ui:VisualElement class="dialog-buttons">
-                <ui:Button name="again" text="开始新的远征" class="btn btn-primary" />
-                <ui:Button name="menu" text="返回主菜单" class="btn btn-secondary" />
+                <ui:Button name="again" text="#run_end.again" class="btn btn-primary" />
+                <ui:Button name="menu" text="#run_end.menu" class="btn btn-secondary" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

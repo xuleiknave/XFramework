@@ -58,11 +58,11 @@ namespace Starline.Client
             {
                 CommanderSkillDef skill = def;
                 Button button = Ui.Button("", () => _battle.Cast(skill), "skill");
-                button.Add(Ui.Label(skill.DisplayName, "skill-name"));
-                button.Add(Ui.Label("补给 " + skill.Cost, "small", "muted"));
+                button.Add(Ui.Label(Loc.T(skill.Name), "skill-name"));
+                button.Add(Ui.Label(Loc.Ui("battle.skill_cost", skill.Cost), "small", "muted"));
                 Label state = Ui.Label("", "small");
                 button.Add(state);
-                button.tooltip = skill.Description;
+                button.tooltip = Loc.T(skill.Description);
                 skills.Add(button);
                 _skills.Add((skill, button, state));
             }
@@ -94,9 +94,9 @@ namespace Starline.Client
         private void Refresh()
         {
             BattleSim sim = _battle.Battle;
-            _player.text = "我方 " + sim.CountCombatants(BoardLayout.PlayerSide) + " / " + sim.CountInitialCombatants(BoardLayout.PlayerSide);
-            _enemy.text = "敌方 " + sim.CountCombatants(BoardLayout.EnemySide) + " / " + sim.CountInitialCombatants(BoardLayout.EnemySide);
-            _time.text = Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒 / " + _battle.Encounter.TimeLimitSeconds;
+            _player.text = Loc.Ui("battle.player_count", sim.CountCombatants(BoardLayout.PlayerSide), sim.CountInitialCombatants(BoardLayout.PlayerSide));
+            _enemy.text = Loc.Ui("battle.enemy_count", sim.CountCombatants(BoardLayout.EnemySide), sim.CountInitialCombatants(BoardLayout.EnemySide));
+            _time.text = Loc.Ui("battle.time", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()), _battle.Encounter.TimeLimitSeconds);
             for (int i = 0; i < _speedButtons.Count; i++)
             {
                 _speedButtons[i].EnableInClassList("btn-toggled", _battle.SpeedIndex == i);
@@ -116,7 +116,7 @@ namespace Starline.Client
             }
 
             float points = sim.SupplyPoints(BoardLayout.PlayerSide).ToFloat();
-            _points.text = "法术点数  " + points.ToString("0.0") + " / 10   （每秒 +1）";
+            _points.text = Loc.Ui("battle.points", points.ToString("0.0"));
             for (int i = 0; i < _pips.Count; i++)
             {
                 _pips[i].EnableInClassList("pip--full", i < Mathf.FloorToInt(points));
@@ -128,12 +128,12 @@ namespace Starline.Client
             {
                 int cd = sim.SkillCooldownTicks(BoardLayout.PlayerSide, def.Skill);
                 bool can = sim.CanCast(BoardLayout.PlayerSide, def.Skill);
-                string text = cd > 0 ? "冷却 " + Mathf.CeilToInt(cd / (float)BattleSim.TicksPerSecond) + " 秒"
-                    : can ? (def.NeedsTarget ? "点击后选择落点" : "可释放") : "法术点数不足";
+                string text = cd > 0 ? Loc.Ui("battle.cooldown", Mathf.CeilToInt(cd / (float)BattleSim.TicksPerSecond))
+                    : Loc.Ui(can ? (def.NeedsTarget ? "battle.pick_target" : "battle.ready") : "battle.no_points");
                 bool armed = def.NeedsTarget && _battle.StrikeArmed;
                 if (armed)
                 {
-                    text = "在战场上点击落点（右键取消）";
+                    text = Loc.Ui("battle.aiming");
                 }
                 state.text = text;
                 button.SetEnabled(can || armed);
@@ -150,37 +150,37 @@ namespace Starline.Client
 
             var lines = new List<string>
             {
-                "用时 " + Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒",
-                "我方损失 " + (sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide))
-                    + " 名，击败敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
-                    + (won ? "（倒下的角色战后全部恢复）" : ""),
+                Loc.Ui("result.time", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat())),
+                Loc.Ui("result.losses", sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide),
+                    sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide))
+                    + (won ? Loc.Ui("result.recovered") : ""),
             };
             SideStats stats = sim.Stats[BoardLayout.PlayerSide];
             if (stats.RelaysLost > 0)
             {
-                lines.Add("我方有 " + stats.RelaysLost + " 个魔网节点被摧毁");
+                lines.Add(Loc.Ui("result.relays_lost", stats.RelaysLost));
             }
             if (stats.RanDry.Count > 0)
             {
                 var names = new List<string>();
                 foreach (string id in stats.RanDry)
                 {
-                    names.Add(UnitCatalog.Get(id).DisplayName);
+                    names.Add(Loc.T(UnitCatalog.Get(id).Name));
                 }
-                lines.Add("法力耗尽过：" + string.Join("、", names));
+                lines.Add(Loc.Ui("result.ran_dry", string.Join(Loc.Ui("list.separator"), names)));
             }
-            lines.AddRange(run.Messages);
+            lines.AddRange(run.Messages.ConvertAll(Loc.T));
 
             string next;
             switch (run.State)
             {
-                case RunState.Reward: next = "领取战利品"; break;
-                case RunState.Victory: next = "要塞陷落！"; break;
-                case RunState.Defeat: next = "撤回灯塔城"; break;
-                case RunState.Battle: next = "调整布阵，再次挑战 Boss"; break;
-                default: next = "返回地图"; break;
+                case RunState.Reward: next = Loc.Ui("result.next_reward"); break;
+                case RunState.Victory: next = Loc.Ui("result.next_victory"); break;
+                case RunState.Defeat: next = Loc.Ui("result.next_defeat"); break;
+                case RunState.Battle: next = Loc.Ui("result.next_retry"); break;
+                default: next = Loc.Ui("result.next_map"); break;
             }
-            string title = won ? "胜利" : sim.Winner == BoardLayout.EnemySide ? "失败" : "平局（算作失败）";
+            string title = Loc.Ui(won ? "result.won" : sim.Winner == BoardLayout.EnemySide ? "result.lost" : "result.draw");
             VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), (next, App.AfterBattle));
             dialog.Q(className: "dialog").AddToClassList(won ? "dialog--win" : "dialog--loss");
             App.Ui.ShowModal(dialog);

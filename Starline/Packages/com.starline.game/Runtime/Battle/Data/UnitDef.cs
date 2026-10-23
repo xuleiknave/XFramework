@@ -24,9 +24,9 @@ namespace Starline.Battle
     public sealed class UnitDef
     {
         public string Id;
-        public string DisplayName;
-        /// <summary>One-line flavour text for cards and tooltips.</summary>
-        public string Description = "";
+        /// <summary>Name and one-line flavour text (Game table; enemies have no description).</summary>
+        public LocText Name => LocText.UnitName(Id);
+        public LocText Description => new LocText("unit." + Id + ".description");
         public UnitRole Role;
 
         /// <summary>Footprint on the board: 1 = one cell, 2 = 2x2 cells, 0 = a grid intersection (relays).</summary>
