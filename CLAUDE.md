@@ -1,6 +1,6 @@
 # Starline（星线）
 
-单机奇幻战略游戏（Steam 买断制）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
+奇幻战略游戏（Steam 买断制，需联网登录）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
 
 ## 先读这些
 
@@ -9,7 +9,7 @@
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
-- `docs/server-design.md`：服务端设计（联网以服务端为准、离线补交动作、接口清单）
+- `docs/server-design.md`：服务端设计（必须联网登录、服务端为准、战斗登记和重跑结算、接口清单）
 - `docs/server-database.md`：服务端数据库表结构（MySQL）
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明

@@ -50,12 +50,12 @@ CREATE TABLE account_auth (
 ) ENGINE=InnoDB COMMENT='第三方登录绑定';
 
 -- 登录会话：访问令牌用短期 JWT 不落库；这里存刷新令牌（只存哈希）
+-- 一个账号同一时间只有一个有效会话：新登录时把旧会话的 revoked_at 填上（旧电脑被踢下线）
 CREATE TABLE account_session (
   session_id      BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
   account_id      BIGINT UNSIGNED  NOT NULL,
   refresh_hash    BINARY(32)       NOT NULL COMMENT '刷新令牌的 SHA-256',
   client_version  VARCHAR(32)      NOT NULL DEFAULT '',
-  device_id       BINARY(16)       NOT NULL COMMENT '客户端首次启动时生成的 UUID，离线动作按设备编号',
   device_hint     VARCHAR(64)      NOT NULL DEFAULT '' COMMENT '平台 / 机器名摘要，方便玩家识别和踢下线',
   created_at      DATETIME(3)      NOT NULL,
   expires_at      DATETIME(3)      NOT NULL,
@@ -102,8 +102,7 @@ CREATE TABLE save_slot (
   play_seconds    INT UNSIGNED     NOT NULL DEFAULT 0,
   runs_started    INT UNSIGNED     NOT NULL DEFAULT 0 COMMENT '远征次数',
   runs_won        INT UNSIGNED     NOT NULL DEFAULT 0,
-  revision        INT UNSIGNED     NOT NULL DEFAULT 0 COMMENT '存档每次写入 +1，乐观锁，防止两台电脑互相覆盖',
-  data_hash       CHAR(16)         CHARACTER SET ascii COLLATE ascii_bin NULL COMMENT '最后一次写入时客户端的配置表版本',
+  revision        INT UNSIGNED     NOT NULL DEFAULT 0 COMMENT '存档每次修改 +1；客户端发现和缓存的不一致就重新拉快照',
   created_at      DATETIME(3)      NOT NULL,
   last_played_at  DATETIME(3)      NOT NULL,
   deleted_at      DATETIME(3)      NULL,
@@ -243,7 +242,7 @@ CREATE TABLE save_codex (
 ) ENGINE=InnoDB COMMENT='图鉴';
 
 -- ============================================================================
--- 5. 远征、星辉高塔、炼金工坊、动作日志
+-- 5. 远征、星辉高塔、炼金工坊、操作日志、战斗记录
 -- ============================================================================
 
 -- 进行中的远征：一个存档最多一局。局内状态整体存一份快照（由内核序列化），不拆表
@@ -317,34 +316,33 @@ CREATE TABLE save_lab_research (
   CONSTRAINT fk_lab_save FOREIGN KEY (save_id) REFERENCES save_slot (save_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='炼金工坊研究';
 
--- 动作日志：客户端对存档做的每一件事（打关、扫荡、升星、买东西……）都是一个动作
--- 在线时一次提交一个，离线时攒在本地，联网后按顺序批量补交；服务端逐个校验并执行
--- (save_id, device_id, client_seq) 唯一：网络重试时同一个动作不会执行两次，直接返回上次的结果
+-- 操作日志：对存档的每一次修改请求（开始 / 结算战斗、扫荡、升星、买东西……）一行，成功和失败都记
+-- (save_id, request_id) 唯一：request_id 是客户端请求头里的 Idempotency-Key，
+-- 断线重发时同一个请求不会执行两次，直接返回上次的结果
 -- 只保留最近一段时间（如 90 天），定期清理
 CREATE TABLE save_action (
   action_id       BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
   save_id         BIGINT UNSIGNED  NOT NULL,
-  device_id       BINARY(16)       NOT NULL,
-  client_seq      INT UNSIGNED     NOT NULL COMMENT '同一设备、同一存档内递增',
-  action_type     VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'stage.battle / hero.star_up / lab.start …',
-  payload         JSON             NOT NULL COMMENT '动作参数；战斗的输入另存在 save_battle',
+  request_id      BINARY(16)       NOT NULL COMMENT 'Idempotency-Key（UUID）',
+  session_id      BIGINT UNSIGNED  NOT NULL COMMENT '发起请求的登录会话',
+  action_type     VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'battle.start / battle.finish / hero.star_up / lab.start …',
+  payload         JSON             NOT NULL COMMENT '请求参数；战斗输入另存在 save_battle',
   battle_id       BIGINT UNSIGNED  NULL,
-  client_time     DATETIME(3)      NOT NULL COMMENT '客户端声称的发生时间（离线时用于计时类动作，服务端会夹在合理范围内）',
-  offline         TINYINT(1)       NOT NULL DEFAULT 0 COMMENT '是否离线时产生、联网后补交',
-  status          TINYINT UNSIGNED NOT NULL COMMENT '1 已执行 2 已拒绝',
-  reject_code     VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NULL COMMENT 'battle_mismatch / not_enough_shards / version_unsupported …',
-  result          JSON             NULL COMMENT '执行结果（奖励、变化），重试时原样返回',
+  status          TINYINT UNSIGNED NOT NULL COMMENT '1 成功 2 失败',
+  error_code      VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NULL COMMENT 'not_enough_shards / invalid_formation / locked …',
+  result          JSON             NULL COMMENT '返回给客户端的结果（奖励、变化），重发时原样返回',
   revision_after  INT UNSIGNED     NOT NULL COMMENT '执行后存档的 revision',
   created_at      DATETIME(3)      NOT NULL,
   PRIMARY KEY (action_id),
-  UNIQUE KEY uk_action_seq (save_id, device_id, client_seq),
+  UNIQUE KEY uk_action_request (save_id, request_id),
   KEY idx_action_save_time (save_id, created_at),
-  KEY idx_action_rejected (status, reject_code, created_at),
+  KEY idx_action_error (status, error_code, created_at),
   CONSTRAINT fk_action_save FOREIGN KEY (save_id) REFERENCES save_slot (save_id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='存档动作日志';
+) ENGINE=InnoDB COMMENT='存档操作日志';
 
--- 战斗记录：每场主线 / 高塔 / 远征战斗的输入和服务端重跑结果
+-- 战斗记录：开始时登记（布阵由服务端按存档数据核对后固定），结束时提交指令，服务端重跑后结算
 -- 奖励只按服务端重跑的结果发；通关录像从这里挑（不用再上传一遍）
+-- 同一存档同时只能有一场进行中的战斗（uk_battle_running）
 -- 只保留最近一段时间；被录像引用的那一份由 replay 表自己存一份，不受清理影响
 CREATE TABLE save_battle (
   battle_id       BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
@@ -353,21 +351,28 @@ CREATE TABLE save_battle (
   target_id       VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT '关卡 id / 高塔层数 / 远征节点',
   data_hash       CHAR(16)         CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   kernel_version  VARCHAR(16)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  seed            BIGINT UNSIGNED  NOT NULL,
-  input           MEDIUMBLOB       NOT NULL COMMENT '布阵和带帧号的指令（录像格式，gzip）',
-  won             TINYINT(1)       NOT NULL COMMENT '服务端重跑的结果',
-  stars_mask      TINYINT UNSIGNED NOT NULL DEFAULT 0,
-  ticks           INT UNSIGNED     NOT NULL,
-  result_hash     BINARY(8)        NOT NULL,
-  power           INT UNSIGNED     NOT NULL COMMENT '服务端算出的上阵战力',
-  used_skill      TINYINT(1)       NOT NULL,
-  verify_status   TINYINT UNSIGNED NOT NULL COMMENT '1 一致 2 客户端声称的结果和重跑不一致（按重跑结果处理） 3 输入非法',
-  created_at      DATETIME(3)      NOT NULL,
+  seed            BIGINT UNSIGNED  NOT NULL COMMENT '服务端下发',
+  formation       JSON             NOT NULL COMMENT '开始时登记的布阵，含当时的等级、星级、符文',
+  power           INT UNSIGNED     NOT NULL COMMENT '服务端按登记的布阵算出的上阵战力',
+  status          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 进行中 2 已结算 3 放弃 4 过期',
+  commands        MEDIUMBLOB       NULL COMMENT '结束时提交的带帧号的指令（gzip）',
+  used_skill      TINYINT(1)       NULL,
+  won             TINYINT(1)       NULL COMMENT '服务端重跑的结果',
+  stars_mask      TINYINT UNSIGNED NULL,
+  ticks           INT UNSIGNED     NULL,
+  result_hash     BINARY(8)        NULL,
+  verify_status   TINYINT UNSIGNED NULL COMMENT '1 与客户端一致 2 不一致（按服务端结果处理）',
+  started_at      DATETIME(3)      NOT NULL,
+  expires_at      DATETIME(3)      NOT NULL COMMENT '超过这个时间还没提交就标记过期（默认开始后 30 分钟）',
+  finished_at     DATETIME(3)      NULL,
+  running_flag    TINYINT UNSIGNED AS (IF(status = 1, 1, NULL)) STORED COMMENT '进行中为 1，其余为 NULL',
   PRIMARY KEY (battle_id),
-  KEY idx_battle_save (save_id, created_at),
+  UNIQUE KEY uk_battle_running (save_id, running_flag),
+  KEY idx_battle_save (save_id, started_at),
+  KEY idx_battle_expire (status, expires_at),
   KEY idx_battle_target (mode, target_id, data_hash, won, power),
   CONSTRAINT fk_battle_save FOREIGN KEY (save_id) REFERENCES save_slot (save_id) ON DELETE CASCADE
-) ENGINE=InnoDB COMMENT='战斗记录（服务端重跑）';
+) ENGINE=InnoDB COMMENT='战斗记录（开始登记、服务端重跑结算）';
 
 -- ============================================================================
 -- 6. 通关录像（方案见 docs/replay-server.md）
@@ -378,7 +383,7 @@ CREATE TABLE game_data_version (
   data_hash       CHAR(16)         CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT '所有 StarlineData JSON 的哈希',
   kernel_version  VARCHAR(16)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
   client_version  VARCHAR(32)      NOT NULL DEFAULT '' COMMENT '对应的游戏版本号，便于人看',
-  status          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 当前 2 兼容（老客户端仍可上传和查看） 3 停用',
+  status          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 当前 2 兼容（发布新版本后短时间保留，让更新前开始的战斗还能结算） 3 停用',
   released_at     DATETIME(3)      NOT NULL,
   PRIMARY KEY (data_hash)
 ) ENGINE=InnoDB COMMENT='内核和配置表版本';
@@ -405,7 +410,7 @@ CREATE TABLE replay (
   like_count      INT UNSIGNED     NOT NULL DEFAULT 0,
   report_count    INT UNSIGNED     NOT NULL DEFAULT 0,
   status          TINYINT UNSIGNED NOT NULL DEFAULT 1 COMMENT '1 正常 2 隐藏（举报 / 管理员） 3 旧版本（新数据重跑打不赢） 4 作者删除',
-  source_battle_id BIGINT UNSIGNED NULL COMMENT '来自哪场已验证的战斗（save_battle），NULL 表示迁移生成',
+  source_battle_id BIGINT UNSIGNED NULL COMMENT '来自哪场已结算的战斗（save_battle），NULL 表示迁移生成',
   migrated_from   BIGINT UNSIGNED  NULL COMMENT '版本更新时从哪份老录像迁移来',
   created_at      DATETIME(3)      NOT NULL,
   PRIMARY KEY (replay_id),
@@ -445,21 +450,6 @@ CREATE TABLE replay_report (
   CONSTRAINT fk_report_account FOREIGN KEY (account_id) REFERENCES account (account_id) ON DELETE CASCADE
 ) ENGINE=InnoDB COMMENT='录像举报';
 
--- 上传记录：包括被拒的，用来做“每账号每关每天最多 N 次”和排查作弊
-CREATE TABLE replay_upload_log (
-  upload_id       BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
-  account_id      BIGINT UNSIGNED  NOT NULL,
-  stage_id        VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  data_hash       CHAR(16)         CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
-  outcome         TINYINT UNSIGNED NOT NULL COMMENT '0 收录 1 未进榜 2 格式错误 3 版本不支持 4 重跑不一致 5 超频',
-  power           INT UNSIGNED     NULL,
-  replay_id       BIGINT UNSIGNED  NULL COMMENT '收录时对应的录像',
-  created_at      DATETIME(3)      NOT NULL,
-  PRIMARY KEY (upload_id),
-  KEY idx_upload_quota (account_id, stage_id, created_at),
-  KEY idx_upload_outcome (outcome, created_at)
-) ENGINE=InnoDB COMMENT='录像上传记录';
-
 -- ============================================================================
 -- 7. 流水
 -- ============================================================================
@@ -475,7 +465,7 @@ CREATE TABLE economy_log (
   balance         BIGINT           NOT NULL COMMENT '变动后的余额',
   reason          VARCHAR(32)      CHARACTER SET ascii COLLATE ascii_bin NOT NULL COMMENT 'stage_clear / sweep / star_up / shop / lab / tower / expedition …',
   ref_id          VARCHAR(64)      CHARACTER SET ascii COLLATE ascii_bin NULL COMMENT '关联对象，如关卡 id、研究 id',
-  action_id       BIGINT UNSIGNED  NULL COMMENT '由哪个动作引起（save_action）',
+  action_id       BIGINT UNSIGNED  NULL COMMENT '由哪次操作引起（save_action）',
   created_at      DATETIME(3)      NOT NULL,
   PRIMARY KEY (log_id),
   KEY idx_economy_save (save_id, created_at),
