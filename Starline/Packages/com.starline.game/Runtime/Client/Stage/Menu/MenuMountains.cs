@@ -4,8 +4,8 @@ using UnityEngine;
 namespace Starline.Client
 {
     /// <summary>
-    /// A ring of dark low pyramids on the horizon around this object, as one generated mesh.
-    /// Change the numbers and the ridge regenerates.
+    /// A ring of dark rounded hills on the horizon around this object (smooth half-domes, matching
+    /// the cartoon models), as one generated mesh. Change the numbers and the ridge regenerates.
     /// </summary>
     [ExecuteAlways]
     [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
@@ -18,10 +18,12 @@ namespace Starline.Client
         public float minDistance = 110f;
         public float maxDistance = 150f;
         public float minHeight = 8f;
-        public float maxHeight = 30f;
-        public float minWidth = 18f;
-        public float maxWidth = 40f;
-        public Color color = new Color(0.035f, 0.05f, 0.09f);
+        public float maxHeight = 26f;
+        public float minWidth = 30f;
+        public float maxWidth = 60f;
+        [Tooltip("山丘前后的厚度相对宽度的比例")]
+        [Range(0.2f, 1f)] public float depth = 0.6f;
+        public Color color = new Color(0.045f, 0.065f, 0.11f);
 
         private Mesh _mesh;
         private Material _material;
@@ -61,8 +63,9 @@ namespace Starline.Client
                 float height = Mathf.Lerp(minHeight, maxHeight, (float)random.NextDouble());
                 float width = Mathf.Lerp(minWidth, maxWidth, (float)random.NextDouble());
                 Vector3 centre = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * distance;
-                Quaternion turn = Quaternion.Euler(0f, (float)random.NextDouble() * 90f, 0f);
-                AddPyramid(vertices, triangles, centre, turn, width, height);
+                // Each hill faces the centre, so its long side runs along the horizon.
+                Quaternion turn = Quaternion.Euler(0f, angle, 0f);
+                AddHill(vertices, triangles, centre, turn, width, height, depth);
             }
             _mesh = new Mesh { name = "Mountains", hideFlags = HideFlags.DontSave };
             _mesh.SetVertices(vertices);
@@ -76,25 +79,41 @@ namespace Starline.Client
             r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
         }
 
-        /// <summary>Four triangular faces with their own vertices, so each face is flat-shaded.</summary>
-        private static void AddPyramid(List<Vector3> vertices, List<int> triangles, Vector3 centre, Quaternion turn, float width, float height)
+        private const int HillSegments = 20;
+        private const int HillRings = 6;
+
+        /// <summary>A half-ellipsoid with shared vertices, so it shades smoothly.</summary>
+        private static void AddHill(List<Vector3> vertices, List<int> triangles, Vector3 centre, Quaternion turn, float width, float height, float depth)
         {
-            Vector3 top = centre + Vector3.up * height;
-            float h = width * 0.5f;
-            Vector3[] b =
+            int start = vertices.Count;
+            float rx = width * 0.5f;
+            float rz = rx * depth;
+            for (int ring = 0; ring <= HillRings; ring++)
             {
-                centre + turn * new Vector3(-h, 0f, -h), centre + turn * new Vector3(h, 0f, -h),
-                centre + turn * new Vector3(h, 0f, h), centre + turn * new Vector3(-h, 0f, h),
-            };
-            for (int i = 0; i < 4; i++)
+                // From the ground (ring 0) up to the top (last ring).
+                float pitch = ring * Mathf.PI * 0.5f / HillRings;
+                float spread = Mathf.Cos(pitch);
+                float y = Mathf.Sin(pitch) * height;
+                for (int k = 0; k < HillSegments; k++)
+                {
+                    float a = k * Mathf.PI * 2f / HillSegments;
+                    vertices.Add(centre + turn * new Vector3(Mathf.Cos(a) * rx * spread, y, Mathf.Sin(a) * rz * spread));
+                }
+            }
+            for (int ring = 0; ring < HillRings; ring++)
             {
-                int start = vertices.Count;
-                vertices.Add(b[i]);
-                vertices.Add(top);
-                vertices.Add(b[(i + 1) % 4]);
-                triangles.Add(start);
-                triangles.Add(start + 1);
-                triangles.Add(start + 2);
+                int row = start + ring * HillSegments;
+                int next = row + HillSegments;
+                for (int k = 0; k < HillSegments; k++)
+                {
+                    int k1 = (k + 1) % HillSegments;
+                    triangles.Add(row + k);
+                    triangles.Add(next + k);
+                    triangles.Add(next + k1);
+                    triangles.Add(row + k);
+                    triangles.Add(next + k1);
+                    triangles.Add(row + k1);
+                }
             }
         }
     }

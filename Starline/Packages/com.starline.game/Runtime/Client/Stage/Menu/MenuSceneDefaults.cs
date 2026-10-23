@@ -44,7 +44,7 @@ namespace Starline.Client
 
             // The source tower of 灯塔城 and the light it throws on the expedition.
             Transform tower = Prop(root.transform, "源晶塔", "supply_ship", new Vector3(5f, 0f, 4f), 200f, 1.5f, ViewUtil.SupplyColor, 3f).transform;
-            Light towerLight = Child(root.transform, "源晶塔灯光", new Vector3(5f, 4.5f, 3f)).gameObject.AddComponent<Light>();
+            Light towerLight = Child(root.transform, "源晶塔灯光", new Vector3(5f, 5.5f, 3f)).gameObject.AddComponent<Light>();
             towerLight.type = LightType.Point;
             towerLight.color = ViewUtil.SupplyColor;
             towerLight.intensity = 6f;
@@ -52,14 +52,14 @@ namespace Starline.Client
             towerLight.shadows = LightShadows.None;
             towerLight.gameObject.AddComponent<MenuLightPulse>();
 
-            // The expedition, facing the way out along the dark crystals.
+            // The expedition (cartoon characters idling on their glow rings), facing the way out along the dark crystals.
             Transform army = Child(root.transform, "远征军", Vector3.zero);
-            Color blue = ViewUtil.PlayerColor;
-            Prop(army, "重甲骑士", "battleship", new Vector3(2.2f, 0f, 1.4f), 30f, 1f, blue, 2.5f);
-            Prop(army, "游侠", "frigate", new Vector3(3.8f, 0f, 0.1f), 15f, 1f, blue, 2.5f);
-            Prop(army, "奥术法师", "missile_ship", new Vector3(6.9f, 0f, 0.5f), 40f, 1f, blue, 2.5f);
-            Prop(army, "弩手", "pd_ship", new Vector3(8.3f, 0f, 2.3f), 50f, 1f, blue, 2.5f);
-            Prop(army, "狮鹫骑士", "strike_craft", new Vector3(1.0f, 2.6f, 4.5f), 35f, 1f, blue, 2.5f).bobHeight = 0.18f;
+            Hero(army, "布兰 · 盾卫", "shield_guard", 3, new Vector3(2.4f, 0f, 1.6f), 30f);
+            Hero(army, "塞德里克 · 长枪手", "lancer", 2, new Vector3(3.9f, 0f, 0.2f), 15f);
+            Hero(army, "艾琳 · 牧师", "priest", 3, new Vector3(5.4f, 0f, -0.4f), 25f);
+            Hero(army, "泽恩 · 风暴法师", "storm_mage", 4, new Vector3(6.9f, 0f, 0.6f), 40f);
+            Hero(army, "格雷 · 猎人", "hunter", 2, new Vector3(8.3f, 0f, 2.3f), 50f);
+            Hero(army, "菲恩 · 狮鹫侍从", "griffin_squire", 3, new Vector3(1.0f, 2.2f, 4.5f), 35f).bobHeight = 0.18f;
 
             // The mana network: lit up to the first crystal, dark beyond it.
             Transform network = Child(root.transform, "魔网", Vector3.zero);
@@ -104,6 +104,14 @@ namespace Starline.Client
             t.SetParent(parent, false);
             t.localPosition = localPos;
             return t;
+        }
+
+        private static MenuProp Hero(Transform parent, string name, string unitId, int star, Vector3 localPos, float yaw)
+        {
+            MenuProp prop = Prop(parent, name, unitId, localPos, yaw, 1f, ViewUtil.PlayerColor, 2.5f);
+            prop.star = star;
+            prop.groundRing = 0.7f;
+            return prop;
         }
 
         private static MenuProp Prop(Transform parent, string name, string unitId, Vector3 localPos, float yaw, float scale, Color glow, float strength)

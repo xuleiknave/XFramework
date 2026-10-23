@@ -12,7 +12,7 @@ namespace Starline.Client
 
         public static Material Lit(Color color)
         {
-            Material material = ModelLibrary.CreateHullMaterial();
+            Material material = ModelLibrary.CreateHullMaterial("");
             material.name = "Menu Lit";
             material.mainTexture = null;
             material.color = color;
