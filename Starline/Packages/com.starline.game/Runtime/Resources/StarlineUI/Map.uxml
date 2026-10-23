@@ -1,14 +1,14 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement class="screen backdrop row" picking-mode="Ignore">
         <ui:VisualElement name="sidebar" class="panel sidebar">
-            <ui:Label text="晨星远征军" class="h2" />
+            <ui:Label text="#map.army" class="h2" />
             <ui:Label name="durability" class="stat" />
             <ui:Label name="command" class="small muted" />
             <ui:Label name="relays" class="small muted" />
             <ui:Label name="record" class="small muted" />
-            <ui:Label text="角色" class="h3 section" />
+            <ui:Label text="#map.roster" class="h3 section" />
             <ui:VisualElement name="fleet-list" />
-            <ui:Label text="3 名同名同星的角色会自动合成高一星。" class="small muted" />
+            <ui:Label text="#map.merge_hint" class="small muted" />
             <ui:VisualElement name="messages" class="messages" />
             <ui:VisualElement class="spacer" />
             <ui:VisualElement name="node-info" class="info-box">
@@ -16,11 +16,11 @@
                 <ui:Label name="node-briefing" class="body" />
                 <ui:Label name="node-reward" class="small good" />
             </ui:VisualElement>
-            <ui:Button name="abandon" text="放弃远征" class="btn btn-secondary" />
+            <ui:Button name="abandon" text="#map.abandon" class="btn btn-secondary" />
         </ui:VisualElement>
         <ui:VisualElement class="map-area" picking-mode="Ignore">
             <ui:Label name="act-title" class="h1" />
-            <ui:Label text="从左往右推进，每次在相连的节点中选一个。悬停查看情报，点击亮起的节点出发。" class="small muted" />
+            <ui:Label text="#map.route_hint" class="small muted" />
             <ui:VisualElement name="map-canvas" class="map-canvas" picking-mode="Ignore" />
         </ui:VisualElement>
     </ui:VisualElement>

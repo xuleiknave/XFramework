@@ -28,17 +28,17 @@ namespace Starline.Client
                 if (node.IsBattle)
                 {
                     Encounter e = EncounterLibrary.Create(node.EncounterKey);
-                    _names[node.Id] = e.Name;
-                    _briefings[node.Id] = e.Briefing;
+                    _names[node.Id] = Loc.T(e.Name);
+                    _briefings[node.Id] = Loc.T(e.Briefing);
                 }
                 else
                 {
-                    _names[node.Id] = "补给站";
-                    _briefings[node.Id] = "一座刚刚连回星线的城邦驿站。休整远征军（耐久 +1），或者领取 1 个法力水晶。";
+                    _names[node.Id] = Loc.Ui("map.supply");
+                    _briefings[node.Id] = Loc.Ui("map.supply_briefing");
                 }
             }
 
-            Find<Label>("act-title").text = _run.Act.Title + " · 地图";
+            Find<Label>("act-title").text = Loc.Ui("map.title", Loc.T(_run.Act.Title));
             _infoBox = Find<VisualElement>("node-info");
             _infoTitle = Find<Label>("node-title");
             _infoBody = Find<Label>("node-briefing");
@@ -58,7 +58,7 @@ namespace Starline.Client
             if (_showIntro)
             {
                 ActStory story = _run.Act.Story;
-                App.Ui.ShowModal(Ui.Dialog(story.IntroTitle, story.Intro, ("出发", App.Ui.CloseModals)));
+                App.Ui.ShowModal(Ui.Dialog(Loc.T(story.IntroTitle), Loc.T(story.Intro), (Loc.Ui("map.depart"), App.Ui.CloseModals)));
             }
         }
 
@@ -66,19 +66,19 @@ namespace Starline.Client
         {
             int max = ExpeditionRun.MaxDurability;
             Label durability = Find<Label>("durability");
-            durability.text = "远征军耐久  " + Ui.Hearts(_run.Durability, max) + "  " + _run.Durability + " / " + max;
+            durability.text = Loc.Ui("map.durability", Ui.Hearts(_run.Durability, max), _run.Durability, max);
             durability.EnableInClassList("bad", _run.Durability <= 2);
             durability.EnableInClassList("good", _run.Durability > 2);
-            Find<Label>("command").text = "指挥点上限 " + _run.CommandLimit + "（每过一个战斗节点 +" + ExpeditionRun.CommandLimitPerBattle + "）";
-            Find<Label>("relays").text = "法力水晶 " + _run.Fleet.Relays + " / " + ExpeditionRun.MaxRelays;
-            Find<Label>("record").text = "战斗 " + _run.BattlesWon + " 胜 / " + _run.BattlesFought + " 场";
+            Find<Label>("command").text = Loc.Ui("map.command", _run.CommandLimit, ExpeditionRun.CommandLimitPerBattle);
+            Find<Label>("relays").text = Loc.Ui("map.relays", _run.Fleet.Relays, ExpeditionRun.MaxRelays);
+            Find<Label>("record").text = Loc.Ui("map.record", _run.BattlesWon, _run.BattlesFought);
 
             VisualElement fleet = Find<VisualElement>("fleet-list");
             fleet.Clear();
             var counts = new SortedDictionary<string, int>();
             foreach (OwnedShip ship in _run.Fleet.Ships)
             {
-                string key = ship.Def.DisplayName + " " + Ui.Stars(ship.Star);
+                string key = Loc.T(ship.Def.Name) + " " + Ui.Stars(ship.Star);
                 counts.TryGetValue(key, out int n);
                 counts[key] = n + 1;
             }
@@ -89,9 +89,9 @@ namespace Starline.Client
 
             VisualElement messages = Find<VisualElement>("messages");
             messages.Clear();
-            foreach (string message in _run.Messages)
+            foreach (LocText message in _run.Messages)
             {
-                messages.Add(Ui.Label(message, "warn", "small"));
+                messages.Add(Ui.Label(Loc.T(message), "warn", "small"));
             }
         }
 
@@ -99,17 +99,17 @@ namespace Starline.Client
         {
             if (node == null)
             {
-                _infoTitle.text = "图例";
-                _infoBody.text = "战斗 · 精英（更强，奖励更好）· 补给站（休整或领水晶）· BOSS。悬停节点查看情报，点击亮起的节点出发。";
+                _infoTitle.text = Loc.Ui("map.legend");
+                _infoBody.text = Loc.Ui("map.legend_body");
                 _infoReward.text = "";
                 return;
             }
             _infoTitle.text = TypeName(node.Type) + " · " + _names[node.Id];
             _infoBody.text = _briefings[node.Id];
-            _infoReward.text = node.Type == NodeType.Elite ? "胜利：三选一，必有一名 ★★ 角色"
-                : node.Type == NodeType.Boss ? "胜利：通关本幕    失败：耐久 −" + ExpeditionConfig.Current.BossLoss + "，可以重打"
+            _infoReward.text = node.Type == NodeType.Elite ? Loc.Ui("map.reward_elite")
+                : node.Type == NodeType.Boss ? Loc.Ui("map.reward_boss", ExpeditionConfig.Current.BossLoss)
                 : node.Type == NodeType.Supply ? ""
-                : "胜利：三选一    失败：耐久 −" + ExpeditionConfig.Current.NormalLoss;
+                : Loc.Ui("map.reward_battle", ExpeditionConfig.Current.NormalLoss);
         }
 
         private void OnNodeClicked(MapNode node)
@@ -127,12 +127,12 @@ namespace Starline.Client
 
         private void ShowSupplyDialog()
         {
-            VisualElement dialog = Ui.Dialog("补给站", "一座刚刚连回星线的城邦驿站，可以帮远征军做一次整备。二选一：");
+            VisualElement dialog = Ui.Dialog(Loc.Ui("map.supply"), Loc.Ui("map.supply_dialog"));
             VisualElement buttons = dialog.Q(className: "dialog-buttons");
-            Button repair = Ui.Button("休整远征军：耐久 +1（当前 " + _run.Durability + " / " + ExpeditionRun.MaxDurability + "）",
+            Button repair = Ui.Button(Loc.Ui("map.supply_repair", _run.Durability, ExpeditionRun.MaxDurability),
                 () => ChooseSupply(true), "btn-primary");
             repair.SetEnabled(_run.Durability < ExpeditionRun.MaxDurability);
-            Button relay = Ui.Button("领取法力水晶：+1（当前 " + _run.Fleet.Relays + " 个）", () => ChooseSupply(false), "btn-secondary");
+            Button relay = Ui.Button(Loc.Ui("map.supply_relay", _run.Fleet.Relays), () => ChooseSupply(false), "btn-secondary");
             relay.SetEnabled(_run.Fleet.Relays < ExpeditionRun.MaxRelays);
             buttons.Add(repair);
             buttons.Add(relay);
@@ -147,9 +147,9 @@ namespace Starline.Client
 
         private void ConfirmAbandon()
         {
-            App.Ui.ShowModal(Ui.Dialog("放弃远征", "当前远征的进度会丢失（存档功能在下一阶段加入）。确定返回主菜单吗？",
-                ("继续远征", App.Ui.CloseModals),
-                ("放弃并返回主菜单", App.ShowMainMenu)));
+            App.Ui.ShowModal(Ui.Dialog(Loc.Ui("map.abandon_title"), Loc.Ui("map.abandon_body"),
+                (Loc.Ui("map.abandon_cancel"), App.Ui.CloseModals),
+                (Loc.Ui("map.abandon_confirm"), App.ShowMainMenu)));
         }
 
         private string NodeLabel(MapNode node)
@@ -157,26 +157,32 @@ namespace Starline.Client
             switch (node.Type)
             {
                 case NodeType.Supply:
-                    return "补给站";
-                case NodeType.Boss:
-                    string boss = _names[node.Id];
-                    int c = boss.IndexOf('：');
-                    return "BOSS\n" + (c >= 0 ? boss.Substring(c + 1) : boss);
+                    return Loc.Ui("map.supply");
                 default:
-                    string name = _names[node.Id];
-                    int colon = name.IndexOf('：');
-                    return TypeName(node.Type) + "\n" + (colon >= 0 ? name.Substring(colon + 1) : name);
+                    return TypeName(node.Type) + "\n" + WithoutPrefix(_names[node.Id]);
             }
+        }
+
+        /// <summary>"精英战：缝合巨怪巡游" → "缝合巨怪巡游": the node already shows its type.</summary>
+        private static string WithoutPrefix(string name)
+        {
+            int colon = name.IndexOf('：');
+            if (colon >= 0)
+            {
+                return name.Substring(colon + 1);
+            }
+            colon = name.IndexOf(": ", System.StringComparison.Ordinal);
+            return colon >= 0 ? name.Substring(colon + 2) : name;
         }
 
         private static string TypeName(NodeType type)
         {
             switch (type)
             {
-                case NodeType.Elite: return "精英";
-                case NodeType.Supply: return "补给站";
-                case NodeType.Boss: return "BOSS";
-                default: return "战斗";
+                case NodeType.Elite: return Loc.Ui("map.type_elite");
+                case NodeType.Supply: return Loc.Ui("map.supply");
+                case NodeType.Boss: return Loc.Ui("map.type_boss");
+                default: return Loc.Ui("map.type_battle");
             }
         }
     }

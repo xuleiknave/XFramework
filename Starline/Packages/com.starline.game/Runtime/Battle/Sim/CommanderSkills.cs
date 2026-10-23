@@ -12,8 +12,8 @@ namespace Starline.Battle
     public sealed class CommanderSkillDef
     {
         public CommanderSkill Skill;
-        public string DisplayName;
-        public string Description = "";
+        public LocText Name => new LocText("skill." + Skill + ".name");
+        public LocText Description => new LocText("skill." + Skill + ".description");
         public int Cost;
         public int CooldownSeconds;
         public bool NeedsTarget;
@@ -44,8 +44,6 @@ namespace Starline.Battle
                 all[(int)skill] = new CommanderSkillDef
                 {
                     Skill = skill,
-                    DisplayName = s["name"].AsString(),
-                    Description = s.String("description", ""),
                     Cost = s["cost"].AsInt(),
                     CooldownSeconds = s["cooldown"].AsInt(),
                     NeedsTarget = s.Bool("needsTarget"),

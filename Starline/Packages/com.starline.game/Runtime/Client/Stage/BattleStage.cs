@@ -163,8 +163,8 @@ namespace Starline.Client
                         if (_views.TryGetValue(e.TargetId, out UnitView dead))
                         {
                             UnitDef def = dead.Def;
-                            string who = (dead.Side == BoardLayout.PlayerSide ? "我方 " : "敌方 ") + def.DisplayName;
-                            feed(def.IsRelay ? who + " 魔网节点被摧毁！" : def.IsSupplySource ? who + " 魔网源头被摧毁！" : who + " 被击败");
+                            string who = Loc.Ui(dead.Side == BoardLayout.PlayerSide ? "feed.player_unit" : "feed.enemy_unit", Loc.T(def.Name));
+                            feed(Loc.Ui(def.IsRelay ? "feed.relay_destroyed" : def.IsSupplySource ? "feed.source_destroyed" : "feed.defeated", who));
                             if (withEffects)
                             {
                                 SpawnFlash(dead.transform.position + Vector3.up * 0.5f, def.Size >= 2 ? 4f : 2f, 0.45f, new Color(1f, 0.8f, 0.4f));
@@ -182,14 +182,14 @@ namespace Starline.Client
                         Unit unit = _battle.GetUnit(e.TargetId);
                         if (unit != null)
                         {
-                            feed((unit.Side == BoardLayout.PlayerSide ? "我方 " : "敌方 ") + unit.Def.DisplayName + " 法力耗尽");
+                            feed(Loc.Ui("feed.out_of_ammo", Loc.Ui(unit.Side == BoardLayout.PlayerSide ? "feed.player_unit" : "feed.enemy_unit", Loc.T(unit.Def.Name))));
                         }
                         break;
                     }
                     case BattleEventType.SkillCast:
                         if (e.SourceId == BoardLayout.PlayerSide)
                         {
-                            feed("释放【" + CommanderSkillDef.All[e.Amount.ToIntFloor()].DisplayName + "】");
+                            feed(Loc.Ui("feed.skill_cast", Loc.T(CommanderSkillDef.All[e.Amount.ToIntFloor()].Name)));
                         }
                         break;
                     case BattleEventType.StrikeLanded:
@@ -199,7 +199,7 @@ namespace Starline.Client
                         }
                         break;
                     case BattleEventType.BattleEnded:
-                        feed(e.SourceId == BoardLayout.PlayerSide ? "胜利！" : e.SourceId == BoardLayout.EnemySide ? "失败" : "平局");
+                        feed(Loc.Ui(e.SourceId == BoardLayout.PlayerSide ? "feed.won" : e.SourceId == BoardLayout.EnemySide ? "feed.lost" : "feed.draw"));
                         break;
                 }
             }

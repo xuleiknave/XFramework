@@ -41,7 +41,7 @@ namespace Starline.Client
 
         public static UnitView Create(UnitDef def, int side, int unitId, Vector3 position, Transform parent, int star = 1)
         {
-            var root = new GameObject(def.DisplayName + " #" + unitId);
+            var root = new GameObject(def.Id + " #" + unitId);
             root.transform.SetParent(parent, false);
             var view = root.AddComponent<UnitView>();
             view.UnitId = unitId;

@@ -13,9 +13,9 @@ namespace Starline.Battle
         public double Margin;
         public double AverageSeconds;
         public double AverageLosses;
-        /// <summary>Most frequent problems in lost battles, already worded for the UI.</summary>
-        public readonly List<string> LossReasons = new List<string>();
-        public string Advice;
+        /// <summary>Most frequent problems in lost battles, as text for the UI.</summary>
+        public readonly List<LocText> LossReasons = new List<LocText>();
+        public LocText Advice;
     }
 
     /// <summary>
@@ -95,8 +95,8 @@ namespace Starline.Battle
         private struct Reason
         {
             public double Share;
-            public string Text;
-            public string Advice;
+            public LocText Text;
+            public LocText Advice;
         }
 
         private static void BuildReasons(ForecastResult result, int defeats, Dictionary<string, int> lost,
@@ -104,7 +104,7 @@ namespace Starline.Battle
         {
             if (defeats == 0)
             {
-                result.Advice = "推演中没有出现败局，可以直接开战。";
+                result.Advice = new LocText("forecast.no_defeat");
                 return;
             }
 
@@ -115,7 +115,7 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)lost[worstLost] / defeats,
-                    Text = UnitCatalog.Get(worstLost).DisplayName + " 被击败",
+                    Text = new LocText("forecast.unit_lost", LocText.UnitName(worstLost)),
                     Advice = AdviceForLoss(UnitCatalog.Get(worstLost)),
                 });
             }
@@ -125,8 +125,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)dry[worstDry] / defeats,
-                    Text = UnitCatalog.Get(worstDry).DisplayName + " 法力耗尽停手",
-                    Advice = "让 " + UnitCatalog.Get(worstDry).DisplayName + " 待在魔网覆盖范围内，或者在它附近加一个法力水晶。",
+                    Text = new LocText("forecast.unit_dry", LocText.UnitName(worstDry)),
+                    Advice = new LocText("forecast.advice_dry", LocText.UnitName(worstDry)),
                 });
             }
             if (relayLost > 0)
@@ -134,8 +134,8 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)relayLost / defeats,
-                    Text = "魔网节点被摧毁",
-                    Advice = "在法力水晶附近放一名弩手，挡住来切魔网连线的怨灵。",
+                    Text = new LocText("forecast.relay_lost"),
+                    Advice = new LocText("forecast.advice_relay_lost"),
                 });
             }
             if (unsupplied > 0)
@@ -143,17 +143,17 @@ namespace Starline.Battle
                 reasons.Add(new Reason
                 {
                     Share = (double)unsupplied / defeats,
-                    Text = "角色长时间断开魔网",
-                    Advice = "检查红框的“未接入”角色，把它们移进绿色覆盖区。",
+                    Text = new LocText("forecast.unsupplied"),
+                    Advice = new LocText("forecast.advice_unsupplied"),
                 });
             }
 
             reasons.Sort((a, b) => b.Share.CompareTo(a.Share));
             for (int i = 0; i < reasons.Count && i < 2; i++)
             {
-                result.LossReasons.Add(reasons[i].Text + "（" + Math.Round(reasons[i].Share * 100) + "% 的败局）");
+                result.LossReasons.Add(new LocText("forecast.reason_share", reasons[i].Text, (int)Math.Round(reasons[i].Share * 100)));
             }
-            result.Advice = reasons.Count > 0 ? reasons[0].Advice : null;
+            result.Advice = reasons.Count > 0 ? reasons[0].Advice : default(LocText);
         }
 
         private static string MostFrequent(Dictionary<string, int> counts, bool onlyCombatants)
@@ -176,20 +176,20 @@ namespace Starline.Battle
             return best;
         }
 
-        private static string AdviceForLoss(UnitDef def)
+        private static LocText AdviceForLoss(UnitDef def)
         {
             switch (def.Role)
             {
                 case UnitRole.Artillery:
-                    return "把 " + def.DisplayName + " 往后放，前面用重甲骑士或游侠挡住突进的敌人。";
+                    return new LocText("forecast.advice_artillery", def.Name);
                 case UnitRole.Craft:
-                    return def.DisplayName + " 怕点防御，避开敌方点防御单位所在的一翼。";
+                    return new LocText("forecast.advice_craft", def.Name);
                 case UnitRole.Heavy:
-                    return "敌方骨塔和怨灵克制重装单位，先用狮鹫骑士或游侠解决它们。";
+                    return new LocText("forecast.advice_heavy");
                 case UnitRole.PointDefense:
-                    return def.DisplayName + " 很脆，放在第二排，让前排替它挡伤害。";
+                    return new LocText("forecast.advice_point_defense", def.Name);
                 default:
-                    return "前排太薄，考虑多放一个耐打的单位。";
+                    return new LocText("forecast.advice_default");
             }
         }
     }

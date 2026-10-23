@@ -37,6 +37,9 @@ namespace Starline.Battle.Tests
             Run("远征：失败扣耐久，Boss 失败扣 2，归零结束", DurabilityRules);
             Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
             Run("敌方阵容都合法", EncountersAreValid);
+            Run("语言表：每条都有中文，译文占位符一致", LocalizationTablesAreComplete);
+            Run("语言表：角色、技能、阵容、剧情都有文本", GameDataHasText);
+            Run("语言表：界面用到的 key 都存在", ClientKeysExist);
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
 
             Console.WriteLine();
@@ -94,7 +97,7 @@ namespace Starline.Battle.Tests
         {
             Encounter e = Fixtures.WreckFieldAmbush();
             Assert(FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit).Count == 0,
-                "默认阵型应合法：" + string.Join("；", FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit)));
+                "默认阵型应合法：" + Fixtures.Join("；", FormationRules.Validate(e.SuggestedPlayer, e.CommandLimit)));
             Assert(FormationRules.Validate(e.Enemy, 99).Count == 0, "敌方阵型应合法");
 
             Formation f = e.SuggestedPlayer;
@@ -264,7 +267,7 @@ namespace Starline.Battle.Tests
                     wins++;
                 }
             }
-            Info(na + " " + UnitCatalog.Get(a).DisplayName + " 对 " + nb + " " + UnitCatalog.Get(b).DisplayName + "：20 局胜 " + wins);
+            Info(na + " " + Fixtures.Text(UnitCatalog.Get(a).Name) + " 对 " + nb + " " + Fixtures.Text(UnitCatalog.Get(b).Name) + "：20 局胜 " + wins);
             Assert(wins >= 18, "胜场不足 18");
         }
 
@@ -342,11 +345,11 @@ namespace Starline.Battle.Tests
             sw.Stop();
             Info("推演 100 场用时 " + sw.ElapsedMilliseconds + " 毫秒；胜率 " + Math.Round(r.WinRate * 100) + "% ±" + Math.Round(r.Margin * 100)
                 + "%，平均 " + Math.Round(r.AverageSeconds) + " 秒，平均损失 " + Math.Round(r.AverageLosses, 1));
-            foreach (string reason in r.LossReasons)
+            foreach (LocText reason in r.LossReasons)
             {
-                Info("败因：" + reason);
+                Info("败因：" + Fixtures.Text(reason));
             }
-            Info("建议：" + r.Advice);
+            Info("建议：" + Fixtures.Text(r.Advice));
             Assert(sw.ElapsedMilliseconds < 5000, "推演太慢");
             Assert(r.WinRate >= 0.25 && r.WinRate <= 0.85, "默认阵型胜率应在 25%~85% 之间，实际 " + r.WinRate);
         }

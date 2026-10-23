@@ -51,8 +51,6 @@ namespace Starline.Battle
                 var def = new UnitDef
                 {
                     Id = u["id"].AsString(),
-                    DisplayName = u["name"].AsString(),
-                    Description = u.String("description", ""),
                     Role = GameData.ParseEnum<UnitRole>(u["role"]),
                     Size = u.Int("size", 1),
                     CommandCost = u.Int("commandCost"),

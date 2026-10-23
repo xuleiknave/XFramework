@@ -10,12 +10,12 @@ namespace Starline.Client
         {
             switch (role)
             {
-                case UnitRole.Light: return "轻装 · 克远程";
-                case UnitRole.Heavy: return "重装 · 克轻装";
-                case UnitRole.Craft: return "飞骑 · 克重装、远程";
-                case UnitRole.PointDefense: return "对空 · 克飞骑";
-                case UnitRole.Artillery: return "远程 · 克重装";
-                default: return "魔网";
+                case UnitRole.Light: return Loc.Ui("role.light");
+                case UnitRole.Heavy: return Loc.Ui("role.heavy");
+                case UnitRole.Craft: return Loc.Ui("role.craft");
+                case UnitRole.PointDefense: return Loc.Ui("role.point_defense");
+                case UnitRole.Artillery: return Loc.Ui("role.artillery");
+                default: return Loc.Ui("role.structure");
             }
         }
 
@@ -25,15 +25,15 @@ namespace Starline.Client
             float hp = (def.MaxHp * UnitDef.HpScale(star)).ToFloat();
             float shield = (def.MaxShield * UnitDef.HpScale(star)).ToFloat();
             float dps = (def.Damage * UnitDef.DamageScale(star)).ToFloat() / def.FireIntervalSeconds.ToFloat();
-            string text = "生命 " + Mathf.RoundToInt(hp) + "  护盾 " + Mathf.RoundToInt(shield)
-                + "\n每秒伤害 " + dps.ToString("0") + "  射程 " + (def.Range.ToFloat() / BoardLayout.CellSize.ToFloat()).ToString("0.#") + " 格";
+            string text = Loc.Ui("stats.survival", Mathf.RoundToInt(hp), Mathf.RoundToInt(shield))
+                + "\n" + Loc.Ui("stats.attack", dps.ToString("0"), (def.Range.ToFloat() / BoardLayout.CellSize.ToFloat()).ToString("0.#"));
             if (def.MaxAmmo > 0)
             {
-                text += "\n法力 " + def.MaxAmmo + "（断开魔网后用完就停手）";
+                text += "\n" + Loc.Ui("stats.ammo", def.MaxAmmo);
             }
             if (def.OffGridGraceSeconds > Fix.Zero)
             {
-                text += "\n可离网 " + def.OffGridGraceSeconds.ToIntFloor() + " 秒";
+                text += "\n" + Loc.Ui("stats.off_grid", def.OffGridGraceSeconds.ToIntFloor());
             }
             return text;
         }
