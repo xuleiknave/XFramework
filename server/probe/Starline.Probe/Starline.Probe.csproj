@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    UOS 验证（S0）的检查逻辑。不依赖 UOS：本地控制台和云函数都调用它。
+    内核源码和配置表直接编进这个程序集，部署到云函数时只需要这一个 dll。
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../../Starline/Packages/com.starline.game/Runtime/Battle/**/*.cs" Link="Kernel/%(RecursiveDir)%(Filename)%(Extension)" />
+    <EmbeddedResource Include="../../../Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/*.json" LogicalName="StarlineData.%(Filename).json" />
+  </ItemGroup>
+
+</Project>

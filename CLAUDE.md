@@ -25,6 +25,7 @@
 - `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
 - `server/db/schema.sql`：服务端第二阶段（UOS CRUD Storage / MySQL）的建表语句。服务端是托管在 UOS 的 C# 云函数，第一阶段数据库用 CRUD Save，见 `docs/server-design.md`、`docs/server-database.md`；业务代码还没写
+- `server/probe/`：UOS 验证云函数（S0）：在 UOS 上检查内核重跑、数据库条件写、Steam API、冷启动；`dotnet run --project server/probe/Starline.Probe.Local` 在本机跑
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟
 
 ## 命令
