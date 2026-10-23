@@ -8,6 +8,10 @@ namespace Starline.Client
     /// share Palette.png; models imported with tools/models/import_model.py (AI-generated or hand-made) bring
     /// their own &lt;model key&gt;_tex.png. Every model has two material slots, "Hull" (that texture) and
     /// "Glow" (emissive parts whose colour the client sets per side and mana network state).
+    /// Cartoon characters are rigged and carry their clips (idle, walk, attack, hit, death; see
+    /// <see cref="UnitAnimator"/>). They have no base: battle shows them standing on the board, and
+    /// showcase screens (roster, star-up, codex) put them on base_s&lt;star&gt; / base_large_s&lt;star&gt;
+    /// with <see cref="InstantiateShowcase"/>.
     /// </summary>
     public static class ModelLibrary
     {
@@ -15,6 +19,10 @@ namespace Starline.Client
 
         private static readonly Dictionary<string, GameObject> Prefabs = new Dictionary<string, GameObject>();
         private static readonly Dictionary<string, Texture2D> Textures = new Dictionary<string, Texture2D>();
+        private static readonly Dictionary<string, AnimationClip[]> ClipSets = new Dictionary<string, AnimationClip[]>();
+
+        /// <summary>Height of the top of the showcase base; the character stands on it.</summary>
+        public const float BaseTop = 0.08f;
         private static Texture2D _palette;
         private static Shader _lit;
 
@@ -47,6 +55,53 @@ namespace Starline.Client
             GameObject model = Object.Instantiate(prefab, parent, false);
             model.name = "Model";
             return model;
+        }
+
+        /// <summary>The model's animation clips (empty for static models).</summary>
+        public static AnimationClip[] Clips(string modelKey)
+        {
+            if (!ClipSets.TryGetValue(modelKey, out AnimationClip[] clips))
+            {
+                var list = new List<AnimationClip>();
+                foreach (AnimationClip clip in Resources.LoadAll<AnimationClip>(Folder + "/" + modelKey))
+                {
+                    if (!clip.name.StartsWith("__preview__"))
+                    {
+                        list.Add(clip);
+                    }
+                }
+                clips = list.ToArray();
+                ClipSets[modelKey] = clips;
+            }
+            return clips;
+        }
+
+        /// <summary>
+        /// A character for showcase screens (roster, star-up, codex): the star's costume standing on the
+        /// star's base (2×2 characters on the large base), idling. Battle uses the model without a base.
+        /// Materials are left to the caller (see <see cref="AssignMaterials"/>); returns null without a model.
+        /// </summary>
+        public static GameObject InstantiateShowcase(string unitId, int star, int size, Transform parent)
+        {
+            string modelKey = ModelKey(unitId, star);
+            if (Prefab(modelKey) == null)
+            {
+                return null;
+            }
+            var root = new GameObject("Showcase " + modelKey);
+            root.transform.SetParent(parent, false);
+            GameObject stand = Instantiate((size >= 2 ? "base_large_s" : "base_s") + Mathf.Clamp(star, 1, 5), root.transform);
+            if (stand != null)
+            {
+                stand.name = "Base";
+            }
+            GameObject model = Instantiate(modelKey, root.transform);
+            if (stand != null)
+            {
+                model.transform.localPosition = Vector3.up * BaseTop;
+            }
+            UnitAnimator.Attach(model, Clips(modelKey));
+            return root;
         }
 
         private static GameObject Prefab(string modelKey)

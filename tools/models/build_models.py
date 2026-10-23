@@ -22,7 +22,7 @@ import sys
 
 import bpy  # 必须先于 bmesh 导入（以 Python 模块方式运行时）
 import bmesh
-from mathutils import Matrix, Vector
+from mathutils import Matrix, Quaternion, Vector
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT_DIR = os.path.join(REPO, "Starline", "Packages", "com.starline.game", "Runtime", "Resources", "StarlineModels")
@@ -117,19 +117,114 @@ def P(f, x, z):
 
 
 class Builder:
-    """往一个 bmesh 里堆零件；每个零件指定色块名或 GLOW。"""
+    """往一个 bmesh 里堆零件；每个零件指定色块名或 GLOW。
+
+    卡通角色还会登记骨骼（bone）：每个零件记一个编号，导出前按零件中心找最近的骨骼，整块绑到那根骨骼上
+    （卡通角色是一块块拼起来的，整块刚性绑定就够了）。attach 可以把一段代码画的零件强制绑到指定骨骼。"""
 
     def __init__(self):
         self.bm = bmesh.new()
         self.uv = self.bm.loops.layers.uv.verify()
+        self.part = self.bm.verts.layers.int.new("part")
+        self.next_part = 1
+        self.part_bone = {}  # 零件编号 → 强制绑定的骨骼
+        self.force = None
+        self.bones = []  # [名字, 头, 尾, 父骨骼]，骨骼坐标和网格一样
+        self.draw_base = True  # 卡通角色不把底座画进角色网格，底座单独导出（只在展示界面用）
+        self.base_spec = None
 
     def _paint(self, faces, colour):
         glow = colour == GLOW
         uv = (0.0, 0.0) if glow else palette_uv(colour)
+        part = self.next_part
+        self.next_part += 1
+        if self.force:
+            self.part_bone[part] = self.force
         for face in faces:
             face.material_index = 1 if glow else 0
             for loop in face.loops:
                 loop[self.uv].uv = uv
+            for v in face.verts:
+                if v[self.part] == 0:
+                    v[self.part] = part
+
+    def bone(self, name, head, tail, parent="root"):
+        """登记一根骨骼；同名的只保留第一根。返回名字。"""
+        if not any(bn[0] == name for bn in self.bones):
+            if not self.bones and name != "root":
+                self.bones.append(["root", Vector((0, 0, 0)), Vector((0, 0, 0.12)), None])
+            self.bones.append([name, Vector(head), Vector(tail), parent if name != "root" else None])
+        return name
+
+    def has_bone(self, name):
+        return any(bn[0] == name for bn in self.bones)
+
+    def hand_bone(self, hand):
+        """离 hand 最近的前臂骨骼（武器绑在拿着它的手上）。"""
+        best, dist = None, 0.25
+        for name, head, tail, _ in self.bones:
+            if name.startswith("arm_lower") and (tail - hand).length < dist:
+                best, dist = name, (tail - hand).length
+        return best
+
+    class _Attach:
+        def __init__(self, builder, bone):
+            self.builder, self.bone, self.saved = builder, bone, None
+
+        def __enter__(self):
+            self.saved = self.builder.force
+            if self.bone:
+                self.builder.force = self.bone
+
+        def __exit__(self, *exc):
+            self.builder.force = self.saved
+
+    def attach(self, bone):
+        """with b.attach("arm_lower.R"): 里面画的零件都绑到这根骨骼；bone 为 None 时不改变。"""
+        return Builder._Attach(self, bone)
+
+    def held(self, hand):
+        return self.attach(self.hand_bone(hand))
+
+    def _bind(self):
+        """把每个零件绑到骨骼：强制绑定优先，否则找离零件中心最近的骨骼段。"""
+        sums = {}
+        for v in self.bm.verts:
+            acc = sums.setdefault(v[self.part], [Vector((0, 0, 0)), 0])
+            acc[0] += v.co
+            acc[1] += 1
+        index = {bn[0]: i for i, bn in enumerate(self.bones)}
+        choice = {}
+        for part, (total, n) in sums.items():
+            if part in self.part_bone and self.part_bone[part] in index:
+                choice[part] = index[self.part_bone[part]]
+                continue
+            c = total / n
+            best, dist = 0, None
+            for i, (name, head, tail, _) in enumerate(self.bones):
+                seg = tail - head
+                t = max(0.0, min(1.0, (c - head).dot(seg) / max(seg.length_squared, 1e-9)))
+                d = (head + seg * t - c).length
+                if name == "root":
+                    d += 0.15  # 根骨骼只接没有别的骨骼可接的零件（比如树根）
+                if dist is None or d < dist:
+                    best, dist = i, d
+            choice[part] = best
+        deform = self.bm.verts.layers.deform.verify()
+        for v in self.bm.verts:
+            v[deform][choice[v[self.part]]] = 1.0
+
+    def ground(self):
+        """把模型最低点移到 z = 0（角色不带底座，脚踩地面）。"""
+        low = min(v.co.z for v in self.bm.verts)
+        for v in self.bm.verts:
+            v.co.z -= low
+        for bn in self.bones:
+            bn[1] = bn[1] - Vector((0, 0, low))
+            bn[2] = bn[2] - Vector((0, 0, low))
+        if self.bones:  # 根骨骼在脚底中心，倒下时绕脚底转
+            self.bones[0][1], self.bones[0][2] = Vector((0, 0, 0)), Vector((0, 0, 0.12))
+        return low
 
     def _new_faces(self, before):
         return [f for f in self.bm.faces if f not in before]
@@ -232,6 +327,9 @@ class Builder:
     def finish(self, name, hull_mat, glow_mat, smooth=False):
         bmesh.ops.remove_doubles(self.bm, verts=self.bm.verts, dist=0.0001)
         bmesh.ops.recalc_face_normals(self.bm, faces=self.bm.faces)
+        rigged = len(self.bones) > 1
+        if rigged:
+            self._bind()
         mesh = bpy.data.meshes.new(name)
         self.bm.to_mesh(mesh)
         self.bm.free()
@@ -245,6 +343,9 @@ class Builder:
         mesh.materials.append(glow_mat)
         obj = bpy.data.objects.new(name, mesh)
         bpy.context.scene.collection.objects.link(obj)
+        if rigged:
+            for bn in self.bones:
+                obj.vertex_groups.new(name=bn[0])
         return obj
 
 
@@ -270,11 +371,15 @@ def base(b, r, colour="stone_dark", sides=8, h=0.08):
 def scaled(b, k, fn, pivot=(0.0, 0.0, 0.08)):
     """调用 fn 画出部件，再把新画的部分以底座顶面中心为基点放大 k 倍（单个角色要比原来小队里的小人大，才看得清）。"""
     before = set(b.bm.verts)
+    n_bones = len(b.bones)
     fn()
     c = Vector(pivot)
     for v in b.bm.verts:
         if v not in before:
             v.co = c + (v.co - c) * k
+    for bn in b.bones[n_bones:]:
+        for i in (1, 2):
+            bn[i] = c + (bn[i] - c) * k
 
 
 def gem(b, centre, radii, colour=GLOW, rot=(0.0, 0.0, 0.0)):
@@ -567,10 +672,14 @@ def limb(b, points, r1, r2, colour, segments=12):
 def posed(b, fn, lean=0.0, pivot_z=0.1):
     """画出 fn 的部件后整体前倾：越高的点越往前（f 方向）挪。"""
     before = set(b.bm.verts)
+    n_bones = len(b.bones)
     fn()
     for v in b.bm.verts:
         if v not in before:
             v.co.y -= lean * (v.co.z - pivot_z)
+    for bn in b.bones[n_bones:]:
+        for i in (1, 2):
+            bn[i] = bn[i] - Vector((0, lean * (bn[i].z - pivot_z), 0))
 
 
 def face(b, c, r, eye="iron", glow_eyes=False, nose=True, brows=None):
@@ -611,6 +720,7 @@ def hero(b, z0=0.1, legs="leather", boots="leather", body="cloth_blue", skin="sk
     S(b, head, (head_r, head_r * 0.95, head_r * 0.95), skin, 20, 12)
     if has_face:
         face(b, head, head_r, eye=eye, glow_eyes=glow_eyes, brows=brows)
+    humanoid_bones(b, z0, head, head_r, legs=not robe)
     return {
         "head": head, "head_r": head_r,
         "shoulder": (P(0, 0.22, z0 + 0.82), P(0, -0.22, z0 + 0.82)),  # 右、左
@@ -618,9 +728,26 @@ def hero(b, z0=0.1, legs="leather", boots="leather", body="cloth_blue", skin="sk
     }
 
 
+def humanoid_bones(b, z0, head, head_r, legs=True, parent="root", f=0.0):
+    """人形骨骼：hips（骨盆）、spine（躯干）、head，有腿时加 leg.R / leg.L。"""
+    b.bone("hips", P(f, 0, z0 + 0.3), P(f, 0, z0 + 0.52), parent)
+    b.bone("spine", P(f, 0, z0 + 0.52), P(f, 0, z0 + 0.88), "hips")
+    b.bone("head", P(f, 0, z0 + 0.88), head + Vector((0, 0, head_r)), "spine")
+    if legs:
+        for side, s in (("R", 1), ("L", -1)):
+            b.bone("leg." + side, P(f, s * 0.1, z0 + 0.44), P(f + 0.02, s * 0.1, z0 + 0.04), "hips")
+
+
 def arm(b, shoulder, elbow, hand, sleeve, glove="skin", r=0.06):
-    limb(b, [shoulder, elbow, hand], r, r * 0.85, sleeve)
-    S(b, hand, (0.065, 0.065, 0.065), glove, 12, 8)
+    side = "R" if shoulder.x >= 0 else "L"
+    upper = b.bone("arm_upper." + side, shoulder, elbow, "spine")
+    lower = b.bone("arm_lower." + side, elbow, hand, upper)
+    with b.attach(upper):
+        R(b, shoulder, elbow, r, r * 0.925, sleeve, 12)
+    with b.attach(lower):
+        S(b, elbow, (r * 0.925,) * 3, sleeve, 12, 8)
+        R(b, elbow, hand, r * 0.925, r * 0.85, sleeve, 12)
+        S(b, hand, (0.065, 0.065, 0.065), glove, 12, 8)
 
 
 def rivets(b, points, colour="gold", r=0.02):
@@ -645,7 +772,11 @@ def model_id(unit_id, star):
 
 
 def star_base(b, r, star, colour="stone_dark"):
-    """底座：★2 银边，★3 金边，★4 金边镶 4 颗发光宝石，★5 再加一道内圈、镶 8 颗。"""
+    """底座：★2 银边，★3 金边，★4 金边镶 4 颗发光宝石，★5 再加一道内圈、镶 8 颗。
+    卡通角色的底座不画进角色网格（实际战斗不需要底座），只记下规格，另外导出 base_s<星级> / base_large_s<星级>。"""
+    if not b.draw_base:
+        b.base_spec = (r, star, colour)
+        return
     base(b, r, colour, sides=32)
     if star >= 2:
         b.ring(P(0, 0, 0.082), r * 0.95, 0.024, metal(star, "silver"), segments=48, sides=6)
@@ -672,8 +803,25 @@ def emblem(b, c, s=1.0, colour="gold", jewel=None):
         gem(b, c + Vector((0, -0.008, 0)), (0.026 * s, 0.02 * s, 0.036 * s), jewel)
 
 
-def cape(b, top_z, bottom_z, w_top, w_bottom, colour, trim=None, trim2=None, f0=-0.13, flare=0.14, folds=3,
-         cols=10, rows=8, thick=0.018):
+def held_weapon(fn):
+    """武器零件绑在拿着它的那只手（最近的前臂骨骼）上。"""
+    def wrapped(b, hand, *args, **kwargs):
+        with b.held(hand):
+            return fn(b, hand, *args, **kwargs)
+    wrapped.__doc__ = fn.__doc__
+    return wrapped
+
+
+def cape(b, top_z, bottom_z, *args, f0=-0.13, flare=0.14, **kwargs):
+    """披风单独一根骨骼（cape），待机和走路时会飘动。"""
+    name = "cape" if not b.has_bone("cape") else "cape2"
+    b.bone(name, P(f0, 0, top_z), P(f0 - 0.04 - flare, 0, bottom_z), "spine" if b.has_bone("spine") else "root")
+    with b.attach(name):
+        return _cape(b, top_z, bottom_z, *args, f0=f0, flare=flare, **kwargs)
+
+
+def _cape(b, top_z, bottom_z, w_top, w_bottom, colour, trim=None, trim2=None, f0=-0.13, flare=0.14, folds=3,
+          cols=10, rows=8, thick=0.018):
     """背后的披风：一片有厚度的弧面，下摆外飘，带几道褶；trim 是下摆的饰边颜色，trim2 是第二道饰边。"""
     before = set(b.bm.faces)
 
@@ -1065,11 +1213,17 @@ def necromancer(b, star=1):  # 维克多 · 死灵法师：骷髅头、尖兜帽
 
 def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条手臂、树冠；★2 藤蔓腰带，★3 宝石扣五瓣花，★4 符文环发光果实，★5 满树花冠和枝角
     star_base(b, 0.8, star, colour="bark")
-    for i in range(6):
-        a = i * 2 * math.pi / 6 + 0.3
-        c, s = math.cos(a), math.sin(a)
-        limb(b, [P(0.22 * c, 0.22 * s, 0.4), P(0.45 * c, 0.45 * s, 0.18), P(0.66 * c, 0.66 * s, 0.09)], 0.1, 0.03,
-             "bark", 10)
+    b.bone("spine", P(0, 0, 0.1), P(0, 0, 1.0))
+    b.bone("head", P(0, 0, 1.0), P(0, 0, 2.0), "spine")  # 树冠
+    for side, s in (("R", 1), ("L", -1)):
+        b.bone("arm_upper." + side, P(0, s * 0.27, 0.95), P(0.12, s * 0.55, 0.8), "spine")
+        b.bone("arm_lower." + side, P(0.12, s * 0.55, 0.8), P(0.3, s * 0.62, 0.42), "arm_upper." + side)
+    with b.attach("root"):  # 树根扎在地上不动
+        for i in range(6):
+            a = i * 2 * math.pi / 6 + 0.3
+            c, s = math.cos(a), math.sin(a)
+            limb(b, [P(0.22 * c, 0.22 * s, 0.4), P(0.45 * c, 0.45 * s, 0.18), P(0.66 * c, 0.66 * s, 0.09)], 0.1,
+                 0.03, "bark", 10)
     R(b, P(0, 0, 0.08), P(0, 0, 1.0), 0.36, 0.3, "bark", 20)
     S(b, P(0, 0, 1.0), (0.3, 0.3, 0.32), "bark", 20, 12)
     for i in range(10):
@@ -1218,6 +1372,7 @@ def dress(b, k, star, plain="steel_dark", pad=None, cape_colour=None, cape5=None
     return t
 
 
+@held_weapon
 def sword(b, hand, star, length=0.42, blade="white", guard=None, glow_from=5, tilt=62):
     """斜举向前上方的剑。"""
     g = guard or metal(star, "steel_dark")
@@ -1232,6 +1387,7 @@ def sword(b, hand, star, length=0.42, blade="white", guard=None, glow_from=5, ti
         gem(b, hand + Vector((0, -0.07, 0.035)), (0.02, 0.016, 0.03))
 
 
+@held_weapon
 def bow(b, hand, star, wood="wood", size=0.36, string="white", tips=None):
     """竖握在左手的弓，弓臂向前弯。"""
     t = tips or metal(star, wood)
@@ -1247,6 +1403,7 @@ def bow(b, hand, star, wood="wood", size=0.36, string="white", tips=None):
         R(b, hand + Vector((0, 0.1, 0)), hand + Vector((0, -0.25, 0)), 0.008, 0.008, GLOW, 6)
 
 
+@held_weapon
 def staff(b, hand, z0, star, wood="wood", height=1.45):
     """立在地上的法杖，按星级加金属箍；返回杖顶位置。"""
     base_p = Vector((hand.x, hand.y, z0))
@@ -1259,6 +1416,7 @@ def staff(b, hand, z0, star, wood="wood", height=1.45):
     return top
 
 
+@held_weapon
 def spear(b, hand, star, length=1.3, shaft="wood", pennant=None):
     """斜指前方的长枪；★3 起挂小旗。"""
     back = hand + Vector((0, 0.45, -0.25))
@@ -1282,44 +1440,56 @@ def spear(b, hand, star, length=1.3, shaft="wood", pennant=None):
 def bird(b, z, body="griffin", wing="feather", head_c="feather", beak="gold", lion=True, star=1, span=0.75):
     """卡通飞行坐骑（狮鹫或巨鹰）：椭球身体、昂起的鸟头和尖喙、羽片展开的大翅膀；返回鞍座位置。"""
     t = metal(star, "leather")
+    head = P(0.56, 0, z + 0.36)
+    mount = b.bone("mount", P(0.3, 0, z), P(-0.45, 0, z))
+    neck = b.bone("mount_head", P(0.38, 0, z + 0.12), head + Vector((0, 0, 0.16)), mount)
+    b.bone("mount_tail", P(-0.45, 0, z), P(-0.8, 0, z + 0.1), mount)
+    for side, s in (("R", 1), ("L", -1)):
+        o = P(0.06, s * 0.2, z + 0.16)
+        b.bone("wing." + side, o, o + Vector((s * span * 0.8, 0.25, span * 0.45)), mount)
     S(b, P(0, 0, z), (0.25, 0.5, 0.24), body, 18, 10)
     S(b, P(0.3, 0, z + 0.08), (0.2, 0.2, 0.2), head_c, 16, 10)  # 胸前羽毛
-    head = P(0.56, 0, z + 0.36)
-    R(b, P(0.38, 0, z + 0.12), head, 0.14, 0.12, head_c, 14)
-    S(b, head, (0.16, 0.17, 0.16), head_c, 16, 10)
-    R(b, head + Vector((0, -0.13, -0.01)), head + Vector((0, -0.3, -0.08)), 0.06, 0.004, beak, 10)
+    with b.attach(neck):
+        R(b, P(0.38, 0, z + 0.12), head, 0.14, 0.12, head_c, 14)
+        S(b, head, (0.16, 0.17, 0.16), head_c, 16, 10)
+        R(b, head + Vector((0, -0.13, -0.01)), head + Vector((0, -0.3, -0.08)), 0.06, 0.004, beak, 10)
     for s in (-1, 1):
-        S(b, head + Vector((s * 0.085, -0.1, 0.04)), (0.028, 0.02, 0.036), "iron", 8, 6)
-        S(b, head + Vector((s * 0.09, -0.115, 0.055)), (0.01, 0.008, 0.01), "white", 6, 4)
-        R(b, head + Vector((s * 0.06, 0.1, 0.1)), head + Vector((s * 0.09, 0.25, 0.16)), 0.035, 0.006, head_c, 8)
+        with b.attach(neck):
+            S(b, head + Vector((s * 0.085, -0.1, 0.04)), (0.028, 0.02, 0.036), "iron", 8, 6)
+            S(b, head + Vector((s * 0.09, -0.115, 0.055)), (0.01, 0.008, 0.01), "white", 6, 4)
+            R(b, head + Vector((s * 0.06, 0.1, 0.1)), head + Vector((s * 0.09, 0.25, 0.16)), 0.035, 0.006, head_c,
+              8)
         if lion:  # 狮鹫的前爪、后腿
             for f in (0.26, -0.28):
                 limb(b, [P(f, s * 0.13, z - 0.1), P(f + 0.05, s * 0.14, z - 0.24), P(f + 0.11, s * 0.14, z - 0.3)],
                      0.055, 0.04, body if f < 0 else head_c, 10)
         # 翅膀：翅根一块圆鼓的覆羽，外面六根飞羽向上后方展开
         o = P(0.06, s * 0.2, z + 0.16)
-        S(b, o + Vector((s * 0.2, 0.08, 0.14)), (0.26, 0.2, 0.07), wing, 16, 8, rot=(0, -s * 35, 0))
-        for i in range(6):
-            el = math.radians(22 + i * 5)
-            ln = span * (1.0 - 0.06 * i)
-            end = o + Vector((s * ln * math.cos(el), 0.1 + i * 0.06, ln * math.sin(el)))
-            R(b, o + Vector((s * 0.12, 0.03 + i * 0.04, 0.08)), end, 0.075, 0.035, wing, 10)
-        el = math.radians(32)  # 飞羽之间的翼面，填满羽毛的缝
-        S(b, o + Vector((s * span * 0.42 * math.cos(el), 0.2, span * 0.42 * math.sin(el))),
-          (span * 0.48, 0.2, 0.035), wing, 18, 8, rot=(0, -s * 32, 0))
-        if star >= 3:  # 翅根金饰
-            b.ring(o + Vector((s * 0.1, 0.04, 0.08)), 0.07, 0.012, "gold", axis="x", segments=12, sides=4)
-    R(b, P(-0.45, 0, z), P(-0.8, 0, z + 0.1), 0.07, 0.012, body if lion else wing, 10)  # 尾巴
-    if lion:
-        S(b, P(-0.82, 0, z + 0.1), (0.06, 0.06, 0.06), head_c, 8, 6)
+        with b.attach("wing." + ("R" if s > 0 else "L")):
+            S(b, o + Vector((s * 0.2, 0.08, 0.14)), (0.26, 0.2, 0.07), wing, 16, 8, rot=(0, -s * 35, 0))
+            for i in range(6):
+                el = math.radians(22 + i * 5)
+                ln = span * (1.0 - 0.06 * i)
+                end = o + Vector((s * ln * math.cos(el), 0.1 + i * 0.06, ln * math.sin(el)))
+                R(b, o + Vector((s * 0.12, 0.03 + i * 0.04, 0.08)), end, 0.075, 0.035, wing, 10)
+            el = math.radians(32)  # 飞羽之间的翼面，填满羽毛的缝
+            S(b, o + Vector((s * span * 0.42 * math.cos(el), 0.2, span * 0.42 * math.sin(el))),
+              (span * 0.48, 0.2, 0.035), wing, 18, 8, rot=(0, -s * 32, 0))
+            if star >= 3:  # 翅根金饰
+                b.ring(o + Vector((s * 0.1, 0.04, 0.08)), 0.07, 0.012, "gold", axis="x", segments=12, sides=4)
+    with b.attach("mount_tail"):
+        R(b, P(-0.45, 0, z), P(-0.8, 0, z + 0.1), 0.07, 0.012, body if lion else wing, 10)  # 尾巴
+        if lion:
+            S(b, P(-0.82, 0, z + 0.1), (0.06, 0.06, 0.06), head_c, 8, 6)
     # 鞍和缰绳
     seat = P(-0.06, 0, z + 0.2)
     b.rbox(seat + Vector((0, 0, -0.02)), (0.3, 0.28, 0.06), "leather" if star < 3 else "royal", 0.5)
     b.ring(seat + Vector((0, 0, -0.03)), 0.16, 0.014, t, segments=16, sides=4)
-    if star >= 4:
-        gem(b, head + Vector((0, -0.15, 0.08)), (0.03, 0.02, 0.045))  # 额前宝石
-    if star >= 5:
-        b.ring(head + Vector((0, 0, 0.06)), 0.15, 0.014, "gold", segments=16, sides=4)
+    with b.attach(neck):
+        if star >= 4:
+            gem(b, head + Vector((0, -0.15, 0.08)), (0.03, 0.02, 0.045))  # 额前宝石
+        if star >= 5:
+            b.ring(head + Vector((0, 0, 0.06)), 0.15, 0.014, "gold", segments=16, sides=4)
     return seat
 
 
@@ -1339,6 +1509,7 @@ def seated(b, seat, body, legs="leather", boots="leather", skin="skin", belt="le
     head = P(f, 0, z0 + 0.88 + head_r * 0.9)
     S(b, head, (head_r, head_r * 0.95, head_r * 0.95), skin, 20, 12)
     face(b, head, head_r, eye=eye, brows=brows)
+    humanoid_bones(b, z0, head, head_r, legs=False, parent="mount" if b.has_bone("mount") else "root", f=f)
     return {
         "head": head, "head_r": head_r,
         "shoulder": (P(f, 0.22, z0 + 0.82), P(f, -0.22, z0 + 0.82)),
@@ -1455,34 +1626,35 @@ def banner_bearer(b, star=1):  # 奥莉薇亚 · 旗手：红发马尾、胸甲�
     rs, ls = k["shoulder"]
     rh = P(0.12, 0.3, z0 + 0.95)
     arm(b, rs, P(0.0, 0.34, z0 + 0.75), rh, "cloth_blue", "leather")
-    pole_top = z0 + 2.0
-    R(b, Vector((rh.x, rh.y, z0 + 0.25)), Vector((rh.x, rh.y, pole_top)), 0.022, 0.02, "gold" if star >= 5 else "wood",
-      10)
-    b.rbox(Vector((rh.x, rh.y + 0.0, pole_top - 0.05)), (0.025, 0.55, 0.03), metal(star, "wood"), 0.4)  # 横杆
-    fc = Vector((rh.x, rh.y + 0.0, pole_top - 0.36))
-    b.rbox(fc, (0.03, 0.5, 0.6), flag_c, 0.25)
-    for dz in (0.27, -0.27):  # 旗边
-        b.rbox(fc + Vector((0, 0, dz)), (0.04, 0.52 if star >= 2 else 0.5, 0.03), metal(star, "cloth_navy"), 0.4)
-    if star >= 2:
-        for dy in (0.24, -0.24):
-            b.rbox(fc + Vector((0, dy, 0)), (0.04, 0.03, 0.56), metal(star, "cloth_navy"), 0.4)
-    # 旗徽：两面都有
-    for sx in (1, -1):
-        c = fc + Vector((sx * 0.02, 0, 0.03))
-        b.ring(c, 0.11, 0.018, "gold" if star >= 3 else "white", axis="x", segments=20, sides=6)
-        gem(b, c, (0.035, 0.04, 0.05) if star >= 3 else (0.025, 0.03, 0.04), "gold" if star < 3 else GLOW)
-    if star >= 3:  # 下沿金穗
-        for i in range(5):
-            dy = -0.2 + i * 0.1
-            R(b, fc + Vector((0, dy, -0.29)), fc + Vector((0, dy, -0.38)), 0.012, 0.006, "gold", 6)
-    tip = Vector((rh.x, rh.y, pole_top + 0.02))
-    if star >= 4:
-        S(b, tip, (0.045, 0.045, 0.045), "gold", 12, 8)
-        gem(b, tip + Vector((0, 0, 0.09)), (0.035, 0.035, 0.07))
-    else:
-        R(b, tip, tip + Vector((0, 0, 0.14)), 0.04, 0.003, metal(star, "steel"), 8)
-    if star >= 5:
-        b.ring(tip + Vector((0, 0, 0.09)), 0.08, 0.01, "gold_light", axis="x", segments=16, sides=4)
+    with b.attach("arm_lower.R"):
+        pole_top = z0 + 2.0
+        R(b, Vector((rh.x, rh.y, z0 + 0.25)), Vector((rh.x, rh.y, pole_top)), 0.022, 0.02, "gold" if star >= 5 else "wood",
+          10)
+        b.rbox(Vector((rh.x, rh.y + 0.0, pole_top - 0.05)), (0.025, 0.55, 0.03), metal(star, "wood"), 0.4)  # 横杆
+        fc = Vector((rh.x, rh.y + 0.0, pole_top - 0.36))
+        b.rbox(fc, (0.03, 0.5, 0.6), flag_c, 0.25)
+        for dz in (0.27, -0.27):  # 旗边
+            b.rbox(fc + Vector((0, 0, dz)), (0.04, 0.52 if star >= 2 else 0.5, 0.03), metal(star, "cloth_navy"), 0.4)
+        if star >= 2:
+            for dy in (0.24, -0.24):
+                b.rbox(fc + Vector((0, dy, 0)), (0.04, 0.03, 0.56), metal(star, "cloth_navy"), 0.4)
+        # 旗徽：两面都有
+        for sx in (1, -1):
+            c = fc + Vector((sx * 0.02, 0, 0.03))
+            b.ring(c, 0.11, 0.018, "gold" if star >= 3 else "white", axis="x", segments=20, sides=6)
+            gem(b, c, (0.035, 0.04, 0.05) if star >= 3 else (0.025, 0.03, 0.04), "gold" if star < 3 else GLOW)
+        if star >= 3:  # 下沿金穗
+            for i in range(5):
+                dy = -0.2 + i * 0.1
+                R(b, fc + Vector((0, dy, -0.29)), fc + Vector((0, dy, -0.38)), 0.012, 0.006, "gold", 6)
+        tip = Vector((rh.x, rh.y, pole_top + 0.02))
+        if star >= 4:
+            S(b, tip, (0.045, 0.045, 0.045), "gold", 12, 8)
+            gem(b, tip + Vector((0, 0, 0.09)), (0.035, 0.035, 0.07))
+        else:
+            R(b, tip, tip + Vector((0, 0, 0.14)), 0.04, 0.003, metal(star, "steel"), 8)
+        if star >= 5:
+            b.ring(tip + Vector((0, 0, 0.09)), 0.08, 0.01, "gold_light", axis="x", segments=16, sides=4)
     lh = P(0.24, -0.26, z0 + 0.52)
     arm(b, ls, P(0.08, -0.33, z0 + 0.62), lh, "cloth_blue", "leather")
     sword(b, lh, star, length=0.34)
@@ -1596,23 +1768,25 @@ def _spirit_knight(b, star):
         if star >= 4:
             gem(b, sh + Vector((0, -0.1, 0.06)), (0.022, 0.018, 0.03))
     # 双手按在身前拄地的大剑上
-    sx = P(0.36, 0, 0)
-    R(b, Vector((sx.x, sx.y, z0 + 0.02)), Vector((sx.x, sx.y, z0 + 0.6)), 0.03, 0.055, "white", 4)
-    if star >= 5:
-        R(b, Vector((sx.x, sx.y - 0.01, z0 + 0.1)), Vector((sx.x, sx.y - 0.01, z0 + 0.56)), 0.02, 0.03, GLOW, 4)
-    b.rbox(Vector((sx.x, sx.y, z0 + 0.62)), (0.34 if star >= 3 else 0.28, 0.05, 0.05), crest, 0.5)
-    R(b, Vector((sx.x, sx.y, z0 + 0.64)), Vector((sx.x, sx.y, z0 + 0.76)), 0.022, 0.022, "leather", 8)
-    S(b, Vector((sx.x, sx.y, z0 + 0.79)), (0.04, 0.04, 0.04), crest, 10, 6)
-    if star >= 4:
-        gem(b, Vector((sx.x, sx.y - 0.03, z0 + 0.62)), (0.025, 0.02, 0.035))
+    with b.attach("arm_lower.R"):
+        sx = P(0.36, 0, 0)
+        R(b, Vector((sx.x, sx.y, z0 + 0.02)), Vector((sx.x, sx.y, z0 + 0.6)), 0.03, 0.055, "white", 4)
+        if star >= 5:
+            R(b, Vector((sx.x, sx.y - 0.01, z0 + 0.1)), Vector((sx.x, sx.y - 0.01, z0 + 0.56)), 0.02, 0.03, GLOW, 4)
+        b.rbox(Vector((sx.x, sx.y, z0 + 0.62)), (0.34 if star >= 3 else 0.28, 0.05, 0.05), crest, 0.5)
+        R(b, Vector((sx.x, sx.y, z0 + 0.64)), Vector((sx.x, sx.y, z0 + 0.76)), 0.022, 0.022, "leather", 8)
+        S(b, Vector((sx.x, sx.y, z0 + 0.79)), (0.04, 0.04, 0.04), crest, 10, 6)
+        if star >= 4:
+            gem(b, Vector((sx.x, sx.y - 0.03, z0 + 0.62)), (0.025, 0.02, 0.035))
     for s, sh in zip((1, -1), k["shoulder"]):
         hand = Vector((sx.x + s * 0.05, sx.y - 0.0, z0 + 0.72))
         arm(b, sh, P(0.15, s * 0.3, z0 + 0.66), hand, armor, armor)
-    # 英灵：脚下发光的光环和飘浮的光点
-    b.ring(P(0, 0, z0 + 0.05), 0.32, 0.012, GLOW, segments=32, sides=4)
-    for i in range(3 if star < 3 else 6):
-        a = i * 2 * math.pi / (3 if star < 3 else 6) + 0.4
-        S(b, P(0.42 * math.cos(a), 0.42 * math.sin(a), z0 + 0.3 + 0.25 * (i % 3)), (0.025, 0.025, 0.025), GLOW, 8, 6)
+    with b.attach("root"):
+        # 英灵：脚下发光的光环和飘浮的光点
+        b.ring(P(0, 0, z0 + 0.05), 0.32, 0.012, GLOW, segments=32, sides=4)
+        for i in range(3 if star < 3 else 6):
+            a = i * 2 * math.pi / (3 if star < 3 else 6) + 0.4
+            S(b, P(0.42 * math.cos(a), 0.42 * math.sin(a), z0 + 0.3 + 0.25 * (i % 3)), (0.025, 0.025, 0.025), GLOW, 8, 6)
 
 
 def spirit_knight(b, star=1):  # 雷恩爵士 · 英灵（2×2）：淡蓝铠甲的老骑士，白胡子，双手拄大剑；★2 银饰，★3 金冠饰刺绣，★4 宝石，★5 金冠、发光剑刃
@@ -2064,11 +2238,25 @@ def archmage(b, star=1):  # 阿尔德 · 大法师：深蓝星纹长袍、高尖
         S(b, book + Vector((dx, 0, dz)), (r, r, r), GLOW, 8, 6)
 
 
+def golem_bones(b, z0, hips, spine, head, leg_x, leg_top, shoulder, elbow, hand):
+    """魔像的骨骼：和人形同名（动画通用），比例按魔像的身体。shoulder/elbow/hand 给右侧，左侧镜像。"""
+    b.bone("hips", P(0, 0, z0 + hips[0]), P(0, 0, z0 + hips[1]))
+    b.bone("spine", P(0, 0, z0 + hips[1]), P(0, 0, z0 + spine), "hips")
+    b.bone("head", P(0, 0, z0 + spine), P(0, 0, z0 + head), "spine")
+    for side, s in (("R", 1), ("L", -1)):
+        b.bone("leg." + side, P(0, s * leg_x, z0 + leg_top), P(0.02, s * leg_x, z0), "hips")
+        sh, el, ha = (Vector((v.x * s, v.y, v.z)) for v in (shoulder, elbow, hand))
+        b.bone("arm_upper." + side, sh, el, "spine")
+        b.bone("arm_lower." + side, el, ha, "arm_upper." + side)
+
+
 def crystal_golem(b, star=1):  # 微光 · 水晶傀儡：石块拼成的小傀儡，背上和肩上长出水晶，胸口发光核心；★2 银箍，★3 金箍更多水晶，★4 水晶冠，★5 金纹、环绕水晶
     star_base(b, 0.75, star)
     stone = "stone"
     t = metal(star, "stone_dark")
     z0 = 0.1
+    golem_bones(b, z0, hips=(0.2, 0.36), spine=0.82, head=1.1, leg_x=0.14, leg_top=0.24,
+                shoulder=P(0, 0.3, z0 + 0.7), elbow=P(0.05, 0.38, z0 + 0.5), hand=P(0.18, 0.36, z0 + 0.32))
     for s in (-1, 1):  # 粗短的腿
         b.rbox(P(0.02, s * 0.14, z0 + 0.12), (0.18, 0.18, 0.24), "stone_dark", 0.4)
     b.rbox(P(0, 0, z0 + 0.55), (0.5, 0.36, 0.48), stone, 0.45)  # 身体
@@ -2114,6 +2302,8 @@ def _siege_golem(b, star):
     plate = "gold_dark" if star >= 5 else "steel_dark"
     t = metal(star, "steel_dark")
     z0 = 0.1
+    golem_bones(b, z0, hips=(0.3, 0.5), spine=0.98, head=1.22, leg_x=0.17, leg_top=0.42,
+                shoulder=P(0, 0.38, z0 + 0.92), elbow=P(0.06, 0.48, z0 + 0.62), hand=P(0.2, 0.46, z0 + 0.32))
     for s in (-1, 1):
         R(b, P(0, s * 0.17, z0 + 0.15), P(0, s * 0.17, z0 + 0.42), 0.1, 0.11, "stone_dark", 14)
         b.rbox(P(0.04, s * 0.17, z0 + 0.08), (0.24, 0.24, 0.14), plate, 0.4)
@@ -2202,6 +2392,7 @@ def banshee(b, star=1):  # 赛薇 · 女妖：没有腿、拖着幽魂尾巴飘�
         R(b, o + Vector((0, 0, 0.12)), o + Vector((0.08 * math.sin(a), 0.08 * math.cos(a), -0.16)), 0.07, 0.01,
           "crimson" if star >= 5 else "ghost", 8)
     k = {"head_r": 0.25, "z0": z0}
+    humanoid_bones(b, z0, P(0, 0, z0 + 0.88 + 0.25 * 0.9), 0.25, legs=False)
     S(b, P(0, 0, z0 + 0.66), (0.19, 0.15, 0.23), ghost)
     b.ring(P(0, 0, z0 + 0.52), 0.18, 0.014, metal(star, "bone_dark"), segments=24, sides=4)
     h = P(0, 0, z0 + 0.88 + 0.25 * 0.9)
@@ -2338,6 +2529,7 @@ def elf(b, star, body, legs=None, boots="elf_dark", robe=None, hair_c="silver", 
     return k
 
 
+@held_weapon
 def curved_blade(b, hand, star, length=0.34, side=1, colour=None):
     """精灵弯刃：一段弧形刀身。"""
     c = colour or ("gold_light" if star >= 5 else "silver")
@@ -2620,12 +2812,196 @@ LARGE_UNITS = {"spirit_knight", "siege_golem"}  # 2×2 卡通角色
 SMOOTH_UNITS = set(SAMPLE_UNITS) | {u for _, group, _ in CARTOON_FACTIONS for u in group}
 
 
+# ---- 骨骼和动画 ------------------------------------------------------------------
+# 卡通角色带骨骼和动画一起导出（决策 46）。骨骼在建模时登记（Builder.bone），零件整块绑到最近的骨骼。
+# 所有角色共用一套骨骼名字，所以动画按“动作风格”写一次就能套到每个角色上：
+#   root（脚底，整体位移和倒下）、hips、spine、head、leg.R/L、arm_upper.R/L、arm_lower.R/L、cape，
+#   飞骑另有 mount（坐骑身体）、mount_head、mount_tail、wing.R/L。
+# 每段动画是一个 NLA 片段，导出成 FBX 里同名的动画：idle、walk、attack、hit、death（24 帧每秒）。
+# 旋转写成“绕世界轴转多少度”：X 轴正方向 = 向前俯身（手臂、腿往后摆），Z 轴 = 扭身；
+# 右侧手臂向外抬是绕 Y 轴负方向，左侧相反。位移按角色高度缩放（2×2 角色动作幅度跟着变大）。
+
+ANIM_FPS = 24
+
+# 攻击动作风格：slash 劈砍、thrust 突刺、punch 拳击、shoot 射击、throw 投掷、cast 施法
+ATTACK_STYLE = {
+    "shield_guard": "slash", "shadow_assassin": "slash", "storm_mage": "cast", "necromancer": "cast",
+    "treant_guard": "punch",
+    "priest": "cast", "lancer": "thrust", "banner_bearer": "slash", "ballista": "shoot", "griffin_squire": "slash",
+    "spirit_knight": "slash",
+    "beast_tamer": "cast", "trapper": "slash", "hunter": "shoot", "herbalist": "cast", "slinger": "throw",
+    "marksman": "shoot",
+    "hexer": "cast", "siege_golem": "punch", "pyromancer": "cast", "frost_mage": "cast", "archmage": "cast",
+    "crystal_golem": "punch", "spell_knight": "slash",
+    "banshee": "cast", "mana_leech": "cast", "blood_knight": "slash",
+    "shadow_dancer": "slash", "blade_singer": "slash", "moon_archer": "shoot", "druid": "cast",
+    "wind_rider": "thrust", "envoy": "cast", "star_speaker": "cast", "sentinel": "throw",
+}
+
+
+def _wing(up):
+    """翅膀上扬 up 度（负数是下扑）：右翅绕 Y 负方向，左翅相反。"""
+    return {"wing.R": [("Y", -up)], "wing.L": [("Y", up)]}
+
+
+def _merge(*poses):
+    out = {}
+    for pose in poses:
+        for bone, value in pose.items():
+            rot, loc = out.get(bone, ([], (0, 0, 0)))
+            if isinstance(value, tuple) and len(value) == 2:  # 已经合并过的（旋转, 位移）
+                rot, loc = rot + list(value[0]), tuple(a + b for a, b in zip(loc, value[1]))
+            elif isinstance(value, tuple):  # 位移
+                loc = tuple(a + b for a, b in zip(loc, value))
+            else:
+                rot = rot + list(value)
+            out[bone] = (rot, loc)
+    return out
+
+
+def _loc(f=0.0, x=0.0, z=0.0):
+    """root / mount 的位移：f 向前、x 向右、z 向上（世界坐标，Blender 里向前是 -Y）。"""
+    return (x, -f, z)
+
+
+def clip_keys(clip, style, flyer, k):
+    """返回 (帧数, [(帧, 姿势)])；姿势是 {骨骼: [(轴, 度)] 或位移}，k 是位移缩放。"""
+    if clip == "idle":
+        mid = {"root": _loc(z=0.012 * k), "spine": [("X", 2)], "head": [("X", -3), ("Z", 4)],
+               "arm_upper.R": [("X", -4), ("Y", -3)], "arm_upper.L": [("X", -4), ("Y", 3)], "cape": [("X", 6)],
+               "mount_tail": [("Z", 10)]}
+        if not flyer:
+            return 48, [(0, {}), (24, mid), (48, {})]
+        up, down = _merge(_wing(28)), _merge(_wing(-12), {"mount": _loc(z=0.03 * k)})
+        return 48, [(0, up), (12, down), (24, _merge(up, mid)), (36, down), (48, up)]
+    if clip == "walk":
+        lean = {"spine": [("X", 6)], "cape": [("X", 14)]}
+        a = {"leg.R": [("X", -25)], "leg.L": [("X", 25)], "arm_upper.R": [("X", 20)], "arm_upper.L": [("X", -20)],
+             "hips": [("Z", 5)]}
+        b = {"leg.R": [("X", 25)], "leg.L": [("X", -25)], "arm_upper.R": [("X", -20)], "arm_upper.L": [("X", 20)],
+             "hips": [("Z", -5)]}
+        bob = {"root": _loc(z=0.03 * k)}
+        if flyer:
+            up, down = _merge(_wing(35), {"mount": [("X", 6)]}), _merge(_wing(-20), {"mount": [("X", 6)]}, bob)
+            return 16, [(0, _merge(up, lean)), (4, _merge(down, lean)), (8, _merge(up, lean)),
+                        (12, _merge(down, lean)), (16, _merge(up, lean))]
+        return 16, [(0, _merge(a, lean)), (4, _merge(bob, lean)), (8, _merge(b, lean)), (12, _merge(bob, lean)),
+                    (16, _merge(a, lean))]
+    if clip == "attack":
+        rider = {
+            "slash": [(5, {"arm_upper.R": [("X", -125)], "arm_lower.R": [("X", -25)], "spine": [("X", -6), ("Z", 14)]}),
+                      (8, {"arm_upper.R": [("X", 15)], "spine": [("X", 14), ("Z", -14)], "root": _loc(f=0.08 * k)})],
+            "thrust": [(5, {"arm_upper.R": [("X", 25)], "spine": [("X", -5)], "root": _loc(f=-0.03 * k)}),
+                       (8, {"arm_upper.R": [("X", -55)], "arm_lower.R": [("X", -15)], "spine": [("X", 10)],
+                            "root": _loc(f=0.14 * k)})],
+            "punch": [(4, {"arm_upper.R": [("X", 30)], "spine": [("Z", 15)]}),
+                      (7, {"arm_upper.R": [("X", -85)], "arm_lower.R": [("X", -10)], "spine": [("X", 10), ("Z", -15)],
+                           "root": _loc(f=0.06 * k)})],
+            "shoot": [(5, {"arm_upper.R": [("X", 25)], "arm_lower.R": [("X", 30)], "arm_upper.L": [("X", -20)],
+                           "spine": [("X", -3)]}),
+                      (7, {"arm_upper.R": [("X", 5)], "arm_upper.L": [("X", -20)], "spine": [("X", -8)],
+                           "root": _loc(f=-0.03 * k)})],
+            "throw": [(5, {"arm_upper.R": [("X", -160)], "spine": [("X", -10)]}),
+                      (8, {"arm_upper.R": [("X", -40)], "spine": [("X", 12)], "root": _loc(f=0.05 * k)})],
+            "cast": [(6, {"arm_upper.R": [("X", -90)], "arm_upper.L": [("X", -90)], "arm_lower.R": [("X", -20)],
+                          "arm_lower.L": [("X", -20)], "spine": [("X", -8)], "head": [("X", -8)],
+                          "root": _loc(z=0.03 * k)}),
+                     (9, {"arm_upper.R": [("X", -60)], "arm_upper.L": [("X", -60)], "spine": [("X", 8)],
+                          "head": [("X", 4)]})],
+        }[style]
+        keys = [(0, {})] + rider + [(14, {})]
+        if flyer:  # 坐骑先抬头扬翅，再俯冲
+            dive = {6: _merge(_wing(40), {"mount": [("X", -15)]}),
+                    9: _merge(_wing(-25), {"mount": [("X", 25)], "root": _loc(f=0.2 * k, z=-0.05 * k)})}
+            keys = [(0, {})] + [(f, _merge(p, dive.get(6 if f < 7 else 9, {}))) for f, p in rider] + [(14, {})]
+        return 14, keys
+    if clip == "hit":
+        hit = {"spine": [("X", -14)], "head": [("X", -12)], "root": _loc(f=-0.05 * k), "arm_upper.R": [("X", 10)],
+               "arm_upper.L": [("X", 10)], "mount": [("X", -10)]}
+        return 8, [(0, {}), (2, hit), (8, {})]
+    if clip == "death":
+        if flyer:
+            fall = _merge({"root": [("X", -60)]}, {"root": _loc(z=-0.6 * k)}, _wing(-35),
+                          {"spine": [("X", -20)], "arm_upper.R": [("X", -50)], "arm_upper.L": [("X", -50)]})
+        else:
+            fall = {"root": [("X", -88)], "spine": [("X", -10)], "head": [("X", -15)],
+                    "arm_upper.R": [("X", -40), ("Y", -30)], "arm_upper.L": [("X", -40), ("Y", 30)],
+                    "cape": [("X", -30)]}
+        return 24, [(0, {}), (6, {"spine": [("X", -15)], "head": [("X", -10)], "root": _loc(f=-0.04 * k)}),
+                    (18, fall), (24, fall)]
+    raise ValueError(clip)
+
+
+ANIM_CLIPS = ("idle", "walk", "attack", "hit", "death")
+
+
+def rig(obj, bones):
+    """按登记的骨骼建骨架，网格挂上 Armature 修改器（顶点组在 Builder.finish 里已经按骨骼分好）。"""
+    data = bpy.data.armatures.new(obj.name + "_rig")
+    arm_obj = bpy.data.objects.new(obj.name + "_rig", data)
+    bpy.context.scene.collection.objects.link(arm_obj)
+    bpy.ops.object.select_all(action="DESELECT")
+    bpy.context.view_layer.objects.active = arm_obj
+    arm_obj.select_set(True)
+    bpy.ops.object.mode_set(mode="EDIT")
+    for name, head, tail, parent in bones:
+        eb = data.edit_bones.new(name)
+        eb.head = head
+        eb.tail = tail if (tail - head).length > 0.01 else head + Vector((0, 0, 0.05))
+        if parent:
+            eb.parent = data.edit_bones[parent]
+    bpy.ops.object.mode_set(mode="OBJECT")
+    obj.parent = arm_obj
+    mod = obj.modifiers.new("Armature", "ARMATURE")
+    mod.object = arm_obj
+    return arm_obj
+
+
+def animate(arm_obj, style, flyer, k):
+    """给骨架做 ANIM_CLIPS 里的几段动画，每段放进一条 NLA 轨道（导出成同名动画）。"""
+    scene = bpy.context.scene
+    scene.render.fps = ANIM_FPS
+    arm_obj.animation_data_create()
+    rest = {pb.name: pb.bone.matrix_local.to_3x3() for pb in arm_obj.pose.bones}
+    start = 0
+    for clip in ANIM_CLIPS:
+        length, keys = clip_keys(clip, style, flyer, k)
+        action = bpy.data.actions.new(arm_obj.name + "|" + clip)
+        arm_obj.animation_data.action = action
+        for frame, pose in keys:
+            pose = _merge(pose)
+            for pb in arm_obj.pose.bones:
+                rot, loc = pose.get(pb.name, ([], (0, 0, 0)))
+                m = rest[pb.name]
+                q = Quaternion()
+                for axis, deg in rot:
+                    q = Quaternion(Vector({"X": (1, 0, 0), "Y": (0, 1, 0), "Z": (0, 0, 1)}[axis]),
+                                   math.radians(deg)) @ q
+                # 绕世界轴的旋转换到骨骼自己的坐标系
+                local = m.inverted() @ q.to_matrix() @ m
+                pb.rotation_mode = "QUATERNION"
+                pb.rotation_quaternion = local.to_quaternion()
+                pb.location = m.inverted() @ Vector(loc)
+                pb.keyframe_insert("rotation_quaternion", frame=frame)
+                pb.keyframe_insert("location", frame=frame)
+        arm_obj.animation_data.action = None
+        track = arm_obj.animation_data.nla_tracks.new()
+        track.name = clip
+        strip = track.strips.new(clip, start, action)
+        strip.extrapolation = "NOTHING"
+        start += length + 10
+    for pb in arm_obj.pose.bones:
+        pb.rotation_quaternion = Quaternion()
+        pb.location = Vector((0, 0, 0))
+
+
 # ---- 卡通角色的烘焙贴图和描边 ------------------------------------------------------
 # 色块贴图只有平涂颜色。卡通角色另外展开一套 UV，把“颜色 × 环境光遮蔽（AO）”烘焙进角色专属贴图
 # <单位 id>_tex.png（客户端 ModelLibrary 优先用它），缝隙、腋下、帽檐下会自然变暗，体积感更强。
 # 描边用“反向外壳”：沿法线外扩一层、翻转朝向的网格，用深色；Unity 默认剔除背面，所以只在轮廓处露出一圈线。
 
 BAKE_SIZE = 768
+FAST = False  # --fast：试做用，烘焙只采样 8 次
 OUTLINE_STRIP = 0.03  # 贴图顶部留给描边颜色的色带高度（占比）
 OUTLINE_COLOUR = "1C1A26"
 OUTLINE_WIDTH = 0.012
@@ -2656,7 +3032,7 @@ def bake_texture(obj, unit_id, out_dir):
     scene = bpy.context.scene
     scene.render.engine = "CYCLES"
     scene.cycles.device = "CPU"
-    scene.cycles.samples = 128
+    scene.cycles.samples = 8 if FAST else 128
     if scene.world is None:
         scene.world = bpy.data.worlds.new("BakeWorld")
     scene.world.light_settings.distance = AO_DISTANCE
@@ -2733,11 +3109,15 @@ def add_outline(obj, outline_v):
     b = bmesh.new()
     b.from_mesh(mesh)
     uv = b.loops.layers.uv.active
+    deform = b.verts.layers.deform.active
     first = len(b.faces)
     src = list(b.faces)
     vmap = {}
     for v in list(b.verts):
-        vmap[v] = b.verts.new(v.co + v.normal * OUTLINE_WIDTH)
+        nv = vmap[v] = b.verts.new(v.co + v.normal * OUTLINE_WIDTH)
+        if deform is not None:  # 外壳跟着原来的骨骼动
+            for group, weight in v[deform].items():
+                nv[deform][group] = weight
     for f in src:
         nf = b.faces.new([vmap[v] for v in reversed(f.verts)])
         nf.material_index = 0
@@ -2758,6 +3138,7 @@ def outline_preview_material(obj, span):
     rgb = [srgb_to_linear(c) for c in hex_rgb(OUTLINE_COLOUR)]
     bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
     bsdf.inputs["Roughness"].default_value = 1.0
+    mat.diffuse_color = (*rgb, 1.0)
     geo = nodes.new("ShaderNodeNewGeometry")
     clear = nodes.new("ShaderNodeBsdfTransparent")
     mix = nodes.new("ShaderNodeMixShader")
@@ -2804,12 +3185,26 @@ def set_preview_glow(glow_mat, hex_colour):
     bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
     bsdf.inputs["Emission Color"].default_value = (*rgb, 1.0)
     bsdf.inputs["Emission Strength"].default_value = 4.0
+    glow_mat.diffuse_color = (*rgb, 1.0)  # Workbench 动画预览用
 
 
 def export_fbx(obj, path):
     bpy.ops.object.select_all(action="DESELECT")
     obj.select_set(True)
     bpy.context.view_layer.objects.active = obj
+    if obj.parent is not None and obj.parent.type == "ARMATURE":
+        # 带骨骼的角色：骨架、网格和 NLA 里的每段动画一起导出。不烘焙坐标变换（对骨骼动画不可靠），
+        # Unity 会在模型根节点上补一个 -90° 的旋转，效果一样
+        obj.parent.select_set(True)
+        bpy.ops.export_scene.fbx(
+            filepath=path, use_selection=True, object_types={"ARMATURE", "MESH"}, apply_unit_scale=True,
+            apply_scale_options="FBX_SCALE_ALL", bake_space_transform=False, axis_forward="-Z", axis_up="Y",
+            mesh_smooth_type="FACE", use_mesh_modifiers=False, add_leaf_bones=False, use_armature_deform_only=False,
+            armature_nodetype="NULL", primary_bone_axis="Y", secondary_bone_axis="X",
+            bake_anim=True, bake_anim_use_all_bones=True, bake_anim_use_nla_strips=True,
+            bake_anim_use_all_actions=False, bake_anim_force_startend_keying=True, bake_anim_step=1.0,
+            bake_anim_simplify_factor=0.0, path_mode="STRIP", embed_textures=False)
+        return
     bpy.ops.export_scene.fbx(
         filepath=path, use_selection=True, object_types={"MESH"}, apply_unit_scale=True,
         apply_scale_options="FBX_SCALE_ALL", bake_space_transform=True, axis_forward="-Z", axis_up="Y",
@@ -2821,8 +3216,8 @@ def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height
     """把一组模型排成一排，从战斗镜头的角度（侧前方斜看）渲染一张预览图。turn=90 时正面朝画面右侧。"""
     scene = bpy.context.scene
     for i, obj in enumerate(objects):
-        obj.location = Vector((i * spacing, 0, 0))
-        obj.rotation_euler = (0, 0, math.radians(turn))
+        _mover(obj).location = Vector((i * spacing, 0, 0))
+        _mover(obj).rotation_euler = (0, 0, math.radians(turn))
     width = (len(objects) - 1) * spacing
     cam_data = bpy.data.cameras.new("PreviewCam")
     cam_data.type = "ORTHO"
@@ -2881,10 +3276,10 @@ def render_star_sheet(built, unit_ids, path):
         ids = [model_id(unit_id, star) for star in STAR_TIERS]
         if all(i in built for i in ids):
             for obj, _ in built.values():
-                obj.hide_render = True
+                _show(obj, False)
             objects = [built[i][0] for i in ids]
             for obj in objects:
-                obj.hide_render = False
+                _show(obj, True)
             k = 2.0 if unit_id in LARGE_UNITS else 1.0  # 2×2 角色按比例拉远镜头
             render_sheet(objects, row_path, spacing=2.2 * k, turn=35, margin=1.6 * k, px=600, height_px=1000)
             _trim_rows(Image.open(row_path).convert("RGB")).save(row_path)
@@ -2900,12 +3295,134 @@ def render_star_sheet(built, unit_ids, path):
     sheet.save(path)
     print("已渲染预览", os.path.basename(path))
 
+BASE_MODELS = (("base", 0.75), ("base_large", 1.6))  # 1 格 / 2×2 角色的展示底座
+
+
+def export_bases(palette):
+    """展示用底座：base_s<星级>（1 格）和 base_large_s<星级>（2×2），顶面高 0.08，角色站在顶面上。
+    只在展示、升星、图鉴界面用，战斗里不放底座。"""
+    for name, r in BASE_MODELS:
+        for star in STAR_TIERS:
+            hull, glow = make_materials(palette)
+            b = Builder()
+            star_base(b, r, star)
+            mid = "%s_s%d" % (name, star)
+            obj = b.finish(mid, hull, glow, smooth=True)
+            export_fbx(obj, os.path.join(OUT_DIR, mid + ".fbx"))
+            bpy.data.objects.remove(obj)
+
+
+def preview_base(obj, spec, palette, glow):
+    """预览图里给角色垫上底座（不导出），挂在骨架下跟着角色一起摆放。"""
+    r, star, colour = spec
+    hull, _ = make_materials(palette)
+    b = Builder()
+    star_base(b, r, star, colour)
+    base_obj = b.finish(obj.name + "_base", hull, glow, smooth=True)
+    base_obj.parent = obj.parent
+    base_obj.location = (0, 0, -BASE_TOP)
+
+
+BASE_TOP = 0.08
+
+
+def _mover(obj):
+    """摆放预览时要移动的物体：带骨骼的角色移动骨架。"""
+    return obj.parent if obj.parent is not None else obj
+
+
+def _show(obj, visible):
+    """预览图里显示或隐藏一个模型（连同挂在同一骨架下的底座）。"""
+    for o in (_mover(obj).children if obj.parent is not None else (obj,)):
+        o.hide_render = not visible
+
+
+# 动画预览：每种动作风格挑一名角色（★3），渲染成 GIF
+ANIM_PREVIEW = ["shield_guard", "lancer", "priest", "hunter", "siege_golem", "griffin_squire"]
+
+
+def render_anim_preview(built, unit_ids, out_prefix):
+    """依次播放 idle、walk、attack、hit、death，几名角色并排，输出 <out_prefix>.gif。"""
+    from PIL import Image
+    scene = bpy.context.scene
+    scene.render.engine = "CYCLES"  # 云端没有显卡，Workbench / EEVEE 用不了；低采样的 Cycles 足够看动作
+    scene.cycles.samples = 6
+    scene.cycles.use_denoising = False
+    for obj, _ in built.values():
+        _show(obj, False)
+    px, py = 360, 440
+    scene.render.resolution_x, scene.render.resolution_y = px, py
+    scene.render.film_transparent = False
+    scene.view_settings.view_transform = "Standard"
+    cam_data = bpy.data.cameras.new("AnimCam")
+    cam_data.type = "ORTHO"
+    cam = bpy.data.objects.new("AnimCam", cam_data)
+    scene.collection.objects.link(cam)
+    cam.rotation_euler = (math.radians(56), 0, 0)
+    scene.camera = cam
+    lights = []
+    for name, energy, rot in (("Sun", 3.5, (50, 10, -35)), ("Fill", 1.2, (60, 0, 150))):
+        light = bpy.data.objects.new(name, bpy.data.lights.new(name, "SUN"))
+        light.data.energy = energy
+        light.rotation_euler = tuple(math.radians(a) for a in rot)
+        scene.collection.objects.link(light)
+        lights.append(light)
+    columns = []
+    for unit_id in unit_ids:
+        obj = built[model_id(unit_id, 3)][0]
+        rig_obj = obj.parent
+        _show(obj, True)
+        for child in rig_obj.children:  # 动画预览模拟战斗：不放底座
+            if child.name.endswith("_base"):
+                child.hide_render = True
+        rig_obj.location = (0, 0, 0)
+        rig_obj.rotation_euler = (0, 0, math.radians(35))
+        k = 2.0 if unit_id in LARGE_UNITS else 1.0
+        cam_data.ortho_scale = 3.0 * k
+        cam.location = Vector((0, -13, 8.5 + 0.6 * k))
+        frames = []
+        for track in rig_obj.animation_data.nla_tracks:
+            strip = track.strips[0]
+            step = 1 if track.name in ("attack", "hit") else 2
+            f = strip.frame_start
+            while f <= strip.frame_end:
+                scene.frame_set(int(f))
+                path = out_prefix + ".frame.png"
+                scene.render.filepath = path
+                bpy.ops.render.render(write_still=True)
+                frames.append((Image.open(path).convert("RGB"), step))
+                f += step
+            if track.name == "death":  # 倒下后停一会
+                frames.append((frames[-1][0], 12))
+        os.remove(out_prefix + ".frame.png")
+        columns.append(frames)
+        _show(obj, False)
+    n = min(len(c) for c in columns)
+    out = []
+    durations = []
+    for i in range(n):
+        sheet = Image.new("RGB", (px * len(columns), py))
+        for j, c in enumerate(columns):
+            sheet.paste(c[i][0], (j * px, 0))
+        out.append(sheet.quantize(colors=128))
+        durations.append(int(1000 * columns[0][i][1] / ANIM_FPS))
+    out[0].save(out_prefix + ".gif", save_all=True, append_images=out[1:], duration=durations, loop=0)
+    for o in [cam] + lights:
+        bpy.data.objects.remove(o)
+    print("已渲染动画预览", os.path.basename(out_prefix) + ".gif")
+
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
     preview_dir = None
     if "--preview" in argv:
         preview_dir = os.path.abspath(argv[argv.index("--preview") + 1])
     only = set(argv[argv.index("--only") + 1].split(",")) if "--only" in argv else None
+    global OUT_DIR, FAST
+    if "--out" in argv:  # 试做时输出到别处，不覆盖工程里的模型
+        OUT_DIR = os.path.abspath(argv[argv.index("--out") + 1])
+    FAST = "--fast" in argv
 
     bpy.ops.wm.read_factory_settings(use_empty=True)
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -2917,6 +3434,9 @@ def main():
     built = {}
     outlines = {}
     unit_of = {}
+    bases = {}  # 模型 → 底座规格（预览图里给角色垫上底座，模拟展示界面）
+    if not only or "bases" in only:
+        export_bases(palette)
     for unit_id, fn in UNITS:
         if only and unit_id not in only:
             continue
@@ -2926,13 +3446,22 @@ def main():
             hull, glow = make_materials(palette)
             b = Builder()
             if cartoon:
+                b.draw_base = False  # 战斗里不要底座；底座单独导出，展示界面再加
                 fn(b, star)
+                b.ground()
             else:
                 fn(b)
+            flyer = b.has_bone("mount")
+            height = max(v.co.z for v in b.bm.verts)
+            bones = [list(bn) for bn in b.bones]
             obj = b.finish(mid, hull, glow, smooth=cartoon)
             if cartoon:
                 outline_v = bake_texture(obj, mid, OUT_DIR)
                 outlines[mid] = add_outline(obj, outline_v)
+                rig_obj = rig(obj, bones)
+                animate(rig_obj, ATTACK_STYLE.get(unit_id, "slash"), flyer, height / 1.6)
+                if b.base_spec and not flyer:
+                    bases[mid] = b.base_spec
             export_fbx(obj, os.path.join(OUT_DIR, mid + ".fbx"))
             built[mid] = (obj, glow)
             unit_of[mid] = unit_id
@@ -2949,14 +3478,16 @@ def main():
             set_preview_glow(glow, PREVIEW_GLOW.get(unit_id, side_glow[unit_id]))
             if mid in outlines:
                 outline_preview_material(obj, outlines[mid])
+            if mid in bases:
+                preview_base(obj, bases[mid], palette, glow)
         for name, group, _ in sheets:
             if any(u not in built for u in group):
                 continue
             for obj, _ in built.values():
-                obj.hide_render = True
+                _show(obj, False)
             objects = [built[u][0] for u in group]
             for obj in objects:
-                obj.hide_render = False
+                _show(obj, True)
             if name == "samples":  # 1 格角色的近景，侧前方 3/4 视角
                 render_sheet(objects, os.path.join(preview_dir, name + ".png"), spacing=2.2, turn=35, margin=1.6,
                              px=600, height_px=1000)
@@ -2966,6 +3497,9 @@ def main():
         render_star_sheet(built, [u for u, _ in PREVIEW_SAMPLES], os.path.join(preview_dir, "stars.png"))
         for name, group, _ in CARTOON_FACTIONS:
             render_star_sheet(built, group, os.path.join(preview_dir, "stars_%s.png" % name))
+        anim_units = [u for u in ANIM_PREVIEW if model_id(u, 3) in built]
+        if anim_units:
+            render_anim_preview(built, anim_units, os.path.join(preview_dir, "anim"))
 
 
 if __name__ == "__main__":
