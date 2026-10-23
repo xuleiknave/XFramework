@@ -9,13 +9,16 @@ namespace Starline.Client
 {
     /// <summary>
     /// The auto-battle: counts and time on top, event feed on the right, supply points and
-    /// commander skills at the bottom, and the result dialog when it ends.
+    /// commander skills at the bottom, and the result dialog when it ends. Also plays replays
+    /// back: skills are read-only and the dialog offers to watch again.
     /// </summary>
     public sealed class BattleScreen : UiScreen
     {
         private const int SupplyPips = 10;
 
         private readonly BattleController _battle;
+        private readonly (string text, System.Action action) _replayExit;
+        private readonly Button _pause;
         private readonly List<Button> _speedButtons = new List<Button>();
         private readonly List<VisualElement> _pips = new List<VisualElement>();
         private readonly List<(CommanderSkillDef def, Button button, Label state)> _skills = new List<(CommanderSkillDef, Button, Label)>();
@@ -24,9 +27,11 @@ namespace Starline.Client
         private bool _reported;
         private string _feedShown;
 
-        public BattleScreen(GameApp app, BattleController battle) : base(app, "Battle")
+        /// <param name="replayExit">For a replay: the button that leaves it when it ends (text and action).</param>
+        public BattleScreen(GameApp app, BattleController battle, (string text, System.Action action) replayExit = default) : base(app, "Battle")
         {
             _battle = battle;
+            _replayExit = replayExit;
             _player = Find<Label>("player-count");
             _enemy = Find<Label>("enemy-count");
             _time = Find<Label>("time");
@@ -35,6 +40,15 @@ namespace Starline.Client
             _enemyNet = Find<Label>("enemy-net");
             _feed = Find<VisualElement>("feed");
             Button("skip", Skip);
+            _pause = Button("pause", () => _battle.Paused = !_battle.Paused);
+
+            Label mode = Find<Label>("mode");
+            mode.SetVisible(battle.IsReplay);
+            if (battle.IsReplay)
+            {
+                mode.text = "回放 · " + battle.Encounter.Name + " · 战力 " + battle.Replay.Power;
+                Find<Label>("hint").text = "这是录像回放，指挥官技能按录像里的时机自动释放。";
+            }
 
             VisualElement speeds = Find<VisualElement>("speeds");
             for (int i = 0; i < BattleController.Speeds.Length; i++)
@@ -101,6 +115,8 @@ namespace Starline.Client
             {
                 _speedButtons[i].EnableInClassList("btn-toggled", _battle.SpeedIndex == i);
             }
+            _pause.text = _battle.Paused ? "继续" : "暂停";
+            _pause.EnableInClassList("btn-toggled", _battle.Paused);
 
             string feedNow = string.Join("\n", _battle.Feed);
             if (feedNow != _feedShown)
@@ -135,14 +151,35 @@ namespace Starline.Client
                 {
                     text = "在战场上点击落点（右键取消）";
                 }
+                if (_battle.IsReplay)
+                {
+                    text = "回放中";
+                }
                 state.text = text;
-                button.SetEnabled(can || armed);
+                button.SetEnabled(!_battle.IsReplay && (can || armed));
                 button.EnableInClassList("skill--armed", armed);
             }
         }
 
+        private void ShowReplayResult()
+        {
+            BattleSim sim = _battle.Battle;
+            Replay replay = _battle.Replay;
+            string body = "用时 " + Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒 · 战力 " + replay.Power
+                + (replay.UsesSkills ? " · 使用了 " + replay.Commands.Count + " 次指挥官技能" : " · 没有使用指挥官技能");
+            string title = sim.Winner == BoardLayout.PlayerSide ? "回放结束：胜利" : "回放结束：失败";
+            App.Ui.ShowModal(Ui.Dialog(title, body,
+                _replayExit,
+                ("重新播放", () => App.ShowReplay(replay, _replayExit.text, _replayExit.action))));
+        }
+
         private void ShowResult()
         {
+            if (_battle.IsReplay)
+            {
+                ShowReplayResult();
+                return;
+            }
             ExpeditionRun run = App.Run;
             BattleSim sim = _battle.Battle;
             bool won = _battle.PlayerWon;
@@ -171,6 +208,15 @@ namespace Starline.Client
             }
             lines.AddRange(run.Messages);
 
+            Replay replay = _battle.Record();
+            if (replay != null && won)
+            {
+                ReplayStore.SaveResult saved = App.Replays.SaveIfBest(replay, out Replay previous);
+                lines.Add(saved == ReplayStore.SaveResult.NewBest
+                    ? "已保存为本关最佳录像（战力 " + replay.Power + "）"
+                    : "本关已有战力不高于这次的录像（战力 " + previous.Power + "），没有覆盖");
+            }
+
             string next;
             switch (run.State)
             {
@@ -181,7 +227,12 @@ namespace Starline.Client
                 default: next = "返回地图"; break;
             }
             string title = won ? "胜利" : sim.Winner == BoardLayout.EnemySide ? "失败" : "平局（算作失败）";
-            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), (next, App.AfterBattle));
+            var buttons = new List<(string, System.Action)> { (next, App.AfterBattle) };
+            if (replay != null)
+            {
+                buttons.Add(("回放本场", () => App.ShowReplay(replay, next, App.AfterBattle)));
+            }
+            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), buttons.ToArray());
             dialog.Q(className: "dialog").AddToClassList(won ? "dialog--win" : "dialog--loss");
             App.Ui.ShowModal(dialog);
         }

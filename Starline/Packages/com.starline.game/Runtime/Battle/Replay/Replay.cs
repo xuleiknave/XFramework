@@ -76,6 +76,18 @@ namespace Starline.Battle
 
         /// <summary>True if this replay uses at least one commander skill (shown on the leaderboard).</summary>
         public bool UsesSkills => Commands.Count > 0;
+
+        public bool IsWin => Winner == BoardLayout.PlayerSide;
+
+        /// <summary>True when this build plays the replay back exactly: same file format, battle rules and data.</summary>
+        public bool IsPlayable => Format == FormatVersion && Kernel == KernelVersion && Data == GameData.Fingerprint;
+
+        /// <summary>
+        /// Whether this replay should replace <paramref name="existing"/> as a stage's best: it must be a
+        /// win, and beats an unplayable or losing replay outright, a playable win only with lower power.
+        /// </summary>
+        public bool IsBetterThan(Replay existing) =>
+            IsWin && (existing == null || !existing.IsPlayable || !existing.IsWin || Power < existing.Power);
     }
 
     /// <summary>

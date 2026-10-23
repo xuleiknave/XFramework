@@ -22,6 +22,7 @@ namespace Starline.Battle.Tests
             Run("录像：回放与原战斗结果完全相同", ReplayReproducesBattle);
             Run("录像校验：真录像通过，并重算战力", VerifierAcceptsGenuineReplay);
             Run("录像校验：篡改过的录像被拒", VerifierRejectsTamperedReplays);
+            Run("录像：本关最佳只保留战力更低的胜局", BestReplayRules);
             Run("录像：黄金录像哈希不变", GoldenReplay);
         }
 
@@ -136,6 +137,24 @@ namespace Starline.Battle.Tests
             tamper(replay);
             ReplayCheck check = ReplayVerifier.Verify(replay, stage);
             Assert(!check.Ok, what + "：应被拒绝");
+        }
+
+        private static void BestReplayRules()
+        {
+            Replay win = RecordTestReplay();
+            Replay lower = ReplayJson.Read(ReplayJson.Write(win));
+            lower.Power = win.Power - 1;
+            Replay loss = ReplayJson.Read(ReplayJson.Write(win));
+            loss.Winner = BoardLayout.EnemySide;
+            Replay stale = ReplayJson.Read(ReplayJson.Write(win));
+            stale.Data = "0000000000000000";
+
+            Assert(win.IsPlayable && !stale.IsPlayable, "配置表哈希不同的录像不能回放");
+            Assert(win.IsBetterThan(null), "没有录像时胜局应保存");
+            Assert(!loss.IsBetterThan(null), "败局不保存");
+            Assert(lower.IsBetterThan(win), "战力更低的胜局应替换");
+            Assert(!win.IsBetterThan(lower) && !win.IsBetterThan(win), "战力更高或相同的胜局不替换");
+            Assert(win.IsBetterThan(stale) && win.IsBetterThan(loss), "旧版本或败局应被胜局替换");
         }
 
         private static void GoldenReplay()
