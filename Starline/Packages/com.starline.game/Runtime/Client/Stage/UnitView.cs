@@ -70,7 +70,7 @@ namespace Starline.Client
             view._previous = view._current = position;
             root.transform.position = position;
             root.transform.rotation = Quaternion.LookRotation(side == BoardLayout.PlayerSide ? Vector3.right : Vector3.left);
-            // Higher stars read as slightly bigger (★5 = 1.24×); costumes change at ★3 and ★5 (see ModelKey).
+            // Higher stars read as slightly bigger (★5 = 1.24×); each star also has its own costume (see ModelKey).
             root.transform.localScale = Vector3.one * (1f + 0.06f * (star - 1));
             view._renderers = root.GetComponentsInChildren<Renderer>();
             if (view._hull != null)

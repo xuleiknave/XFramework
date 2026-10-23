@@ -621,10 +621,15 @@ def rivets(b, points, colour="gold", r=0.02):
 
 
 # ---- 升星外观 ------------------------------------------------------------------
-# 卡通角色按星级出三档模型：★1 朴素、★3 精锐、★5 传说（★2/★4 沿用下一档以下的模型，靠体型和界面星标区分）。
-# 升星不换造型，只提升服装和装备的质感：金色滚边、刺绣纹样、披风、宝石扣，★5 再换华贵配色、多层饰边和发光宝石。
+# 卡通角色每个星级一档模型：★1 朴素，★2 银色滚边和扣件，★3 精锐（金边、刺绣、披风、宝石扣），
+# ★4 在 ★3 上提前加一部分传说元素，★5 传说（华贵配色、多层饰边、发光宝石）。升星不换造型，只提升服装和装备的质感。
 
-STAR_TIERS = (1, 3, 5)
+STAR_TIERS = (1, 2, 3, 4, 5)
+
+
+def metal(star, plain):
+    """饰边和扣件的金属：★1 用 plain，★2 银，★3 起金。"""
+    return plain if star == 1 else ("silver" if star == 2 else "gold")
 
 
 def model_id(unit_id, star):
@@ -632,14 +637,16 @@ def model_id(unit_id, star):
 
 
 def star_base(b, r, star, colour="stone_dark"):
-    """底座：★3 加金边，★5 再在金边上镶一圈发光宝石。"""
+    """底座：★2 银边，★3 金边，★4 金边镶 4 颗发光宝石，★5 再加一道内圈、镶 8 颗。"""
     base(b, r, colour, sides=32)
-    if star >= 3:
-        b.ring(P(0, 0, 0.082), r * 0.95, 0.024, "gold", segments=48, sides=6)
+    if star >= 2:
+        b.ring(P(0, 0, 0.082), r * 0.95, 0.024, metal(star, "silver"), segments=48, sides=6)
     if star >= 5:
         b.ring(P(0, 0, 0.082), r * 0.8, 0.014, "gold_light", segments=40, sides=6)
-        for i in range(8):
-            a = i * math.pi / 4 + math.pi / 8
+    if star >= 4:
+        n = 8 if star >= 5 else 4
+        for i in range(n):
+            a = i * 2 * math.pi / n + math.pi / n
             c = P(r * 0.95 * math.cos(a), r * 0.95 * math.sin(a), 0.1)
             S(b, c, (0.035, 0.035, 0.02), "gold", 10, 6)
             gem(b, c + Vector((0, 0, 0.035)), (0.022, 0.022, 0.04))
@@ -708,25 +715,25 @@ def clasp(b, c, jewel=GLOW, s=1.0):
 
 def _shield_guard(b, star):
     armor = "white" if star >= 5 else "steel"
-    trim = "gold" if star >= 3 else "steel_dark"
+    trim = metal(star, "steel_dark")
     tabard = "royal" if star >= 5 else "cloth_blue"
-    k = hero(b, legs="steel_dark", boots=armor, body=armor, belt="gold" if star >= 3 else "leather",
+    k = hero(b, legs="steel_dark", boots=armor, body=armor, belt="leather" if star == 1 else metal(star, ""),
              brows="leather")
     h, hr = k["head"], k["head_r"]
     z0 = k["z0"]
     if star >= 3:  # 披风先画，在身后
-        cape(b, z0 + 0.86, z0 + 0.04, 0.2, 0.34, tabard, trim="gold", trim2="gold_light" if star >= 5 else None)
+        cape(b, z0 + 0.86, z0 + 0.04, 0.2, 0.34, tabard, trim="gold", trim2="gold_light" if star >= 4 else None)
         for sh in k["shoulder"]:
             clasp(b, sh + Vector((0, -0.04, 0.02)), s=0.8)
     # 罩袍：前后两片，滚边
     for f in (0.17, -0.17):
         b.rbox(P(f, 0, z0 + 0.42), (0.26, 0.04, 0.3), tabard, 0.3)
         b.rbox(P(f, 0, z0 + 0.27), (0.27, 0.045, 0.03), trim, 0.4)
-        if star >= 3:
+        if star >= 2:
             for s in (-1, 1):
                 b.rbox(P(f, s * 0.13, z0 + 0.42), (0.025, 0.045, 0.3), trim, 0.4)
     if star >= 3:
-        emblem(b, P(0.205, 0, z0 + 0.4), 0.9, "gold", jewel=GLOW if star >= 5 else None)
+        emblem(b, P(0.205, 0, z0 + 0.4), 0.9, "gold", jewel=GLOW if star >= 4 else None)
     if star >= 5:  # 胸甲上的金色日轮纹
         emblem(b, P(0.215, 0, z0 + 0.72), 1.1, "gold_light", jewel=GLOW)
     # 头盔
@@ -739,7 +746,7 @@ def _shield_guard(b, star):
     plume = "white" if star >= 5 else "cloth_blue"
     limb(b, [h + Vector((0, 0, hr * 1.1)), h + Vector((0, 0.1, hr * 1.38)), h + Vector((0, 0.3, hr * 1.35)),
              h + Vector((0, 0.46, hr * (0.9 if star >= 5 else 0.95)))], 0.08 if star >= 5 else 0.07, 0.025, plume, 10)
-    if star >= 5:  # 头盔两侧的金翼
+    if star >= 4:  # 头盔两侧的金翼
         for s in (-1, 1):
             for i, (dz, l) in enumerate(((0.1, 0.16), (0.03, 0.13), (-0.04, 0.1))):
                 o = h + Vector((s * hr * 0.95, hr * 0.2, hr * 0.3 + dz))
@@ -748,13 +755,13 @@ def _shield_guard(b, star):
     for s, sh in zip((1, -1), k["shoulder"]):
         S(b, sh + Vector((0, 0, 0.04)), (0.13, 0.12, 0.09), armor, 14, 8)
         S(b, sh + Vector((0, 0, 0.0)), (0.12, 0.13, 0.06), "gold" if star >= 5 else "steel_dark", 14, 8)
-        if star >= 3:
-            b.ring(sh + Vector((0, 0, 0.03)), 0.12, 0.012, "gold", segments=20, sides=4)
-        rivets(b, [sh + Vector((s * 0.05, -0.08, 0.08)), sh + Vector((s * 0.05, 0.08, 0.08))])
+        if star >= 2:
+            b.ring(sh + Vector((0, 0, 0.03)), 0.12, 0.012, trim, segments=20, sides=4)
+        rivets(b, [sh + Vector((s * 0.05, -0.08, 0.08)), sh + Vector((s * 0.05, 0.08, 0.08))], metal(star, "gold"))
     rs, ls = k["shoulder"]
     # 右手持剑
     rh = P(0.18, 0.3, z0 + 0.5)
-    arm(b, rs, P(0.05, 0.3, z0 + 0.62), rh, armor, "leather" if star == 1 else "gold")
+    arm(b, rs, P(0.05, 0.3, z0 + 0.62), rh, armor, "leather" if star == 1 else metal(star, ""))
     tip = rh + Vector((0, -0.45, 0.22))
     b.rbox((rh + tip) / 2 + Vector((0, -0.04, 0.02)), (0.02, 0.07, 0.46), "white", 0.3, rot=(62, 0, 0))
     if star >= 5:
@@ -763,10 +770,10 @@ def _shield_guard(b, star):
     S(b, rh + Vector((0, 0.07, -0.03)), (0.035, 0.035, 0.035), "gold", 10, 6)
     # 左手持塔盾
     lh = P(0.24, -0.26, z0 + 0.55)
-    arm(b, ls, P(0.12, -0.33, z0 + 0.6), lh, armor, "leather" if star == 1 else "gold")
+    arm(b, ls, P(0.12, -0.33, z0 + 0.6), lh, armor, "leather" if star == 1 else metal(star, ""))
     sc = P(0.34, -0.2, z0 + 0.55)
     rot = (0, 0, -18)
-    rim = "gold" if star >= 3 else "steel_dark"
+    rim = metal(star, "steel_dark")
     face_c = "white"
     b.rbox(sc, (0.5 if star >= 3 else 0.48, 0.07, 0.84 if star >= 3 else 0.82), rim, 0.18, rot=rot)
     b.rbox(sc + Vector((-0.012, -0.035, 0)), (0.42, 0.06, 0.76), face_c, 0.18, rot=rot)
@@ -780,11 +787,12 @@ def _shield_guard(b, star):
         for dx in (-0.19, 0.19):  # 四角包金
             for dz in (-0.36, 0.36):
                 S(b, sc + front * 0.9 + Vector((dx, 0, dz)), (0.05, 0.03, 0.05), "gold", 12, 6)
-    js = 1.4 if star >= 5 else 1.0
+    js = 1.4 if star >= 5 else (1.2 if star >= 4 else 1.0)
     gem(b, sc + front * 1.3 + Vector((0, 0, 0.1)), (0.055 * js, 0.05 * js, 0.075 * js))
     b.ring(sc + front * 1.15 + Vector((0, 0, 0.1)), 0.08 * js, 0.014, "gold", axis="f", segments=16, sides=6)
-    if star == 1:
-        rivets(b, [sc + front + Vector((dx, 0, dz)) for dx in (-0.15, 0.15) for dz in (-0.3, 0.3)], "steel_dark")
+    if star <= 2:
+        rivets(b, [sc + front + Vector((dx, 0, dz)) for dx in (-0.15, 0.15) for dz in (-0.3, 0.3)],
+               metal(star, "steel_dark"))
     if star >= 5:  # 盾面日轮：宝石周围一圈金色光芒
         for i in range(8):
             a = i * math.pi / 4
@@ -793,103 +801,104 @@ def _shield_guard(b, star):
             R(b, o + d * 0.12, o + d * 0.2, 0.014, 0.003, "gold_light", 6)
 
 
-def shield_guard(b, star=1):  # 布兰 · 盾卫：戴羽饰头盔的骑士，身前一面塔盾；★3 金边披风，★5 白金甲、金翼盔、日轮盾
+def shield_guard(b, star=1):  # 布兰 · 盾卫：戴羽饰头盔的骑士，身前一面塔盾；★2 银边，★3 金边披风，★4 金翼盔，★5 白金甲、日轮盾
     star_base(b, 0.75, star)
     _shield_guard(b, star)
 
 
 def _shadow_assassin(b, star):
     cloak = "elf_dark" if star >= 5 else "robe_black"
-    metal = "gold" if star >= 3 else "steel"
+    trim = metal(star, "steel")
 
     def body():
         k = hero(b, legs=cloak, boots="leather" if star < 5 else cloak, body="cloth_navy",
                  belt="leather", glow_eyes=True, head_r=0.23)
         h, hr, z0 = k["head"], k["head_r"], k["z0"]
-        if star >= 5:  # 半身短披风
+        if star >= 4:  # 半身短披风
             cape(b, z0 + 0.86, z0 + 0.32, 0.18, 0.28, cloak, trim="gold", f0=-0.12, flare=0.2, rows=6)
         # 兜帽和面巾
         S(b, h + Vector((0, hr * 0.32, hr * 0.12)), (hr * 1.1, hr * 1.05, hr * 1.08), cloak, 20, 12)
-        if star >= 3:  # 兜帽金边
-            b.ring(h + Vector((0, -hr * 0.2, hr * 0.12)), hr * 0.95, 0.012, metal, axis="f", segments=24, sides=4)
+        if star >= 2:  # 兜帽饰边
+            b.ring(h + Vector((0, -hr * 0.2, hr * 0.12)), hr * 0.95, 0.012, trim, axis="f", segments=24, sides=4)
         limb(b, [h + Vector((0, 0.12, hr * 0.7)), h + Vector((0, 0.3, hr * 0.6)), h + Vector((0, 0.42, hr * 0.2))],
              0.1, 0.02, cloak, 12)
         S(b, h + Vector((0, -hr * 0.55, -hr * 0.35)), (hr * 0.82, hr * 0.5, hr * 0.42), "cloth_blue", 16, 8)
         for s in (-1, 1):
             tail = [P(-0.12, s * 0.06, z0 + 0.86), P(-0.3, s * 0.1, z0 + 0.8), P(-0.46, s * 0.14, z0 + 0.72)]
             limb(b, tail, 0.045, 0.02, "cloth_blue", 10)
-            if star >= 3:
-                S(b, tail[-1], (0.025, 0.025, 0.025), metal, 8, 6)
+            if star >= 2:
+                S(b, tail[-1], (0.025, 0.025, 0.025), trim, 8, 6)
         # 腰包、斜挎皮带
         for s in (-1, 1):
             b.rbox(P(0.05, s * 0.2, z0 + 0.46), (0.08, 0.1, 0.1), "leather", 0.4)
-            if star >= 3:
-                S(b, P(0.1, s * 0.2, z0 + 0.48), (0.018, 0.012, 0.018), metal, 8, 6)
+            if star >= 2:
+                S(b, P(0.1, s * 0.2, z0 + 0.48), (0.018, 0.012, 0.018), trim, 8, 6)
         b.rbox(P(0.15, 0, z0 + 0.7), (0.06, 0.03, 0.4), "leather", 0.4, rot=(0, 35, 0))
         if star >= 3:  # 第二条交叉皮带和飞刀
             b.rbox(P(0.15, 0, z0 + 0.7), (0.06, 0.03, 0.4), "leather", 0.4, rot=(0, -35, 0))
             for i in range(3):
                 o = P(0.17, -0.04 + i * 0.05, z0 + 0.62 + i * 0.07)
                 b.rbox(o, (0.015, 0.02, 0.09), "steel", 0.3, rot=(0, -35, 0))
-        rivets(b, [P(0.17, 0, z0 + 0.7)], metal)
-        if star >= 5:  # 胸前的宝石徽章
+        rivets(b, [P(0.17, 0, z0 + 0.7)], trim)
+        if star >= 4:  # 胸前的宝石徽章
             emblem(b, P(0.19, 0, z0 + 0.7), 0.7, "gold", jewel=GLOW)
         if star >= 3:  # 护肩
             for sh in k["shoulder"]:
                 S(b, sh + Vector((0, 0, 0.03)), (0.1, 0.1, 0.06), "leather", 12, 8)
-                b.ring(sh + Vector((0, 0, 0.03)), 0.095, 0.01, metal, segments=16, sides=4)
+                b.ring(sh + Vector((0, 0, 0.03)), 0.095, 0.01, trim, segments=16, sides=4)
         # 双手反握匕首
-        blade = 0.36 if star >= 5 else 0.3
+        blade = 0.36 if star >= 5 else (0.33 if star >= 4 else 0.3)
         for s, sh in zip((1, -1), k["shoulder"]):
             hand = P(0.32, s * 0.28, z0 + 0.5)
             arm(b, sh, P(0.12, s * 0.33, z0 + 0.62), hand, "cloth_navy", cloak)
             b.rbox(hand + Vector((0, -0.02, 0)), (0.03, 0.05, 0.1), "leather", 0.4)
-            b.rbox(hand + Vector((0, -0.02, 0.06)), (0.16 if star >= 3 else 0.12, 0.03, 0.03), metal, 0.5)
-            if star >= 3:
-                S(b, hand + Vector((0, -0.02, 0.1)), (0.022, 0.022, 0.022), metal, 8, 6)
+            b.rbox(hand + Vector((0, -0.02, 0.06)), (0.16 if star >= 3 else 0.12, 0.03, 0.03), trim, 0.5)
+            if star >= 2:
+                S(b, hand + Vector((0, -0.02, 0.1)), (0.022, 0.022, 0.022), trim, 8, 6)
             b.rbox(hand + Vector((0, -0.06, -blade * 0.6)), (0.015, 0.06, blade), GLOW, 0.3, rot=(-25, 0, 0))
 
     posed(b, body, lean=0.18)
 
 
-def shadow_assassin(b, star=1):  # 夜莺 · 影刃刺客：兜帽面巾、围巾飘尾，双手反握发光匕首；★3 金扣交叉带飞刀，★5 紫黑短披风
+def shadow_assassin(b, star=1):  # 夜莺 · 影刃刺客：兜帽面巾、围巾飘尾，双手反握发光匕首；★2 银扣，★3 金扣交叉带飞刀，★4 短披风，★5 紫黑配色
     star_base(b, 0.75, star)
     _shadow_assassin(b, star)
 
 
 def _storm_mage(b, star):
-    trim = "gold" if star >= 3 else "cloth_navy"
+    trim = metal(star, "cloth_navy")
     k = hero(b, body="white", robe="white", belt="gold", boots="royal" if star >= 5 else "cloth_navy",
              brows="steel_dark", head_r=0.25)
     h, hr, z0 = k["head"], k["head_r"], k["z0"]
     if star >= 5:  # 深蓝外袍披肩，金边
         cape(b, z0 + 0.88, z0 + 0.02, 0.22, 0.36, "royal", trim="gold", trim2="gold_light", f0=-0.1, flare=0.1)
-    if star >= 3:  # 下摆金边和金色闪电纹
-        b.ring(P(0, 0, z0 + 0.1), 0.28, 0.018, "gold", segments=32, sides=6)
+    if star >= 2:  # 下摆饰边
+        b.ring(P(0, 0, z0 + 0.1), 0.28, 0.018, trim, segments=32, sides=6)
+    if star >= 3:  # 金色闪电纹
         for a in (-0.5, 0.5):
             o = P(0.27 * math.cos(a), 0.27 * math.sin(a), z0 + 0.18)
             b.chain([o, o + Vector((0, 0, 0.06)), o + Vector((0.02 * a, -0.01, 0.09)), o + Vector((0, 0, 0.15))],
                     0.01, 0.006, "gold", 6)
     # 前襟饰带和扣子
     b.rbox(P(0.2, 0, z0 + 0.32), (0.1, 0.04, 0.55), "royal" if star >= 5 else "cloth_navy", 0.4, rot=(0, -14, 0))
-    if star >= 3:
+    if star >= 2:
         for s in (-1, 1):
-            b.rbox(P(0.205, s * 0.055, z0 + 0.32), (0.015, 0.045, 0.55), "gold", 0.4, rot=(0, -14, 0))
-    if star >= 5:
+            b.rbox(P(0.205, s * 0.055, z0 + 0.32), (0.015, 0.045, 0.55), trim, 0.4, rot=(0, -14, 0))
+    if star >= 4:
         for i in range(3):
             gem(b, P(0.22 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i), (0.022, 0.018, 0.03))
     else:
-        rivets(b, [P(0.21 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i) for i in range(3)])
+        rivets(b, [P(0.21 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i) for i in range(3)], metal(star, "gold"))
     # 兜帽、银发、胡子
     S(b, h + Vector((0, hr * 0.3, 0.02)), (hr * 1.08, hr * 1.0, hr * 1.06), "royal" if star >= 5 else "cloth_navy",
       20, 12)
-    if star >= 3:
-        b.ring(h + Vector((0, -hr * 0.18, 0.02)), hr * 0.98, 0.014, "gold", axis="f", segments=24, sides=4)
+    if star >= 2:
+        b.ring(h + Vector((0, -hr * 0.18, 0.02)), hr * 0.98, 0.014, trim, axis="f", segments=24, sides=4)
     S(b, h + Vector((0, -hr * 0.5, hr * 0.55)), (hr * 0.7, hr * 0.4, hr * 0.3), "steel", 14, 8)
     for dx, l in ((-0.06, 0.2), (0, 0.26), (0.06, 0.2)):
         R(b, P(-h.y + hr * 0.8, dx, h.z - hr * 0.45), P(-h.y + hr * 0.7, dx * 1.3, h.z - hr * 0.45 - l),
           0.05, 0.01, "steel", 10)
-    if star >= 5:  # 额前的星饰
+    if star >= 4:  # 额前的星饰
         gem(b, h + Vector((0, -hr * 0.95, hr * 0.45)), (0.03, 0.02, 0.045))
     # 立领
     b.ring(P(0, 0, z0 + 0.88), 0.17, 0.04, "gold", segments=20, sides=6)
@@ -897,20 +906,20 @@ def _storm_mage(b, star):
     for s in (-1, 1):
         b.rbox(P(-0.03, s * 0.14, z0 + 0.98), (0.12, 0.04, 0.22 if star >= 5 else 0.2), collar, 0.4,
                rot=(0, 0, s * 20))
-        if star >= 3:
-            b.rbox(P(-0.03, s * 0.16, z0 + 0.98), (0.13, 0.015, 0.23 if star >= 5 else 0.21), "gold", 0.4,
+        if star >= 2:
+            b.rbox(P(-0.03, s * 0.16, z0 + 0.98), (0.13, 0.015, 0.23 if star >= 5 else 0.21), trim, 0.4,
                    rot=(0, 0, s * 20))
     # 披肩、袖口
     for sh in k["shoulder"]:
         S(b, sh + Vector((0, 0, 0.02)), (0.12, 0.13, 0.08), collar, 14, 8)
-        if star >= 3:
-            b.ring(sh + Vector((0, 0, 0.0)), 0.12, 0.012, "gold", segments=20, sides=4)
+        if star >= 2:
+            b.ring(sh + Vector((0, 0, 0.0)), 0.12, 0.012, trim, segments=20, sides=4)
     rs, ls = k["shoulder"]
     rh = P(0.15, 0.32, z0 + 0.62)
     arm(b, rs, P(0.05, 0.32, z0 + 0.65), rh, "white")
     lh = P(0.16, -0.4, z0 + 0.98)
     arm(b, ls, P(0.06, -0.4, z0 + 0.76), lh, "white")
-    if star >= 3:
+    if star >= 2:
         for hand, elbow in ((rh, P(0.05, 0.32, z0 + 0.65)), (lh, P(0.06, -0.4, z0 + 0.76))):
             cuff = hand + (elbow - hand).normalized() * 0.08
             S(b, cuff, (0.065, 0.065, 0.04), trim, 12, 6)
@@ -922,10 +931,11 @@ def _storm_mage(b, star):
           "royal" if star >= 5 else "gold", 10)
     top = Vector((rh.x, rh.y, z0 + 1.58))
     b.ring(top, 0.13, 0.02, "gold", axis="f", segments=20, sides=6)
-    if star >= 5:
+    if star >= 4:
         b.ring(top, 0.17, 0.012, "gold_light", axis="x", segments=20, sides=6)
+    if star >= 5:
         b.ring(top, 0.19, 0.01, "gold_light", axis="z", segments=24, sides=6)
-    gem(b, top, (0.05, 0.05, 0.09) if star < 5 else (0.07, 0.07, 0.13))
+    gem(b, top, (0.05, 0.05, 0.09) if star < 4 else ((0.06, 0.06, 0.11) if star == 4 else (0.07, 0.07, 0.13)))
     for s in (-1, 1):
         pts = [top + Vector((s * 0.13, 0, 0)), top + Vector((s * 0.2, 0, 0.08)), top + Vector((s * 0.16, 0, 0.13)),
                top + Vector((s * 0.26, 0, 0.24))]
@@ -943,7 +953,7 @@ def _storm_mage(b, star):
             gem(b, P(0.5 * math.cos(a), 0.5 * math.sin(a), z0 + 0.7), (0.02, 0.02, 0.035))
 
 
-def storm_mage(b, star=1):  # 泽恩 · 风暴法师：白袍金立领、白胡子，金环法杖，左手托雷云；★3 金边刺绣，★5 深蓝外袍、宝石扣、符文环
+def storm_mage(b, star=1):  # 泽恩 · 风暴法师：白袍金立领、白胡子，金环法杖，左手托雷云；★2 银边，★3 金边刺绣，★4 宝石扣星饰，★5 深蓝外袍、符文环
     star_base(b, 0.75, star)
     _storm_mage(b, star)
 
@@ -974,31 +984,31 @@ def _skull(b, c, r, glow=True, crown=None):
 
 def _necromancer(b, star):
     robe = "robe_black"
-    metal = "gold_dark" if star >= 3 else "bone_dark"
-    k = hero(b, body=robe, robe=robe, belt=metal, boots="crimson" if star >= 5 else "rot_dark", skin="bone",
+    trim = "bone_dark" if star == 1 else ("silver" if star == 2 else "gold_dark")
+    k = hero(b, body=robe, robe=robe, belt=trim, boots="crimson" if star >= 5 else "rot_dark", skin="bone",
              head_r=0.24, has_face=False)
     h, hr, z0 = k["head"], k["head_r"], k["z0"]
     if star >= 3:  # 破旧但华贵的长披风：★3 黑底暗金边，★5 深红里衬
-        cape(b, z0 + 0.9, z0 + 0.02, 0.22, 0.38, "crimson" if star >= 5 else robe, trim=metal,
-             trim2="gold" if star >= 5 else None, f0=-0.1, flare=0.16)
+        cape(b, z0 + 0.9, z0 + 0.02, 0.22, 0.38, "crimson" if star >= 5 else robe, trim=trim,
+             trim2="gold" if star >= 4 else None, f0=-0.1, flare=0.16)
     _skull(b, h + Vector((0, -0.01, 0)), hr, crown="gold_dark" if star >= 5 else None)
     # 前襟饰带
     b.rbox(P(0.19, 0, z0 + 0.32), (0.08, 0.04, 0.55), "crimson" if star >= 5 else "rot_dark", 0.4, rot=(0, -14, 0))
-    if star >= 3:
+    if star >= 2:
         for s in (-1, 1):
-            b.rbox(P(0.195, s * 0.045, z0 + 0.32), (0.012, 0.045, 0.55), metal, 0.4, rot=(0, -14, 0))
-        b.ring(P(0, 0, z0 + 0.12), 0.28, 0.018, metal, segments=32, sides=6)
+            b.rbox(P(0.195, s * 0.045, z0 + 0.32), (0.012, 0.045, 0.55), trim, 0.4, rot=(0, -14, 0))
+        b.ring(P(0, 0, z0 + 0.12), 0.28, 0.018, trim, segments=32, sides=6)
     for i in range(3):
         S(b, P(0.21 + 0.02 * i, 0, z0 + 0.15 + 0.12 * i), (0.03, 0.03, 0.03), "bone", 8, 6)
     # 兜帽
     S(b, h + Vector((0, hr * 0.3, 0.04)), (hr * 1.15, hr * 1.05, hr * 1.12), robe, 20, 12)
-    if star >= 3:
-        b.ring(h + Vector((0, -hr * 0.2, 0.04)), hr * 1.0, 0.014, metal, axis="f", segments=24, sides=4)
+    if star >= 2:
+        b.ring(h + Vector((0, -hr * 0.2, 0.04)), hr * 1.0, 0.014, trim, axis="f", segments=24, sides=4)
     limb(b, [h + Vector((0, 0.15, hr * 0.8)), h + Vector((0, 0.32, hr * 0.8)), h + Vector((0, 0.45, hr * 0.3))],
          0.11, 0.02, robe, 12)
     # 骨刺领
-    for i in range(9 if star >= 5 else 7):
-        n = 8 if star >= 5 else 6
+    for i in range(9 if star >= 4 else 7):
+        n = 8 if star >= 4 else 6
         a = math.pi * (-0.1 + 1.2 * i / n)
         o = P(-0.1 * math.sin(a) + 0.02, 0.2 * math.cos(a), z0 + 0.86)
         out = (o - P(0.02, 0, z0 + 0.86)).normalized()
@@ -1008,19 +1018,19 @@ def _necromancer(b, star):
             u = -1 + i / 2
             _skull(b, P(0.2 - 0.03 * abs(u), u * 0.13, z0 + 0.66 - 0.06 * (1 - abs(u))), 0.035, glow=False)
     for s, sh in zip((1, -1), k["shoulder"]):
-        S(b, sh + Vector((0, 0, 0.02)), (0.13, 0.13, 0.08), metal if star >= 5 else "rot_dark", 14, 8)
-        _skull(b, sh + Vector((0, -0.02, 0.1)), 0.075, glow=star >= 5)
-        if star >= 3:
-            b.ring(sh + Vector((0, 0, 0.0)), 0.13, 0.012, metal, segments=20, sides=4)
+        S(b, sh + Vector((0, 0, 0.02)), (0.13, 0.13, 0.08), trim if star >= 5 else "rot_dark", 14, 8)
+        _skull(b, sh + Vector((0, -0.02, 0.1)), 0.075, glow=star >= 4)
+        if star >= 2:
+            b.ring(sh + Vector((0, 0, 0.0)), 0.13, 0.012, trim, segments=20, sides=4)
     rs, ls = k["shoulder"]
     rh = P(0.15, 0.32, z0 + 0.62)
     arm(b, rs, P(0.05, 0.32, z0 + 0.65), rh, robe, "bone")
     R(b, Vector((rh.x, rh.y, z0)), Vector((rh.x, rh.y, z0 + 1.42)), 0.025, 0.02, "bone_dark", 10)
     for dz in (0.3, 0.7, 1.1):
-        S(b, Vector((rh.x, rh.y, z0 + dz)), (0.04, 0.04, 0.03), metal if star >= 3 else "bone", 10, 6)
+        S(b, Vector((rh.x, rh.y, z0 + dz)), (0.04, 0.04, 0.03), trim if star >= 3 else "bone", 10, 6)
     top = Vector((rh.x, rh.y, z0 + 1.55))
     _skull(b, top, 0.1, crown="gold_dark" if star >= 3 else None)
-    horns = ((0.08, 0.17, 0.18),) if star < 5 else ((0.08, 0.17, 0.18), (0.06, 0.24, 0.3))
+    horns = ((0.08, 0.17, 0.18),) if star < 4 else ((0.08, 0.17, 0.18), (0.06, 0.24, 0.3))
     for hx, hy, hz in horns:
         for s in (-1, 1):
             limb(b, [top + Vector((s * hx, 0, 0.04)), top + Vector((s * hy, 0.02, hz * 0.55)),
@@ -1033,10 +1043,10 @@ def _necromancer(b, star):
         S(b, lh + Vector((0, 0, dz)), (r, r, r * 1.3), GLOW, 10, 6)
 
 
-def necromancer(b, star=1):  # 维克多 · 死灵法师：骷髅头、尖兜帽、骨刺领、骷髅法杖、绿火骷髅；★3 暗金边披风骷髅链，★5 金冠深红披风
+def necromancer(b, star=1):  # 维克多 · 死灵法师：骷髅头、尖兜帽、骨刺领、骷髅法杖、绿火骷髅；★2 银边，★3 暗金边披风骷髅链，★4 双角杖三颗骷髅，★5 金冠深红披风
     star_base(b, 0.75, star)
     _necromancer(b, star)
-    for a in ((2.0, 4.2) if star < 5 else (1.8, 3.1, 4.4)):
+    for a in ((2.0, 4.2) if star < 4 else (1.8, 3.1, 4.4)):
         c = P(0.6 * math.cos(a), 0.6 * math.sin(a), 1.25)
         _skull(b, c, 0.09)
         for dz, r in ((0.1, 0.06), (0.18, 0.04), (0.25, 0.02)):
@@ -1045,7 +1055,7 @@ def necromancer(b, star=1):  # 维克多 · 死灵法师：骷髅头、尖兜帽
         b.ring(P(0, 0, 0.35), 0.55, 0.008, GLOW, segments=40, sides=4)
 
 
-def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条手臂、树冠；★3 藤蔓腰带和银饰，★5 花冠、发光果实、银色符文环
+def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条手臂、树冠；★2 藤蔓腰带，★3 宝石扣五瓣花，★4 符文环发光果实，★5 满树花冠和枝角
     star_base(b, 0.8, star, colour="bark")
     for i in range(6):
         a = i * 2 * math.pi / 6 + 0.3
@@ -1058,13 +1068,14 @@ def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条�
         a = i * 2 * math.pi / 10
         c, s = math.cos(a), math.sin(a)
         R(b, P(0.35 * c, 0.35 * s, 0.12), P(0.3 * c, 0.3 * s, 1.05), 0.035, 0.025, "wood", 8)
-    if star >= 3:  # 藤蔓腰带，紫宝石扣
+    if star >= 2:  # 藤蔓腰带，★3 起加紫宝石扣
         b.ring(P(0, 0, 0.55), 0.355, 0.03, "leaf", segments=32, sides=6)
         b.ring(P(0, 0, 0.55), 0.36, 0.012, "silver", segments=32, sides=4)
+    if star >= 3:
         S(b, P(0.36, 0, 0.55), (0.06, 0.03, 0.06), "silver", 12, 8)
         gem(b, P(0.385, 0, 0.55), (0.035, 0.025, 0.05))
-    if star >= 5:  # 树干上的银色符文环
-        for z in (0.3, 0.8):
+    if star >= 4:  # 树干上的银色符文环：★4 一道，★5 两道
+        for z in ((0.3, 0.8) if star >= 5 else (0.8,)):
             b.ring(P(0, 0, z), 0.34 - 0.02 * z, 0.014, "silver", segments=32, sides=4)
             for i in range(6):
                 a = i * math.pi / 3 + z
@@ -1085,7 +1096,7 @@ def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条�
     for f, x in shrooms:
         R(b, P(f, x, 0.08), P(f, x, 0.2), 0.025, 0.02, "white", 8)
         S(b, P(f, x, 0.21), (0.07, 0.07, 0.04), "elf_purple", 12, 6)
-        if star >= 3:
+        if star >= 2:
             for a in (0.0, 2.1, 4.2):
                 S(b, P(f + 0.04 * math.cos(a), x + 0.04 * math.sin(a), 0.245), (0.012,) * 3, GLOW, 6, 4)
     # 手臂
@@ -1096,7 +1107,7 @@ def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条�
             limb(b, [hand, hand + Vector((k * 0.06, -0.08, -0.08)), hand + Vector((k * 0.09, -0.16, -0.06))],
                  0.035, 0.012, "wood", 8)
         S(b, P(0.12, s * 0.5, 0.95), (0.08, 0.08, 0.05), "leaf", 10, 6)
-        if star >= 3:  # 手腕上的银环
+        if star >= 2:  # 手腕上的银环
             b.ring(P(0.24, s * 0.6, 0.52), 0.075, 0.012, "silver", segments=16, sides=4)
     # 树冠
     S(b, P(-0.05, 0, 1.55), (0.5, 0.46, 0.36), "leaf", 20, 12)
@@ -1104,10 +1115,14 @@ def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条�
                        (-0.3, 0.3, 1.5, 0.24), (0.3, -0.25, 1.5, 0.22)):
         S(b, P(f, x, z), (r, r, r * 0.85), "leaf", 16, 10)
     flowers = [(0.45, 0.2, 1.6), (0.35, -0.38, 1.65), (0.2, 0.1, 2.0), (-0.1, 0.5, 1.7)]
+    if star >= 2:
+        flowers += [(0.5, -0.05, 1.45), (0.1, -0.45, 1.85)]
     if star >= 3:
-        flowers += [(0.5, -0.05, 1.45), (0.1, -0.45, 1.85), (-0.2, 0.2, 2.05), (0.3, 0.4, 1.8)]
+        flowers += [(-0.2, 0.2, 2.05), (0.3, 0.4, 1.8)]
+    if star >= 4:
+        flowers += [(0.0, 0.55, 1.5), (-0.4, -0.2, 1.8)]
     if star >= 5:
-        flowers += [(0.0, 0.55, 1.5), (-0.4, -0.2, 1.8), (0.4, 0.05, 1.85), (-0.15, -0.5, 1.55), (0.25, -0.2, 2.05)]
+        flowers += [(0.4, 0.05, 1.85), (-0.15, -0.5, 1.55), (0.25, -0.2, 2.05)]
     for f, x, z in flowers:
         for i in range(5 if star >= 3 else 1):  # ★3 起是五瓣花
             a = i * 2 * math.pi / 5
@@ -1115,10 +1130,11 @@ def treant_guard(b, star=1):  # 老橡 · 树人守卫：树干身躯、枝条�
             S(b, P(f, x + d * math.cos(a), z + d * math.sin(a)), (0.035 if star >= 3 else 0.05,) * 3,
               "elf_purple" if i % 2 == 0 else "white", 10, 6)
         S(b, P(f + 0.02, x, z + (0 if star >= 3 else 0.025)), (0.02, 0.02, 0.02), GLOW, 6, 4)
-    if star >= 5:  # 垂下的发光果实和枝角花冠
+    if star >= 4:  # 垂下的发光果实
         for f, x in ((0.3, 0.35), (0.35, -0.3), (-0.2, 0.45), (-0.3, -0.4)):
             R(b, P(f, x, 1.38), P(f, x, 1.2), 0.008, 0.008, "wood", 6)
             gem(b, P(f, x, 1.15), (0.04, 0.04, 0.06))
+    if star >= 5:  # 枝角花冠
         for s in (-1, 1):
             limb(b, [P(0, s * 0.2, 2.0), P(0.05, s * 0.32, 2.2), P(0.02, s * 0.45, 2.3)], 0.03, 0.008, "wood", 8)
             R(b, P(0.04, s * 0.3, 2.17), P(0.08, s * 0.25, 2.3), 0.015, 0.004, "wood", 6)
@@ -1158,7 +1174,7 @@ PREVIEW_SAMPLES = [("shield_guard", PLAYER_GLOW), ("shadow_assassin", PLAYER_GLO
 # <单位 id>_tex.png（客户端 ModelLibrary 优先用它），缝隙、腋下、帽檐下会自然变暗，体积感更强。
 # 描边用“反向外壳”：沿法线外扩一层、翻转朝向的网格，用深色；Unity 默认剔除背面，所以只在轮廓处露出一圈线。
 
-BAKE_SIZE = 1024
+BAKE_SIZE = 768
 OUTLINE_STRIP = 0.03  # 贴图顶部留给描边颜色的色带高度（占比）
 OUTLINE_COLOUR = "1C1A26"
 OUTLINE_WIDTH = 0.012
@@ -1393,9 +1409,9 @@ def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height
 
 def _trim_rows(image, pad=24):
     """裁掉一行渲染图上下的空背景。"""
-    from PIL import ImageChops
+    from PIL import Image, ImageChops
     bg = image.getpixel((0, 0))
-    diff = ImageChops.difference(image, image.__class__.new(image.mode, image.size, bg)).convert("L")
+    diff = ImageChops.difference(image, Image.new(image.mode, image.size, bg)).convert("L")
     box = diff.point(lambda v: 255 if v > 12 else 0).getbbox()
     if not box:
         return image

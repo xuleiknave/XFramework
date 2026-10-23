@@ -19,19 +19,19 @@ namespace Starline.Client
         private static Shader _lit;
 
         /// <summary>
-        /// The model to use for a unit at a star level. Cartoon characters have star tiers exported as
-        /// &lt;unit id&gt;_s3 and &lt;unit id&gt;_s5 (dressier costumes); a star uses the highest tier at or below it,
-        /// falling back to the plain model.
+        /// The model to use for a unit at a star level. Cartoon characters export one costume per star as
+        /// &lt;unit id&gt;_s2 … &lt;unit id&gt;_s5 (each dressier than the last); a star uses the highest tier at or
+        /// below it, falling back to the plain ★1 model.
         /// </summary>
         public static string ModelKey(string unitId, int star)
         {
-            if (star >= 5 && Prefab(unitId + "_s5") != null)
+            for (int s = star; s >= 2; s--)
             {
-                return unitId + "_s5";
-            }
-            if (star >= 3 && Prefab(unitId + "_s3") != null)
-            {
-                return unitId + "_s3";
+                string key = unitId + "_s" + s;
+                if (Prefab(key) != null)
+                {
+                    return key;
+                }
             }
             return unitId;
         }
