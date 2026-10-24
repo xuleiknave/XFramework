@@ -18,8 +18,6 @@ namespace Starline.Client
         public BattleStage Stage { get; private set; }
         public UiRoot Ui { get; private set; }
         public UnitOverlay Overlay { get; private set; }
-        /// <summary>Each stage's best replay, saved on this computer.</summary>
-        public ReplayStore Replays { get; private set; }
         /// <summary>The expedition in progress, or null on the main menu.</summary>
         public ExpeditionRun Run { get; private set; }
 
@@ -40,7 +38,6 @@ namespace Starline.Client
             Stage = new BattleStage(transform, camera);
             Ui = UiRoot.Create(transform);
             Overlay = new UnitOverlay(Ui, Stage);
-            Replays = ReplayStore.CreateDefault();
         }
 
         private void Start() => ShowMainMenu();
@@ -108,12 +105,11 @@ namespace Starline.Client
             }
         }
 
-        /// <summary>Opens deployment for the current battle; pass <paramref name="screen"/> to return to an existing one (after watching a replay).</summary>
-        public void ShowDeploy(DeployScreen screen = null)
+        public void ShowDeploy()
         {
             Stage.SetVisible(true);
             Stage.Rig.GoToDeploy();
-            Show(screen ?? new DeployScreen(this));
+            Show(new DeployScreen(this));
         }
 
         public void ShowBattle(Encounter encounter, Formation formation)
@@ -127,13 +123,6 @@ namespace Starline.Client
             Stage.SetVisible(true);
             Encounter stage = EncounterLibrary.Create(replay.Stage);
             Show(new BattleScreen(this, new BattleController(replay, stage, Stage), (exitText, exit)));
-        }
-
-        public void ShowReplays()
-        {
-            Stage.Clear();
-            Stage.SetVisible(false);
-            Show(new ReplayListScreen(this));
         }
 
         /// <summary>Where to go after the battle result, depending on the run state.</summary>

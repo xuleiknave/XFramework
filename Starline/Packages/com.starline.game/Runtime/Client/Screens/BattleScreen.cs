@@ -208,14 +208,8 @@ namespace Starline.Client
             }
             lines.AddRange(run.Messages);
 
+            // Kept in memory only, for "回放本场"; nothing is saved on this computer.
             Replay replay = _battle.Record();
-            if (replay != null && won)
-            {
-                ReplayStore.SaveResult saved = App.Replays.SaveIfBest(replay, out Replay previous);
-                lines.Add(saved == ReplayStore.SaveResult.NewBest
-                    ? "已保存为本关最佳录像（战力 " + replay.Power + "）"
-                    : "本关已有战力不高于这次的录像（战力 " + previous.Power + "），没有覆盖");
-            }
 
             string next;
             switch (run.State)

@@ -72,8 +72,7 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
    │                                                Boss 战失败且有耐久 ──▶ Deploy
    └──────────────── RunEnd ◀──── 通关 / 耐久归零 ────────────────────────────┘
 
-MainMenu ──我的录像──▶ ReplayList ──观看──▶ Battle（回放）──结束──▶ ReplayList
-Battle 结果弹窗 ──回放本场──▶ Battle（回放）──结束──▶ 结果弹窗原来的下一步
+Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在内存里）──结束──▶ 结果弹窗原来的下一步
 ```
 
 | 界面 | 类 | 布局 |
@@ -84,7 +83,6 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放）──结束�
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
 | 战利品 | `RewardScreen` | `Reward.uxml` |
 | 远征结束 | `RunEndScreen` | `RunEnd.uxml` |
-| 我的录像（主菜单进入；观看时复用战斗界面） | `ReplayListScreen`，存储 `ReplayStore` | `ReplayList.uxml` |
 
 ### 新增一个界面
 

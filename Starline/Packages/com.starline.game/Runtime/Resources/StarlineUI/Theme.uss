@@ -551,35 +551,6 @@ Label {
 
 /* ---- Replays ------------------------------------------------------------- */
 
-.replay-panel {
-    width: 1680px;
-    height: 1680px;
-}
-
-.replay-list {
-    margin: 29px 0;
-}
-
-.replay-card {
-    flex-direction: row;
-    align-items: center;
-    padding: 24px 34px;
-    margin: 0 0 19px 0;
-    background-color: var(--panel-raised);
-    border-color: var(--border);
-}
-
-.replay-card .btn {
-    width: 240px;
-    margin-left: 29px;
-}
-
-.replay-card-title {
-    font-size: 38px;
-    -unity-font-style: bold;
-    color: var(--gold-bright);
-}
-
 .replay-banner {
     align-self: center;
     margin-top: 14px;
@@ -592,9 +563,3 @@ Label {
     border-radius: 5px;
 }
 
-.replay-box {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top-width: 2px;
-    border-color: var(--border);
-}
