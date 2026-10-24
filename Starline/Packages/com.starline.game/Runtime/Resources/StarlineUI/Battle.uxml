@@ -8,12 +8,14 @@
             <ui:Label name="enemy-count" class="h2 count" />
             <ui:VisualElement name="speeds" class="row speeds" />
             <ui:Button name="skip" text="跳过 »" class="btn btn-small" />
+            <ui:Button name="view" text="视角：默认" tooltip="切换预设视角（V）。也可以在战场上拖动旋转、滚轮或双指缩放。" class="btn btn-small view-btn" />
+            <ui:Button name="view-reset" text="复位" class="btn btn-small" />
         </ui:VisualElement>
-        <ui:VisualElement class="row grow" picking-mode="Ignore">
-            <ui:VisualElement class="grow" picking-mode="Ignore" />
+        <ui:VisualElement class="row grow battle-body" picking-mode="Ignore">
+            <ui:VisualElement name="board-area" class="grow" picking-mode="Ignore" />
             <ui:VisualElement name="feed" class="feed" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:VisualElement class="bottombar">
+        <ui:VisualElement class="bottombar battle-bottombar">
             <ui:VisualElement class="supply-box">
                 <ui:Label name="points" class="body" />
                 <ui:VisualElement name="pips" class="row pips" />
