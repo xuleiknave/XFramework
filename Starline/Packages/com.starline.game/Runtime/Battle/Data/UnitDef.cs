@@ -17,6 +17,22 @@ namespace Starline.Battle
         Structure,
     }
 
+    /// <summary>The five factions of the story (story.md section 2). Structures and neutral units use None.</summary>
+    public enum Faction
+    {
+        None,
+        /// <summary>晨星骑士团</summary>
+        Morningstar,
+        /// <summary>边境游侠会</summary>
+        Rangers,
+        /// <summary>银月法师塔</summary>
+        Silvermoon,
+        /// <summary>亡灵</summary>
+        Undead,
+        /// <summary>影歌精灵</summary>
+        Elves,
+    }
+
     /// <summary>
     /// Intrinsic attributes of a unit type (GDD 6.2). Distances are in battle units
     /// (one board cell is <see cref="BoardLayout.CellSize"/> units); times are in seconds.
@@ -28,6 +44,7 @@ namespace Starline.Battle
         /// <summary>One-line flavour text for cards and tooltips.</summary>
         public string Description = "";
         public UnitRole Role;
+        public Faction Faction;
 
         /// <summary>Footprint on the board: 1 = one cell, 2 = 2x2 cells, 0 = a grid intersection (relays).</summary>
         public int Size = 1;

@@ -6,11 +6,19 @@ namespace Starline.Battle
     public static class FormationRules
     {
         /// <summary>Can this unit be placed with its anchor at (depth, row) without overlapping?</summary>
-        public static bool CanPlace(Formation formation, UnitDef def, int depth, int row, Placement ignore = null)
+        public static bool CanPlace(Formation formation, UnitDef def, int depth, int row, Placement ignore = null) =>
+            CanPlace(formation, def, depth, row, null, BoardLayout.PlayerSide, ignore);
+
+        /// <summary>Same, also respecting the terrain: no units on blocking tiles, no crystals beside drained tiles.</summary>
+        public static bool CanPlace(Formation formation, UnitDef def, int depth, int row, BattleTerrain terrain, int side, Placement ignore = null)
         {
             if (def.IsRelay)
             {
                 if (!BoardLayout.IsIntersectionInside(depth, row))
+                {
+                    return false;
+                }
+                if (terrain != null && !terrain.AllowsRelay(side, depth, row))
                 {
                     return false;
                 }
@@ -27,6 +35,10 @@ namespace Starline.Battle
                     {
                         return false;
                     }
+                    if (terrain != null && !terrain.IsDeployable(side, d, r))
+                    {
+                        return false;
+                    }
                     Placement occupant = formation.UnitAt(d, r);
                     if (occupant != null && occupant != ignore)
                     {
@@ -38,7 +50,7 @@ namespace Starline.Battle
         }
 
         /// <summary>Returns human-readable problems; an empty list means the formation is valid.</summary>
-        public static List<string> Validate(Formation formation, int commandLimit)
+        public static List<string> Validate(Formation formation, int commandLimit, BattleTerrain terrain = null, int side = BoardLayout.PlayerSide)
         {
             var errors = new List<string>();
             int sources = 0;
@@ -56,7 +68,7 @@ namespace Starline.Battle
                 {
                     combatants++;
                 }
-                if (!CanPlace(probe, def, p.Depth, p.Row))
+                if (!CanPlace(probe, def, p.Depth, p.Row, terrain, side))
                 {
                     errors.Add(def.DisplayName + " 的位置无效或与其他单位重叠");
                 }

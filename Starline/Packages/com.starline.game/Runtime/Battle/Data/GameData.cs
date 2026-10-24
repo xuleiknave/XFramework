@@ -12,7 +12,7 @@ namespace Starline.Battle
     public static class GameData
     {
         /// <summary>File names (without extension) that make up the data set, in load order.</summary>
-        public static readonly string[] Files = { "units", "counters", "skills", "encounters", "expedition" };
+        public static readonly string[] Files = { "units", "counters", "skills", "encounters", "expedition", "terrains" };
 
         private static Dictionary<string, JsonValue> _files;
 
@@ -31,6 +31,7 @@ namespace Starline.Battle
             UnitCatalog.Load(files["units"]);
             CounterTable.Load(files["counters"]);
             CommanderSkillDef.Load(files["skills"]);
+            TerrainCatalog.Load(files["terrains"]);
             Loaded?.Invoke();
         }
 
