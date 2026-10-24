@@ -5,7 +5,7 @@
             <ui:Label name="durability" class="stat good" />
             <ui:Label text="左键：放置 / 拿起移动    右键：撤下 / 取消    选中法力水晶后点交叉点" class="small muted hint" />
         </ui:VisualElement>
-        <ui:VisualElement class="row grow" picking-mode="Ignore">
+        <ui:VisualElement class="row grow deploy-body" picking-mode="Ignore">
             <ui:VisualElement name="roster-panel" class="panel side-left">
                 <ui:Label name="command" class="h3" />
                 <ui:ScrollView name="roster" class="grow roster" />
@@ -15,7 +15,7 @@
                 <ui:Label text="绿色格子 = 魔网覆盖（节点周围 2 格）。节点相距 ≤ 3 格且在同一条格线上会自动连线。" class="small muted" />
                 <ui:Label name="notice" class="small bad" />
             </ui:VisualElement>
-            <ui:VisualElement class="grow" picking-mode="Ignore" />
+            <ui:VisualElement name="board-area" class="grow board-area" picking-mode="Ignore" />
             <ui:VisualElement name="forecast-panel" class="panel side-right">
                 <ui:Label name="enc-name" class="h2" />
                 <ui:Label name="enc-briefing" class="body" />

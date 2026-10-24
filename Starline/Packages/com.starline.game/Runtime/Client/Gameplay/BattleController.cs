@@ -8,7 +8,8 @@ namespace Starline.Client
 {
     /// <summary>
     /// Runs a battle in real time: fixed-step simulation at the chosen speed, commander
-    /// skills (the orbital strike is aimed with the mouse), skip, and the event feed.
+    /// skills (the orbital strike is aimed with the mouse), skip, the event feed, and free-look
+    /// camera input.
     /// </summary>
     public sealed class BattleController
     {
@@ -68,9 +69,17 @@ namespace Starline.Client
             _stage.RefreshNetworks();
         }
 
-        public void Tick(float deltaTime, bool pointerOverUi)
+        /// <summary>
+        /// Per-frame update. <paramref name="isOverUi"/> tells whether a screen point is over the
+        /// UI, which blocks aiming and camera drags there.
+        /// </summary>
+        public void Tick(float deltaTime, Func<Vector2, bool> isOverUi)
         {
+            // Camera first, so the click that fires an armed strike does not also start a drag.
+            _stage.Rig.TickFreeLook(isOverUi, StrikeArmed);
+
             Mouse mouse = Mouse.current;
+            bool pointerOverUi = mouse != null && isOverUi(mouse.position.ReadValue());
             if (mouse != null && StrikeArmed && mouse.leftButton.wasPressedThisFrame && !pointerOverUi)
             {
                 if (_stage.TryGetGroundPoint(mouse.position.ReadValue(), out Vector3 p))
