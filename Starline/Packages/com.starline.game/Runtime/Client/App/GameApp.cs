@@ -117,6 +117,14 @@ namespace Starline.Client
             Show(new BattleScreen(this, new BattleController(encounter, formation, Stage)));
         }
 
+        /// <summary>Plays a replay on the battle screen; when it ends, <paramref name="exitText"/> runs <paramref name="exit"/>.</summary>
+        public void ShowReplay(Replay replay, string exitText, System.Action exit)
+        {
+            Stage.SetVisible(true);
+            Encounter stage = EncounterLibrary.Create(replay.Stage);
+            Show(new BattleScreen(this, new BattleController(replay, stage, Stage), (exitText, exit)));
+        }
+
         /// <summary>Where to go after the battle result, depending on the run state.</summary>
         public void AfterBattle()
         {

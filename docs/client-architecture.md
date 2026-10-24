@@ -22,11 +22,12 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  Sim/        确定性战斗模拟、指挥官技能                        │
 │  Analysis/   战前推演                                         │
 │  Expedition/ 远征：地图、远征军与合成、奖励、自动布阵、远征配置   │
+│  Replay/     录像录制与回放、录像校验、上阵战力、关卡种子     │
 └───────────────┬──────────────────────────────────────────────┘
                 │ 读取
 ┌───────────────▼──────────────────────────────────────────────┐
 │ 配置表  Runtime/Resources/StarlineData/*.json                 │
-│  units · counters · skills · encounters · expedition         │
+│  units · counters · skills · encounters · expedition · power │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -70,6 +71,8 @@ MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy �
    │                  └─选补给站：弹窗二选一（留在 Map）                         │
    │                                                Boss 战失败且有耐久 ──▶ Deploy
    └──────────────── RunEnd ◀──── 通关 / 耐久归零 ────────────────────────────┘
+
+Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在内存里）──结束──▶ 结果弹窗原来的下一步
 ```
 
 | 界面 | 类 | 布局 |

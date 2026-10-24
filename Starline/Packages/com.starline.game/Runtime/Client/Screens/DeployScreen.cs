@@ -24,7 +24,6 @@ namespace Starline.Client
             _run = app.Run;
             _encounter = _run.CurrentEncounter;
             _deploy = new DeployController(_run, _encounter, app.Stage);
-            _deploy.Changed += Refresh;
 
             Find<Label>("title").text = _run.Act.Title + " · 第 " + (_run.Current.Layer + 1) + " 跳    " + _encounter.Name;
             Find<Label>("enc-name").text = _encounter.Name;
@@ -39,6 +38,7 @@ namespace Starline.Client
         public override void Enter()
         {
             App.Overlay.SetBattleMode(false);
+            _deploy.Changed += Refresh;
             _deploy.Begin();
         }
 

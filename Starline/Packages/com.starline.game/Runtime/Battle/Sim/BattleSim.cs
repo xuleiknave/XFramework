@@ -51,6 +51,7 @@ namespace Starline.Battle
         private readonly Fix[] _supplyPoints = { StartingSupplyPoints, StartingSupplyPoints };
         private readonly int[,] _skillReadyTick = new int[2, CommanderSkillDef.All.Length];
         private readonly List<Command> _pendingCommands = new List<Command>();
+        private readonly List<IssuedCommand> _issuedCommands = new List<IssuedCommand>();
         private readonly List<PendingStrike> _strikes = new List<PendingStrike>();
         private readonly List<BattleEvent> _events = new List<BattleEvent>();
         private readonly List<PendingHit> _hits = new List<PendingHit>();
@@ -117,7 +118,14 @@ namespace Starline.Battle
             && _supplyPoints[side] >= Fix.FromInt(CommanderSkillDef.Get(skill).Cost);
 
         /// <summary>Queues a command; it takes effect at the start of the next tick.</summary>
-        public void Issue(Command command) => _pendingCommands.Add(command);
+        public void Issue(Command command)
+        {
+            _pendingCommands.Add(command);
+            _issuedCommands.Add(new IssuedCommand(Tick, command));
+        }
+
+        /// <summary>Every command issued so far with the tick it was applied at, in order (recorded into replays).</summary>
+        public IReadOnlyList<IssuedCommand> IssuedCommands => _issuedCommands;
 
         public Unit GetUnit(int id) => _unitsById.TryGetValue(id, out Unit unit) ? unit : null;
 
