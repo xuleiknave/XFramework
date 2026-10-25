@@ -21,6 +21,7 @@
   - `Runtime/Client/`：Unity 客户端。`App/GameApp` 入口与界面切换；`Screens/` 每个界面一个类；`Gameplay/` 布阵和战斗逻辑；`Stage/` 3D 棋盘、模型、特效；`UI/` UiRoot、字体、头顶标签
   - `Editor/`：菜单 `Starline > 初始化工程（场景与界面配置）`、URP 自动配置
 - `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
+- `tools/music/compose.py`：程序化生成背景音乐，输出到 `Runtime/Resources/StarlineMusic`，选曲表 `music.json`（见 `docs/music.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟
 
