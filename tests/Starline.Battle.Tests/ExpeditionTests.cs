@@ -77,6 +77,41 @@ namespace Starline.Battle.Tests
             AddShipResult result = fleet.Add("pd_ship");
             Assert(result.MergedTo.Count == 2 && result.Ship.Star == 3, "第 9 支应连锁合成到 ★3");
             Assert(fleet.Ships.Count == 1, "9 支 ★1 应合成 1 支 ★3");
+
+            // Merging stops at ★3; ★4 and ★5 come from shards (GDD 4.8).
+            for (int i = 0; i < 18; i++)
+            {
+                fleet.Add("pd_ship");
+            }
+            Assert(fleet.Ships.Count == 3 && fleet.Ships.TrueForAll(s => s.Star == 3), "27 支 ★1 应得到 3 支 ★3，不再合成 ★4");
+        }
+
+        private static void HighStarScaling()
+        {
+            Fix previousHp = Fix.Zero, previousDamage = Fix.Zero;
+            for (int star = 1; star <= UnitDef.MaxStar; star++)
+            {
+                Assert(UnitDef.HpScale(star) > previousHp && UnitDef.DamageScale(star) > previousDamage, "★" + star + " 的倍率应高于上一星");
+                previousHp = UnitDef.HpScale(star);
+                previousDamage = UnitDef.DamageScale(star);
+            }
+            var battle = new BattleSim(new BattleSetup
+            {
+                Player = new Formation().Add("supply_ship", 4, 3).Add("frigate", 0, 3, 5),
+                Enemy = new Formation().Add("hive", 4, 3).Add("ripper", 0, 3),
+                Seed = 1,
+            });
+            Assert(battle.Units[1].MaxHp == UnitCatalog.Frigate.MaxHp * UnitDef.HpScale(5), "★5 游侠应按 ★5 倍率");
+            Assert(UnitDef.HpScale(9) == UnitDef.HpScale(UnitDef.MaxStar), "超过 ★5 按 ★5 算");
+            Info("星级倍率（耐久 / 伤害）：" + string.Join("，", StarScales()));
+        }
+
+        private static IEnumerable<string> StarScales()
+        {
+            for (int star = 1; star <= UnitDef.MaxStar; star++)
+            {
+                yield return "★" + star + " " + UnitDef.HpScale(star) + " / " + UnitDef.DamageScale(star);
+            }
         }
 
         private static void StarMapIsConnected()

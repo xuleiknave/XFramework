@@ -40,7 +40,7 @@ namespace Starline.Client
                 }
                 card.Add(Ui.Label(Wording.ShipStats(def, option.Star), "body", "stats"));
                 int owned = _run.Fleet.CopiesOwned(option.UnitId, option.Star);
-                if (option.Star < UnitDef.MaxStar && owned > 0)
+                if (option.Star < UnitDef.MaxMergeStar && owned > 0)
                 {
                     card.Add(owned >= 2
                         ? Ui.Label("已有 2 名同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")

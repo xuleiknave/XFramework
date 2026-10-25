@@ -28,6 +28,7 @@
 
 ```
 dotnet run --project tests/Starline.Battle.Tests   # 内核测试，最后一行应是“全部通过”
+dotnet run --project tests/Starline.Battle.Tests -- --balance   # 重新生成 docs/balance-sheet.md（数值平衡表 + 对战模拟）
 ```
 
 云端环境没有 Unity 编辑器，客户端代码无法实际运行，只能靠测试和类型检查（UXML 至少要检查是合法的 XML），改动后要提醒开发者在本地 Unity 中试玩。
@@ -38,6 +39,6 @@ dotnet run --project tests/Starline.Battle.Tests   # 内核测试，最后一行
 - 数值和文本放 JSON 配置表，不要写死在代码里
 - 界面用 UI Toolkit：布局写 UXML、样式写 Theme.uss，C# 只负责绑定和动态内容；铺满屏幕的容器设 `picking-mode="Ignore"`
 - 内核代码目标 netstandard2.1 / C# 9（Unity 6 支持的版本）
-- 调整数值后跑测试，看平衡模拟的输出
+- 调整数值后跑测试，看平衡模拟的输出，并用 `-- --balance` 重新生成数值平衡表
 - 设计变更同步更新 `docs/game-design.md`（重大决定补进 `docs/decisions.md`）
 - 用户可见文本用中文，术语与设计文档一致（部队、法力水晶、源晶塔、远征军耐久等）

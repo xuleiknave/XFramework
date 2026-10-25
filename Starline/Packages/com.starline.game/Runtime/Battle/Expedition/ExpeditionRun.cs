@@ -282,7 +282,7 @@ namespace Starline.Expedition
 
         private string OwnedCombatUnit()
         {
-            var owned = Fleet.Ships.FindAll(s => s.Def.HasWeapon && s.Star < UnitDef.MaxStar);
+            var owned = Fleet.Ships.FindAll(s => s.Def.HasWeapon && s.Star < UnitDef.MaxMergeStar);
             return owned.Count == 0 ? null : owned[_random.Range(0, owned.Count)].UnitId;
         }
 

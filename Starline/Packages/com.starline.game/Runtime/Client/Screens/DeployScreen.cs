@@ -117,7 +117,7 @@ namespace Starline.Client
                 int id = ship.Id;
                 Button card = RosterCard(def.DisplayName + " " + Ui.Stars(ship.Star),
                     (deployed ? "已上阵" : selected ? "放置中" : "后备") + "   指挥 " + def.CommandCost,
-                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxStar ? " · 合成 " + copies + "/3" : ""),
+                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxMergeStar ? " · 合成 " + copies + "/3" : ""),
                     () =>
                     {
                         if (selected)
