@@ -10,15 +10,18 @@ using Starline.Battle;
 namespace Starline.Client
 {
     /// <summary>
-    /// Player-facing text through Unity Localization. Two string tables, both imported from
-    /// Localization/*.csv by the editor (Starline &gt; 本地化): UI for the interface and Game for
-    /// the core's <see cref="LocText"/> (unit names, story, battle messages). Placeholders are
+    /// Player-facing text through Unity Localization. Four string tables, all imported from
+    /// Localization/*.csv by the editor (Starline &gt; 本地化): UI for the interface, Game for
+    /// the core's <see cref="LocText"/> (unit names, act story, battle messages), Characters for
+    /// heroes (names, titles, skills, bios) and Story for the main campaign. Placeholders are
     /// {0}, {1}…; a language without a translation falls back to Simplified Chinese.
     /// </summary>
     public static class Loc
     {
         public const string UiTable = "UI";
         public const string GameTable = "Game";
+        public const string CharactersTable = "Characters";
+        public const string StoryTable = "Story";
         public const string SourceLanguage = "zh-Hans";
         /// <summary>In UXML, text="#key" (or tooltip="#key") is replaced with the UI table entry when the layout loads.</summary>
         public const char KeyPrefix = '#';
@@ -68,6 +71,12 @@ namespace Starline.Client
 
         /// <summary>Interface text from the UI table.</summary>
         public static string Ui(string key, params object[] args) => Get(UiTable, key, args);
+
+        /// <summary>Hero text from the Characters table, such as bio.gavin.1.</summary>
+        public static string Hero(string key, params object[] args) => Get(CharactersTable, key, args);
+
+        /// <summary>Main campaign text from the Story table, such as story.chapter.1.title.</summary>
+        public static string Story(string key, params object[] args) => Get(StoryTable, key, args);
 
         /// <summary>Text produced by the core, from the Game table.</summary>
         public static string T(LocText text) => text.IsEmpty ? string.Empty : Get(GameTable, text.Key, Resolve(text.Args));

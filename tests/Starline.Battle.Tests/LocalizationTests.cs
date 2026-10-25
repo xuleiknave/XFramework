@@ -14,7 +14,7 @@ namespace Starline.Battle.Tests
         /// <summary>Every row has source text, and translations use the same placeholders.</summary>
         private static void LocalizationTablesAreComplete()
         {
-            foreach (string name in new[] { "Game", "UI" })
+            foreach (string name in Fixtures.TableNames)
             {
                 LocCsv table = Fixtures.LoadTable(name);
                 Assert(table.Languages.Contains(Fixtures.SourceLanguage), name + ".csv 缺少 " + Fixtures.SourceLanguage + " 列");
@@ -44,6 +44,38 @@ namespace Starline.Battle.Tests
                 }
                 Info(name + ".csv：" + table.Rows.Count + " 条" + untranslated);
             }
+        }
+
+        /// <summary>Every hero in Characters.csv has a name and all five bio paragraphs (★1~★5).</summary>
+        private static void HeroesHaveBios()
+        {
+            var keys = new HashSet<string>();
+            var heroes = new List<string>();
+            foreach (LocCsv.Row row in Fixtures.LoadTable("Characters").Rows)
+            {
+                keys.Add(row.Key);
+                string[] parts = row.Key.Split('.');
+                if (parts.Length == 3 && parts[0] == "hero" && parts[2] == "name")
+                {
+                    heroes.Add(parts[1]);
+                }
+            }
+            foreach (string hero in heroes)
+            {
+                for (int star = 1; star <= 5; star++)
+                {
+                    Assert(keys.Contains("bio." + hero + "." + star), "Characters.csv 缺少 bio." + hero + "." + star);
+                }
+            }
+            foreach (string key in keys)
+            {
+                if (key.StartsWith("bio.") || key.StartsWith("hero."))
+                {
+                    Assert(heroes.Contains(key.Split('.')[1]), "Characters.csv 的 " + key + " 没有对应的 hero.<id>.name");
+                }
+            }
+            Assert(heroes.Count == 47, "Characters.csv 应有 45 名角色 + 2 名传说角色，现在是 " + heroes.Count);
+            Info("角色小传：" + heroes.Count + " 名角色");
         }
 
         /// <summary>Units, skills, encounters and acts in the JSON tables all have their text.</summary>

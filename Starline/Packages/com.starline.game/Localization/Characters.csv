@@ -1,0 +1,449 @@
+key,zh-Hans,en,note
+role.light.name,轻装,Light,职业
+role.heavy.name,重装,Heavy,职业
+role.flyer.name,飞骑,Flyer,职业
+role.anti_air.name,对空,Anti-Air,职业
+role.ranged.name,远程,Ranged,职业
+role.support.name,支援,Support,职业
+faction.knights.name,晨星骑士团,Order of the Morning Star,阵营
+faction.knights.theme,守护。宁可自己倒下，也不让水晶熄灭。,Guardianship. Better to fall yourself than let a crystal go dark.,阵营主题，也是它的那根线
+hero.gavin.name,加文,Gavin,晨星骑士团 · 重装
+hero.gavin.title,重甲骑士,Heavy Knight,名字后面的称号，显示为“名字 · 称号”
+hero.gavin.skill1.name,冲锋,Charge,专属技能（草案）
+hero.gavin.skill1.desc,开战后第一次攻击击退并眩晕目标,His first attack of the battle knocks back and stuns the target,
+hero.gavin.skill2.name,坚守,Stand Fast,专属技能（草案）
+hero.gavin.skill2.desc,生命低于一半时护盾回满一次,"Once, when his HP drops below half, his shield is fully restored",
+bio.gavin.1,灯塔城守备队最年轻的重甲骑士，雷恩爵士的学生。断线日那年他十九岁，是城门上第一个看到亡灵大军的人。,"The youngest heavy knight in the Lighthaven garrison, and a student of Sir Rayne. He was nineteen on Severance Day, and the first man on the gate to see the undead army coming.",小传 ★1，招募时可看
+bio.gavin.2,加文出身铁匠家，盔甲是父亲一锤一锤打的。父亲没能撑过断线日后的那个冬天，加文到现在还穿着这身补了又补的旧甲，不肯换。,"Gavin comes from a family of smiths, and his father forged his armour blow by blow. His father didn't survive the winter after Severance Day. Gavin still wears that patched old armour and refuses to replace it.",小传 ★2 解锁
+bio.gavin.3,雷恩教他的第一课是“冲锋只有一次，所以要冲在对的地方”。加文练了三年冲锋，雷恩只夸过他一回。,"The first lesson Rayne taught him was: ""You only get one charge, so charge in the right place."" Gavin practised charging for three years. Rayne praised him exactly once.",小传 ★3 解锁
+bio.gavin.4,他和卡西一起拜在雷恩门下，一个在地上，一个在天上。两人吵了很多年，谁也没服过谁，但每次出城，加文都会先抬头找那只狮鹫。,"He and Cassie trained under Rayne together, one on the ground and one in the sky. They've argued for years and neither has ever given in, but every time they ride out, Gavin looks up for that griffin first.",小传 ★4 解锁
+bio.gavin.5,雷恩爵士牺牲后，加文接过了骑士团长的佩剑。他不觉得自己配得上，所以每一仗都站在最前排：只要他还站着，身后的水晶就不会熄灭。,"After Sir Rayne fell, Gavin took up the Knight-Commander's sword. He doesn't think he deserves it, so he stands in the front row of every battle: as long as he's still standing, the crystal behind him won't go out.",小传 ★5 解锁
+hero.bran.name,布兰,Bran,晨星骑士团 · 重装
+hero.bran.title,盾卫,Shieldguard,名字后面的称号，显示为“名字 · 称号”
+hero.bran.skill1.name,盾墙,Shield Wall,专属技能（草案）
+hero.bran.skill1.desc,替身后 1 格内的角色挡下远程攻击,Blocks ranged attacks aimed at allies within 1 tile behind him,
+hero.bran.skill2.name,嘲讽,Taunt,专属技能（草案）
+hero.bran.skill2.desc,让周围敌人转而攻击自己,Makes nearby enemies attack him instead,
+bio.bran.1,灯塔城城门的守门人，扛着一面比他还宽的塔盾。城里的孩子都说，只要布兰还站在门口，亡灵就进不来。,"The gatekeeper of Lighthaven, carrying a tower shield wider than he is. The city's children say that as long as Bran stands at the gate, the undead can't get in.",小传 ★1，招募时可看
+bio.bran.2,布兰原本是码头的搬运工，力气大，话很少。断线日那晚，他用一块船板挡在一群逃难的人前面，挡了整整一夜，天亮后被雷恩爵士收进了守备队。,"Bran used to haul cargo on the docks: strong, and a man of few words. On Severance Day he held a ship's plank in front of a crowd of refugees all night long. At dawn, Sir Rayne took him into the garrison.",小传 ★2 解锁
+bio.bran.3,他那面塔盾上刻满了名字，都是他没能护住的人。每多一个名字，他就把盾举得更高一点。,"His tower shield is covered in carved names, the names of everyone he couldn't protect. With every new name, he holds the shield a little higher.",小传 ★3 解锁
+bio.bran.4,布兰说话慢，常被罗兰拿来开玩笑。他从不还嘴，只是每次罗兰被亡灵追着跑回来，他都已经站在那里等着了。,"Bran speaks slowly, and Roland loves to tease him for it. He never answers back. But every time Roland comes running back with undead on his heels, Bran is already standing there waiting.",小传 ★4 解锁
+bio.bran.5,有人问他怕不怕。布兰想了很久，说：“怕。所以要站在前面，这样后面的人就不用怕了。”,"Someone once asked him if he was afraid. Bran thought for a long time and said, ""Yes. That's why I stand in front. Then the people behind me don't have to be.""",小传 ★5 解锁
+hero.cassie.name,卡西,Cassie,晨星骑士团 · 飞骑
+hero.cassie.title,狮鹫骑士,Griffin Knight,名字后面的称号，显示为“名字 · 称号”
+hero.cassie.skill1.name,俯冲,Dive,专属技能（草案）
+hero.cassie.skill1.desc,落向敌方骨碑或水晶，造成范围伤害,"Swoops onto an enemy Bone Obelisk or crystal, dealing area damage",
+hero.cassie.skill2.name,离网飞行,Off-Web Flight,专属技能（草案）
+hero.cassie.skill2.desc,可离开魔网 10 秒,Can leave the Mana Web for 10 seconds,
+bio.cassie.1,晨星骑士团的王牌狮鹫骑士，专门飞到敌后切断亡灵的骨碑。她在战场上的喊话比谁都多，骂亡灵的词从来不重样。,"The Order of the Morning Star's ace griffin knight, who flies behind enemy lines to cut the undead's Bone Obelisks. Nobody shouts more on the battlefield than she does, and her insults for the undead never repeat.",小传 ★1，招募时可看
+bio.cassie.2,卡西是孤儿，在灯塔城的狮鹫厩里长大。她的狮鹫“疾风”是她亲手从蛋里孵出来的，比她认识的任何人都早。,"Cassie is an orphan who grew up in Lighthaven's griffin stables. Her griffin, Gale, hatched from an egg she raised herself, and she's known him longer than anyone else.",小传 ★2 解锁
+bio.cassie.3,她和加文都是雷恩的学生。雷恩说她飞得太快、想得太少；她说雷恩老了。其实她偷偷把雷恩的每一句话都记在了马鞍的皮带上。,"She and Gavin were both Rayne's students. Rayne said she flew too fast and thought too little; she said Rayne was old. In secret, she wrote down every word he said on the straps of her saddle.",小传 ★3 解锁
+bio.cassie.4,菲恩总跟在她身后，喊她“队长”。卡西嘴上嫌他烦，却在每次任务前把最安全的那条航线留给他。,"Finn follows her everywhere and calls her ""Captain"". Cassie complains that he's a pest, yet before every mission she saves the safest flight path for him.",小传 ★4 解锁
+bio.cassie.5,雷恩牺牲后，卡西一个人飞走了，去找噬魔巨龙报仇。她在废墟里飞了很多天才想明白：雷恩要她守住的不是仇恨，是天上那条还亮着的星线。她回来了。,"After Rayne fell, Cassie flew off alone to take revenge on the Manaeater Wyrm. She flew over the ruins for days before she understood: what Rayne wanted her to protect wasn't her hatred, but the Starline still shining in the sky. She came back.",小传 ★5 解锁
+hero.eileen.name,艾琳,Eileen,晨星骑士团 · 支援
+hero.eileen.title,牧师,Priest,名字后面的称号，显示为“名字 · 称号”
+hero.eileen.skill1.name,治疗术,Heal,专属技能（草案）
+hero.eileen.skill1.desc,治疗生命最低的友军,Heals the ally with the lowest HP,
+hero.eileen.skill2.name,驱散,Dispel,专属技能（草案）
+hero.eileen.skill2.desc,清除友军身上的诅咒,Removes curses from allies,
+bio.eileen.1,晨星礼拜堂的牧师，随远征军出城照顾伤员。她的治疗术需要魔网的法力，所以她总是待在法力水晶旁边。,"A priest of the Morning Star Chapel who travels with the expedition to tend the wounded. Her healing draws on the Mana Web, so she always stays close to a Mana Crystal.",小传 ★1，招募时可看
+bio.eileen.2,断线日之前，礼拜堂的晨钟每天清晨为星线祈福。艾琳是敲钟的人。钟楼在那一夜塌了，她从瓦砾里只捡回了钟锤，现在挂在她的法杖上。,"Before Severance Day, the chapel's morning bell rang every dawn in blessing of the Starline, and Eileen was the one who rang it. The bell tower fell that night. All she recovered from the rubble was the clapper, which now hangs from her staff.",小传 ★2 解锁
+bio.eileen.3,她相信亡灵身上的诅咒可以被驱散，为此和守备队的老兵吵过很多次。林大师唤醒灰爪那天，她是第一个上前替灰爪包扎伤口的人。,"She believes the curse on the undead can be lifted, and she's argued about it with the garrison veterans more times than she can count. On the day Master Lin awakened Greyclaw, she was the first to step forward and dress his wounds.",小传 ★3 解锁
+bio.eileen.4,艾琳私下照顾着城里的孤儿。小麦是断线日后被她从边境带回来的，草药的第一课就是艾琳教的。,"Eileen quietly looks after the city's orphans. She brought Wheat back from the border after Severance Day, and taught her the very first lesson in herbs.",小传 ★4 解锁
+bio.eileen.5,她说自己不是在治伤，是在把人留住。只要还有人愿意回到灯塔城，她就会一直在这里，等下一个需要她的人。,"She says she isn't healing wounds, she's keeping people here. As long as anyone still wants to come back to Lighthaven, she'll stay, waiting for the next person who needs her.",小传 ★5 解锁
+hero.cedric.name,塞德里克,Cedric,晨星骑士团 · 轻装
+hero.cedric.title,长枪手,Lancer,名字后面的称号，显示为“名字 · 称号”
+hero.cedric.skill1.name,突刺,Piercing Thrust,专属技能（草案）
+hero.cedric.skill1.desc,攻击穿透身后一格,His attacks pierce through to the tile behind the target,
+bio.cedric.1,守备队的长枪手，枪术快而准，一枪能穿透两个食尸鬼。他是骑士团里最爱干净的人，打完仗第一件事是擦枪。,"The garrison's lancer, quick and precise, able to run two ghouls through with one thrust. He's the tidiest man in the Order: the first thing he does after a fight is polish his lance.",小传 ★1，招募时可看
+bio.cedric.2,塞德里克出身落魄的贵族家庭，家里只剩一座空宅和一杆祖传的长枪。他加入守备队，是为了把家族的名字重新写回城墙上的功勋碑。,Cedric comes from a fallen noble house. All his family has left is an empty manor and an heirloom lance. He joined the garrison to write his family's name back onto the honour roll on the city wall.,小传 ★2 解锁
+bio.cedric.3,他一直想当重甲骑士，可他买不起战马，也穿不动重甲。雷恩告诉他，最好的骑士不是骑在马上的那个，是守住阵线的那个。,"He always wanted to be a heavy knight, but he can't afford a warhorse and can't move in heavy armour. Rayne told him the best knight isn't the one on horseback, it's the one who holds the line.",小传 ★3 解锁
+bio.cedric.4,他和加文同年入队，嘴上处处要和加文比，可每次加文冲锋，替他护住侧翼的总是塞德里克。,"He and Gavin joined the same year, and Cedric insists on competing with him at everything. Yet every time Gavin charges, it's Cedric guarding his flank.",小传 ★4 解锁
+bio.cedric.5,后来功勋碑重新立起来，塞德里克没有去找自己的名字。他在碑前站了很久，把雷恩的名字擦得干干净净。,"When the honour roll was finally raised again, Cedric didn't look for his own name. He stood before it for a long time and polished Rayne's name until it shone.",小传 ★5 解锁
+hero.olivia.name,奥莉薇亚,Olivia,晨星骑士团 · 支援
+hero.olivia.title,旗手,Standard-Bearer,名字后面的称号，显示为“名字 · 称号”
+hero.olivia.skill1.name,战旗,Battle Standard,专属技能（草案）
+hero.olivia.skill1.desc,插旗处 2 格内友军攻速提升,Allies within 2 tiles of her planted banner gain attack speed,
+bio.olivia.1,王国腹地一座陷落城邦的旗手。城破时她扛着城旗突围，一路跟着星线的光走到了远征军的营地。,"The standard-bearer of a fallen city-state in the Heartland. When the city fell she broke out carrying its banner, and followed the light of the Starline all the way to the expedition's camp.",小传 ★1，招募时可看
+bio.olivia.2,那面旗是她母亲缝的，上面的晨星纹章已经被烧掉了一半。奥莉薇亚说，只要旗还在，城就还在。,"Her mother sewed that banner. Half of its Morning Star crest has been burned away. Olivia says that as long as the banner survives, so does the city.",小传 ★2 解锁
+bio.olivia.3,她嗓门很大，在战场上喊口令比号角还响。士兵们说，听到奥莉薇亚的声音，手里的剑就不抖了。,"She has a huge voice, and her orders carry further than a war horn. The soldiers say that when they hear Olivia, the swords in their hands stop shaking.",小传 ★3 解锁
+bio.olivia.4,雷恩爵士守水晶枢纽的最后一夜，是奥莉薇亚把战旗插在了他身边。那面旗后来一直留在枢纽的废墟上，直到远征军回去把它取回来。,"On Sir Rayne's last night at the crystal nexus, it was Olivia who planted the war banner beside him. It stayed in the ruins of the nexus until the expedition went back to retrieve it.",小传 ★4 解锁
+bio.olivia.5,她现在扛着两面旗：一面是故乡的，一面是骑士团的。她说她要把故乡那面插回城门上，那一天，她会亲手把它交还给城里的人。,"Now she carries two banners: one from her home and one from the Order. She means to plant her home's banner over its gate again, and on that day, hand it back to her people herself.",小传 ★5 解锁
+hero.harold.name,哈罗德,Harold,晨星骑士团 · 对空
+hero.harold.title,弩炮手,Ballista Gunner,名字后面的称号，显示为“名字 · 称号”
+hero.harold.skill1.name,守城弩,Siege Ballista,专属技能（草案）
+hero.harold.skill1.desc,不移动时射程 +2 格,+2 range while not moving,
+bio.harold.1,守了一辈子城墙的老弩炮手，管着一架比他年纪还大的守城弩。他眼睛不太好，可从没射偏过一只怨灵。,"An old ballista gunner who has guarded the walls his whole life, crewing a ballista older than he is. His eyes aren't what they were, but he has never missed a wraith.",小传 ★1，招募时可看
+bio.harold.2,哈罗德年轻时和雷恩一起当兵，是少数敢叫雷恩外号的人。两人在城墙上喝了四十年的酒，吵了四十年的架。,"Harold served alongside Rayne as a young man, and he's one of the few who dared call Rayne by his nickname. The two of them drank and argued on the walls for forty years.",小传 ★2 解锁
+bio.harold.3,他的守城弩叫“老太婆”，是他亡妻的外号。哈罗德每天给它上油，跟它说话，谁都不许碰。,"His ballista is called ""the Old Girl"", which was his late wife's nickname. Harold oils it every day and talks to it, and nobody else is allowed to touch it.",小传 ★3 解锁
+bio.harold.4,他教玛塔用弩，说她是他见过最好的射手，就是脾气太急。玛塔嫌他啰嗦，可她弩上的准星是哈罗德亲手校的。,"He taught Marta the crossbow and says she's the best shot he's ever seen, just too impatient. Marta complains that he nags, but the sights on her crossbow were set by Harold himself.",小传 ★4 解锁
+bio.harold.5,雷恩走后，哈罗德没再喝过酒。他说那壶酒要留着，等星线全亮的那天，倒在雷恩的剑上，替老伙计喝一口。,"Harold hasn't touched a drink since Rayne died. He says he's saving that flask for the day the whole Starline is lit, to pour over Rayne's sword and drink one for his old friend.",小传 ★5 解锁
+hero.finn.name,菲恩,Finn,晨星骑士团 · 飞骑
+hero.finn.title,狮鹫侍从,Griffin Squire,名字后面的称号，显示为“名字 · 称号”
+hero.finn.skill1.name,护主,Guardian,专属技能（草案）
+hero.finn.skill1.desc,卡西在场时替她承受一次致命伤害,"While Cassie is on the field, takes one lethal blow in her place",
+bio.finn.1,卡西的狮鹫侍从，骑着一只还没长大的小狮鹫。他做梦都想成为和卡西一样的王牌。,"Cassie's griffin squire, riding a griffin that isn't fully grown. He dreams of becoming an ace just like her.",小传 ★1，招募时可看
+bio.finn.2,菲恩是狮鹫厩老管事的儿子，从小看着卡西一次次飞出去又飞回来。他第一次偷骑狮鹫就摔断了胳膊，卡西把他背回来，骂了他一路。,"Finn is the son of the old stablemaster, and grew up watching Cassie fly out and come back again and again. The first time he sneaked onto a griffin he broke his arm. Cassie carried him home and scolded him the whole way.",小传 ★2 解锁
+bio.finn.3,他的小狮鹫叫“栗子”，胆子比他还小，一听到怨灵的尖叫就往他怀里钻。菲恩每天陪它练飞，自己摔得满身是伤。,"His little griffin is called Chestnut, and it's even more timid than he is: one wraith's shriek and it dives into his arms. Finn practises flying with it every day and ends up covered in bruises.",小传 ★3 解锁
+bio.finn.4,卡西离队去找噬魔巨龙的那些天，菲恩一个人顶上了她的航线。他飞得不够快，但一次都没有让骨碑连上。,"In the days when Cassie left to hunt the Manaeater Wyrm, Finn took over her flight path alone. He wasn't fast enough, but he never let a single Bone Obelisk connect.",小传 ★4 解锁
+bio.finn.5,卡西回来后，第一次叫了他的名字，而不是“小鬼”。菲恩假装没在意，那天晚上他在厩里抱着栗子笑了很久。,"When Cassie came back, she called him by his name for the first time instead of ""kid"". Finn pretended not to care. That night he sat in the stables hugging Chestnut and grinning for ages.",小传 ★5 解锁
+hero.rayne.name,雷恩爵士,Sir Rayne,晨星骑士团 · 重装
+hero.rayne.title,英灵,Heroic Spirit,名字后面的称号，显示为“名字 · 称号”
+hero.rayne.skill1.name,最后的守望,Last Watch,专属技能（草案）
+hero.rayne.skill1.desc,在场时己方水晶受到的伤害减半,"While he is on the field, damage to allied crystals is halved",
+bio.rayne.1,灯塔城守备司令，晨星骑士团的老团长。他在水晶枢纽为守住水晶牺牲，诺娃把他的意识留在了水晶里。现在他以英灵的样子回到了战场上。,"Lighthaven's garrison commander and the old Knight-Commander of the Order of the Morning Star. He fell defending the crystal nexus, and Nova kept his mind within the crystal. Now he returns to the battlefield as a Heroic Spirit.",小传 ★1，招募时可看
+bio.rayne.2,断线日那年，雷恩已经五十多岁了。王国的军队一支支溃散，他带着灯塔城仅剩的几十名守军，在源晶塔下守了七天七夜，守住了星线最后的光。,"Rayne was past fifty on Severance Day. While the Kingdom's armies broke one after another, he led the few dozen soldiers left in Lighthaven and held the foot of the Source Spire for seven days and seven nights, saving the Starline's last light.",小传 ★2 解锁
+bio.rayne.3,他收过很多学生，最得意的是加文和卡西，最头疼的也是这两个。他从不当面夸他们，夸的话都说给哈罗德听。,"He trained many students. His proudest were Gavin and Cassie, and so were his biggest headaches. He never praised them to their faces; he said it all to Harold instead.",小传 ★3 解锁
+bio.rayne.4,噬魔巨龙袭击枢纽那一夜，雷恩让所有人先撤，自己留了下来。他最后说的话是：“告诉孩子们，水晶没有熄。”,"The night the Manaeater Wyrm struck the nexus, Rayne ordered everyone out and stayed behind. His last words were: ""Tell the children the crystal didn't go out.""",小传 ★4 解锁
+bio.rayne.5,留在水晶里的雷恩能看见整条星线。他说这样也挺好，终于能一直看着那两个孩子了。只是他再也喝不到哈罗德的酒了。,"From inside the crystal, Rayne can see the whole Starline. He says it isn't so bad: at last he can keep an eye on those two all the time. He just can't drink with Harold anymore.",小传 ★5 解锁
+faction.rangers.name,边境游侠会,Frontier Rangers,阵营
+faction.rangers.theme,自由。只为自己认的人拼命。,Freedom. They fight only for the people they choose.,阵营主题，也是它的那根线
+hero.roland.name,罗兰,Roland,边境游侠会 · 轻装
+hero.roland.title,游侠,Ranger,名字后面的称号，显示为“名字 · 称号”
+hero.roland.skill1.name,穿云箭,Cloudpiercer,专属技能（草案）
+hero.roland.skill1.desc,射穿一列敌人,Shoots through an entire line of enemies,
+hero.roland.skill2.name,轻身,Light Step,专属技能（草案）
+hero.roland.skill2.desc,被近战盯上时后跳一格,Leaps back one tile when targeted by a melee attacker,
+bio.roland.1,边境游侠会的游侠，跑得比谁都快，箭也射得比谁都准。他是第一个答应跟着远征军出城的游侠，理由是“城里的酒太贵了”。,"A Frontier Ranger who runs faster and shoots straighter than anyone. He was the first ranger to agree to march out with the expedition, because ""the drinks in town are too expensive"".",小传 ★1，招募时可看
+bio.roland.2,罗兰在边境的林子里长大，没进过学堂，却认得每一种鸟的叫声。他说森林会告诉你亡灵从哪里来，只要你肯听。,"Roland grew up in the border woods. He never went to school, but he knows every birdcall by heart. He says the forest will tell you where the undead are coming from, if only you're willing to listen.",小传 ★2 解锁
+bio.roland.3,他和夜莺是老相识，当年一起在游侠会接任务，一起挨骂，一起分一块干粮。直到那次任务之后，夜莺不告而别。,"He and Nightingale go way back. They took jobs from the Rangers together, got chewed out together and split their rations together. Until, after one particular job, Nightingale left without a word.",小传 ★3 解锁
+bio.roland.4,罗兰一直不相信夜莺会背叛游侠会。他找了她五年，每到一个营地都会先问一句：有没有见过一个戴黑围巾的女人。,"Roland never believed Nightingale betrayed the Rangers. He searched for her for five years, and at every camp the first thing he asked was whether anyone had seen a woman in a black scarf.",小传 ★4 解锁
+bio.roland.5,夜莺回来后，罗兰终于知道了那一夜的真相。他没有多问，只是把那块干粮又分了她一半。他说，自由不是没人管你，是有人等你回来。,"When Nightingale came back, Roland finally learned the truth about that night. He didn't ask anything more. He just split his rations with her again. Freedom, he says, isn't having no one to answer to. It's having someone waiting for you to come home.",小传 ★5 解锁
+hero.nightingale.name,夜莺,Nightingale,边境游侠会 · 轻装
+hero.nightingale.title,影刃刺客,Shadowblade Assassin,名字后面的称号，显示为“名字 · 称号”
+hero.nightingale.skill1.name,影步,Shadowstep,专属技能（草案）
+hero.nightingale.skill1.desc,开战时传送到敌方后排,Teleports into the enemy back line when battle starts,
+hero.nightingale.skill2.name,割喉,Cut Throat,专属技能（草案）
+hero.nightingale.skill2.desc,对生命低于 30% 的目标伤害翻倍,Deals double damage to targets below 30% HP,
+bio.nightingale.1,来去无声的影刃刺客，曾是游侠会的人。她在亡灵后排出现时，敌人往往还没看清她的脸就倒下了。,"A silent Shadowblade Assassin, once a Frontier Ranger. When she appears in the undead back line, her targets usually fall before they see her face.",小传 ★1，招募时可看
+bio.nightingale.2,断线日的前一年，游侠会接了一单护送任务，雇主是一个披着斗篷的法师。夜莺发现那人在偷偷收集水晶碎片，想要阻止，却被当成了叛徒。,"The year before Severance Day, the Rangers took an escort job for a cloaked mage. Nightingale caught him secretly gathering crystal shards and tried to stop him, only to be branded a traitor.",小传 ★2 解锁
+bio.nightingale.3,她没有辩解，因为她拿不出证据。她离开游侠会，独自追查那个法师的下落，一路查到了银月法师塔，查到了一个她不敢说出口的名字。,"She didn't defend herself, because she had no proof. She left the Rangers and tracked the mage alone, all the way to the Silver Moon Tower, and to a name she didn't dare say aloud.",小传 ★3 解锁
+bio.nightingale.4,她知道罗兰在找她，好几次就躲在他营地外的树上。她不敢见他，怕他问，更怕他不问。,"She knew Roland was looking for her. More than once she hid in a tree just outside his camp. She was afraid to face him, afraid he'd ask, and even more afraid he wouldn't.",小传 ★4 解锁
+bio.nightingale.5,当莫德雷德的真面目被揭开，游侠会终于为夜莺正了名。她把黑围巾留在了游侠会的旗杆上，说这一次，她要光明正大地回来。,"Once Mordred's true face was revealed, the Rangers finally cleared Nightingale's name. She left her black scarf on the Rangers' flagpole and said that this time, she'd come back openly.",小传 ★5 解锁
+hero.thorne.name,托恩,Thorne,边境游侠会 · 飞骑
+hero.thorne.title,驯兽师,Beastmaster,名字后面的称号，显示为“名字 · 称号”
+hero.thorne.skill1.name,召唤飞兽,Call Skybeast,专属技能（草案）
+hero.thorne.skill1.desc,每 8 秒放出一只小型飞兽,Releases a small flying beast every 8 seconds,
+bio.thorne.1,住在森林边缘的驯兽师，身边总跟着几只他养大的飞兽。他是少数和影歌精灵打过交道的人类。,"A beastmaster who lives at the edge of the forest, always followed by a few flying beasts he raised himself. He's one of the few humans who has ever dealt with the Shadowsong Elves.",小传 ★1，招募时可看
+bio.thorne.2,托恩小时候在林子里迷了路，被一棵会说话的老树救了出来。那棵树就是老橡。从那以后，托恩每年春天都会带着一壶蜂蜜酒去看它。,"As a boy, Thorne got lost in the woods and was led out by an old tree that could talk. That tree was Old Oak. Every spring since, Thorne has brought it a jug of mead.",小传 ★2 解锁
+bio.thorne.3,他的飞兽是他从断线日的废墟里捡回来的幼崽，有的翅膀受过伤，有的天生胆小。托恩说，没有天生没用的动物，只有没人肯等它们的人。,"His flying beasts are young ones he rescued from the ruins of Severance Day. Some have hurt wings, some were born timid. Thorne says no animal is born useless, there are only people who won't wait for them.",小传 ★3 解锁
+bio.thorne.4,远征军和精灵在迷雾森林交战时，托恩站在两边中间，手里没有武器，只有那壶蜂蜜酒。老橡认出了他，没有再往前走一步。,"When the expedition clashed with the elves in the Misty Forest, Thorne stood between the two sides holding no weapon, just that jug of mead. Old Oak recognised him and didn't take another step.",小传 ★4 解锁
+bio.thorne.5,结盟后，托恩成了人类和精灵之间的信使。他说他不在乎什么盟约，他只是不想再看到朋友和朋友打起来。,"After the alliance, Thorne became a messenger between humans and elves. He says he doesn't care about any pact. He just never wants to see friends fighting friends again.",小传 ★5 解锁
+hero.marta.name,玛塔,Marta,边境游侠会 · 对空
+hero.marta.title,弩手,Arbalist,名字后面的称号，显示为“名字 · 称号”
+hero.marta.skill1.name,箭雨,Arrow Rain,专属技能（草案）
+hero.marta.skill1.desc,对一片空域连射，专打成群的飞行单位,"Fires a volley over an area of sky, built for swarms of flying units",
+bio.marta.1,游侠会最好的弩手，专打怨灵。别人看到怨灵会躲，玛塔看到怨灵会追。,"The best arbalist in the Frontier Rangers, and a wraith hunter. Other people run from wraiths. Marta chases them.",小传 ★1，招募时可看
+bio.marta.2,玛塔的妹妹死在了断线日。那天她们在城外采浆果，一群亡灵冲了过来，玛塔拉着妹妹跑，跑到半路，手里的手只剩下了一只手套。,"Marta's little sister died on Severance Day. They were picking berries outside the town when a pack of undead charged. Marta pulled her sister along as she ran, and halfway there, all she was holding was an empty glove.",小传 ★2 解锁
+bio.marta.3,后来她听说，怨灵是死者的魂魄变的。从那天起她只打怨灵，每打落一只，都要走过去看一眼它的脸。,"Later she heard that wraiths are the souls of the dead. From that day she hunted only wraiths, and every time she shot one down, she walked over to look at its face.",小传 ★3 解锁
+bio.marta.4,她跟哈罗德学弩，嫌他啰嗦，却把他教的每一招都练了一千遍。哈罗德说她手稳心急，她说心不急就找不到人了。,"She learned the crossbow from Harold and complains that he nags, yet she has practised every trick he taught her a thousand times. Harold says her hands are steady but her heart is restless. She says that without a restless heart, she'd never find anyone.",小传 ★4 解锁
+bio.marta.5,玛塔终于在一群怨灵里认出了低语。她举着弩站了很久，最后放下弩，像小时候一样叫了一声妹妹的名字。,"At last, Marta recognised Whisper among a swarm of wraiths. She stood there with her crossbow raised for a long time. Then she lowered it, and called her sister's name the way she did when they were small.",小传 ★5 解锁
+hero.beth.name,贝丝,Beth,边境游侠会 · 支援
+hero.beth.title,陷阱师,Trapper,名字后面的称号，显示为“名字 · 称号”
+hero.beth.skill1.name,捕兽夹,Bear Trap,专属技能（草案）
+hero.beth.skill1.desc,开战前在前排埋下陷阱，定身踩中的敌人,"Lays traps in the front row before battle, rooting enemies who step on them",
+bio.beth.1,游侠会的陷阱师，开战前就在前排埋好了捕兽夹。踩中的亡灵动不了，只能干瞪着眼看箭飞过来。,"The Rangers' trapper, who has her bear traps set in the front row before the fighting even starts. Any undead that steps in one is stuck there, glaring, as the arrows fly in.",小传 ★1，招募时可看
+bio.beth.2,贝丝原来是边境村子里的猎户，专抓狐狸和野兔。亡灵来了以后，她发现食尸鬼比狐狸好骗多了。,"Beth used to be a hunter in a border village, trapping foxes and hares. When the undead came, she found ghouls were much easier to fool than foxes.",小传 ★2 解锁
+bio.beth.3,她的陷阱都是自己做的，用的是废墟里捡来的铁片和弓弦。她给每个陷阱都起了名字，最得意的那个叫“晚饭”。,"She makes all her traps herself from scrap iron and bowstrings salvaged from the ruins. Every trap has a name. Her favourite is called ""Supper"".",小传 ★3 解锁
+bio.beth.4,杜克是她的老搭档，一个埋陷阱，一个扔石头。两人一起端掉过一整座骨碑，回来后为了谁的功劳大吵了三天。,"Duke is her old partner: she sets the traps, he throws the rocks. The two of them once took down a whole Bone Obelisk together, then argued for three days about whose credit it was.",小传 ★4 解锁
+bio.beth.5,贝丝说她不想当英雄，只想回村子里继续抓兔子。可她把回村的路线图画了一遍又一遍，每次都多画上一颗重新亮起来的水晶。,"Beth says she doesn't want to be a hero, she just wants to go home and trap hares again. But she has drawn the map of the road home over and over, and every time she adds one more crystal that's been lit again.",小传 ★5 解锁
+hero.grey.name,格雷,Grey,边境游侠会 · 远程
+hero.grey.title,猎人,Hunter,名字后面的称号，显示为“名字 · 称号”
+hero.grey.skill1.name,标记猎物,Mark Prey,专属技能（草案）
+hero.grey.skill1.desc,被标记的目标受到的伤害 +20%,Marked targets take +20% damage,
+bio.grey.1,头发花白的老猎人，弓不快，但每一箭都落在猎物最疼的地方。被他标记过的亡灵，很少能活着走出射程。,"A grey-haired old hunter. His bow isn't fast, but every arrow lands where it hurts most. Few undead he marks make it out of his range alive.",小传 ★1，招募时可看
+bio.grey.2,格雷在边境打了四十年猎，是游侠会资格最老的人。年轻的游侠都叫他“老灰”，他从来不纠正。,"Grey has hunted the border for forty years and is the oldest hand in the Frontier Rangers. The young rangers call him ""Old Grey"", and he never corrects them.",小传 ★2 解锁
+bio.grey.3,他有个儿子，断线日那年在王国腹地当兵，再也没有回来。格雷不相信儿子死了，他说没见到尸首，就是还在路上。,"He had a son who was a soldier in the Heartland on Severance Day and never came home. Grey doesn't believe his son is dead. He says that until he sees a body, the boy is still on his way.",小传 ★3 解锁
+bio.grey.4,他教罗兰看脚印、听风声，罗兰是他最好的学生，也是最不听话的那个。格雷说这样才对，听话的游侠活不长。,He taught Roland to read tracks and listen to the wind. Roland is his best student and also his least obedient. Grey says that's how it should be: obedient rangers don't live long.,小传 ★4 解锁
+bio.grey.5,第二幕里，格雷在被唤醒的亡灵中找过儿子的脸，没有找到。他把儿子的旧弓弦缠在了自己的弓上，说这样，儿子也算跟着他一起打回去了。,"In Act II, Grey searched the faces of the awakened undead for his son, and didn't find him. He wound his son's old bowstring around his own bow, so that his son, too, is marching back with him.",小传 ★5 解锁
+hero.wheat.name,小麦,Wheat,边境游侠会 · 支援
+hero.wheat.title,草药师,Herbalist,名字后面的称号，显示为“名字 · 称号”
+hero.wheat.skill1.name,药草包,Herb Pouch,专属技能（草案）
+hero.wheat.skill1.desc,每 10 秒给周围友军回复生命,Restores HP to nearby allies every 10 seconds,
+bio.wheat.1,边境村子里的草药师，背着一个比她还大的药草包。她的药闻起来很苦，但伤员们都抢着要。,"A herbalist from a border village, carrying an herb pouch bigger than she is. Her medicine smells bitter, but the wounded all fight over it.",小传 ★1，招募时可看
+bio.wheat.2,小麦在边境的磨坊村长大，断线日后成了孤儿，被艾琳带回灯塔城的礼拜堂。她认的第一种草药是艾琳教的，第二种是她小时候在磨坊后面的小溪边自己找到的。,"Wheat grew up in a border mill village and was orphaned on Severance Day. Eileen brought her back to the chapel in Lighthaven. The first herb she ever learned was taught by Eileen. The second she found herself, by the stream behind the mill when she was little.",小传 ★2 解锁
+bio.wheat.3,她小时候最喜欢去村口的磨坊，磨坊主汤姆大叔是个大胖子，总会偷偷塞给她一块刚出炉的面包。断线日之后，磨坊空了，汤姆大叔也不见了。,"As a child, her favourite place was the mill at the edge of the village. The miller, Uncle Tom, was a big fat man who always slipped her a loaf fresh from the oven. After Severance Day the mill stood empty, and Uncle Tom was gone.",小传 ★3 解锁
+bio.wheat.4,小麦第一次见到憎恶胖汤姆时吓得哭了出来。可它没有攻击她，只是站在那里，喉咙里发出很低的声音，像在叫一个名字。,"The first time Wheat saw the Abomination Big Tom, she burst into tears. But it didn't attack her. It just stood there, making a low sound in its throat, as if it were calling a name.",小传 ★4 解锁
+bio.wheat.5,胖汤姆被唤醒后，小麦每天给它换药，给它讲磨坊后来的事。她说她想把磨坊修好，再请汤姆大叔烤一次面包，这次换她来给他留一块。,"After Big Tom was awakened, Wheat changed his bandages every day and told him what happened to the mill. She wants to fix the mill and ask Uncle Tom to bake bread one more time, and this time she'll be the one saving a loaf for him.",小传 ★5 解锁
+hero.duke.name,杜克,Duke,边境游侠会 · 远程
+hero.duke.title,投石手,Slinger,名字后面的称号，显示为“名字 · 称号”
+hero.duke.skill1.name,碎石,Shatterstone,专属技能（草案）
+hero.duke.skill1.desc,落点溅射，对建筑伤害加倍,"Splashes damage where it lands, double damage to structures",
+bio.duke.1,力气大、嗓门更大的投石手，一块石头能砸塌一座骨碑。他说魔法太贵，石头遍地都是。,"A slinger with a strong arm and an even louder voice, who can bring down a Bone Obelisk with one rock. He says magic is expensive and rocks are everywhere.",小传 ★1，招募时可看
+bio.duke.2,杜克原来是采石场的工头，断线日后采石场成了亡灵的巢穴。他带着工人们用石头砸了三天三夜，最后只剩他一个人走出来。,"Duke used to be a quarry foreman. After Severance Day the quarry became an undead nest. He and his workers fought back with rocks for three days and nights, and he was the only one who walked out.",小传 ★2 解锁
+bio.duke.3,他有一本破本子，记着每一块砸碎的骨碑。本子上的数字越来越大，他说等写满了，就拿去换一桶酒。,"He keeps a battered notebook tallying every Bone Obelisk he's smashed. The number keeps growing. He says when the book is full, he'll trade it for a barrel of ale.",小传 ★3 解锁
+bio.duke.4,他和贝丝是老搭档，一个埋陷阱，一个扔石头，吵了一辈子也没散伙。贝丝说杜克笨，杜克说贝丝的陷阱有一半是他背的。,"He and Beth are old partners: she sets the traps, he throws the rocks. They've bickered their whole lives and never split up. Beth says Duke is thick; Duke says he carried half of Beth's traps.",小传 ★4 解锁
+bio.duke.5,杜克想在灯塔城外重建采石场，用砸碎的骨碑垒一座纪念碑，纪念那些没走出来的工人。本子写满了，那桶酒他一直没去换。,Duke wants to rebuild the quarry outside Lighthaven and use the smashed Bone Obelisks to raise a memorial to the workers who never made it out. The notebook is full now. He still hasn't traded it for that barrel.,小传 ★5 解锁
+hero.john.name,约翰,John,边境游侠会 · 远程
+hero.john.title,神射手,Marksman,名字后面的称号，显示为“名字 · 称号”
+hero.john.skill1.name,远瞄,Long Aim,专属技能（草案）
+hero.john.skill1.desc,射程全场最远，攻击很慢,"The longest range on the field, but a very slow attack",
+bio.john.1,游侠会的神射手，射程全场最远，一箭要瞄很久。别人说他慢，他说亡灵又跑不了。,"The Rangers' marksman, with the longest range on the field. Every shot takes him ages to line up. People say he's slow; he says the undead aren't going anywhere.",小传 ★1，招募时可看
+bio.john.2,约翰话少得出奇，一天说不了十句。游侠们打赌谁能让他笑出来，赌了三年，没人赢过。,"John talks astonishingly little, fewer than ten sentences a day. The rangers have bet for three years on who can make him laugh. Nobody has won.",小传 ★2 解锁
+bio.john.3,他曾是王国猎苑的守林人，专为贵族看守猎场。断线日后猎苑荒了，他带着一张长弓和一壶箭，独自走到了边境。,"He was once a warden of the royal hunting grounds, keeping the game for the nobility. After Severance Day the grounds went wild, and he walked to the border alone with a longbow and a quiver of arrows.",小传 ★3 解锁
+bio.john.4,他和格雷是游侠会里仅有的两个能射中三百步外怨灵的人。两人从不比试，但每次一起出任务，都会默契地分好左右。,"He and Grey are the only two Rangers who can hit a wraith at three hundred paces. They never compete, but on every mission together they split left and right without a word.",小传 ★4 解锁
+bio.john.5,他亲手守住的第一颗水晶重新亮起来的时候，约翰笑了。他说那光比他见过的任何猎物都好看，值得等。,"When the first crystal he guarded himself lit up again, John smiled. He said that light was more beautiful than any quarry he'd ever seen. Worth the wait.",小传 ★5 解锁
+faction.mages.name,银月法师塔,Silver Moon Tower,阵营
+faction.mages.theme,知识。力量来自理解，也会被它反噬。,"Knowledge. Power comes from understanding, and understanding can turn on you.",阵营主题，也是它的那根线
+hero.celine.name,赛琳,Celine,银月法师塔 · 远程
+hero.celine.title,奥术法师,Arcane Mage,名字后面的称号，显示为“名字 · 称号”
+hero.celine.skill1.name,奥术飞弹,Arcane Missiles,专属技能（草案）
+hero.celine.skill1.desc,超远射程轰击,Bombardment from extreme range,
+hero.celine.skill2.name,法力涌动,Mana Surge,专属技能（草案）
+hero.celine.skill2.desc,接入魔网时法力恢复加倍,Mana regeneration doubles while linked to the Mana Web,
+bio.celine.1,银月法师塔的年轻奥术法师，奥术飞弹的射程是全塔第一。她被困在法师塔里，是远征军把她救了出来。,A young arcane mage of the Silver Moon Tower whose Arcane Missiles have the longest range in the Tower. She was trapped inside the Tower until the expedition rescued her.,小传 ★1，招募时可看
+bio.celine.2,赛琳是法师塔里出了名的怪人，别人在研究法术，她在研究怎么用法术造东西。她的房间里堆满了齿轮、水晶和半成品的魔像零件。,"Celine is the Tower's famous oddball. While others study spells, she studies how to build things with them. Her room is piled with gears, crystals and half-finished golem parts.",小传 ★2 解锁
+bio.celine.3,断线日后，法师塔被亡灵围困，半数法师失踪。赛琳用实验室里所有的材料造出了铁砧，靠它守住了塔的大门。,"After Severance Day, the Tower was besieged by the undead and half its mages vanished. Celine used every material in her workshop to build Anvil, and with him she held the Tower's gate.",小传 ★3 解锁
+bio.celine.4,她一直在找自己失踪的导师，找来找去，却找到了莫德雷德留下的笔记。她第一个看懂了那些笔记，也第一个害怕了。,"She kept searching for her missing mentor, and instead found the notes Mordred left behind. She was the first to understand them, and the first to be afraid.",小传 ★4 解锁
+bio.celine.5,赛琳说，莫德雷德错在只想占有法力，没想过理解它。她要把星线的原理写成一本谁都能读懂的书，让下一个莫德雷德不再出现。,"Celine says Mordred's mistake was wanting to possess mana without ever trying to understand it. She means to write the principles of the Starline into a book anyone can read, so there will never be another Mordred.",小传 ★5 解锁
+hero.zane.name,泽恩,Zane,银月法师塔 · 对空
+hero.zane.title,风暴法师,Storm Mage,名字后面的称号，显示为“名字 · 称号”
+hero.zane.skill1.name,连锁闪电,Chain Lightning,专属技能（草案）
+hero.zane.skill1.desc,在最多 4 个飞行单位之间跳跃,Jumps between up to 4 flying units,
+bio.zane.1,银月法师塔的风暴法师，召唤的闪电能在一群怨灵之间跳来跳去。他总是站在高处，衣服永远被风吹得乱七八糟。,"A storm mage of the Silver Moon Tower whose lightning leaps from wraith to wraith. He always stands somewhere high, and his robes are always a wind-whipped mess.",小传 ★1，招募时可看
+bio.zane.2,泽恩是法师塔里最骄傲的学徒，十六岁就学会了连锁闪电。他觉得自己天下第一，直到断线日那天，他的闪电一只亡灵都没能拦住。,"Zane was the proudest apprentice in the Tower. He mastered Chain Lightning at sixteen and thought he was the best in the world, until Severance Day, when his lightning couldn't stop a single undead.",小传 ★2 解锁
+bio.zane.3,那一夜之后，他把自己关在塔顶整整一年，每天对着天空练习。他说他不是在练法术，是在练怎么不再输。,"After that night he shut himself in the top of the Tower for a whole year, practising at the sky every day. He says he wasn't training his magic, he was training himself never to lose again.",小传 ★3 解锁
+bio.zane.4,他和赛琳从小一起在塔里长大，一直暗暗较劲。他嘲笑她造的魔像笨重，可每次铁砧坏了，最先跑来帮忙的也是他。,"He and Celine grew up in the Tower together and have been quietly competing ever since. He mocks her golems for being clunky, yet whenever Anvil breaks down, he's the first one there to help.",小传 ★4 解锁
+bio.zane.5,后来泽恩不再站在最高的地方了。他说站在大家身边，闪电才知道该劈向哪里。,"Later, Zane stopped standing in the highest place. He says that standing beside everyone else, his lightning knows where to strike.",小传 ★5 解锁
+hero.mona.name,莫娜,Mona,银月法师塔 · 支援
+hero.mona.title,咒术师,Hexer,名字后面的称号，显示为“名字 · 称号”
+hero.mona.skill1.name,断网咒,Severing Hex,专属技能（草案）
+hero.mona.skill1.desc,让一段敌方魔网连线失效 6 秒,Disables a stretch of enemy Mana Web link for 6 seconds,
+bio.mona.1,研究诅咒的咒术师，能让一段敌方魔网连线失效。她念咒的声音很轻，听到的人都会起鸡皮疙瘩。,A hexer who studies curses and can shut down a stretch of the enemy's Mana Web. She chants so softly that anyone who hears it gets goosebumps.,小传 ★1，招募时可看
+bio.mona.2,在法师塔里，咒术一直被当成旁门左道。莫娜因为研究亡灵的骨碑，被塔里的长老赶了出去。,"At the Silver Moon Tower, hexes were always considered a dubious art. Mona was thrown out by the Tower's elders for studying the undead's Bone Obelisks.",小传 ★2 解锁
+bio.mona.3,她在饥饿的城邦里独自生活了很久，靠拆解骨碑上的咒文活了下来。她是第一个发现亡灵在吞食水晶、而且越吃越强的人。,"She lived alone in the Hungering City for a long time, surviving by unpicking the curses on Bone Obelisks. She was the first to discover that the undead were devouring crystals, and growing stronger the more they ate.",小传 ★3 解锁
+bio.mona.4,维克多和她互相看不顺眼，一个说对方是叛徒，一个说对方是怪胎。可两人凑在一起研究唤醒亡灵的方法，进展比林大师一个人快了三倍。,"She and Victor can't stand each other: one calls the other a traitor, the other calls her a freak. Yet working together on how to awaken the undead, they made progress three times faster than Master Lin alone.",小传 ★4 解锁
+bio.mona.5,法师塔重新接纳莫娜那天，长老们请她回去教书。她答应了，第一堂课的题目是：“为什么你们不肯学的东西，往往是最该学的。”,"The day the Tower took Mona back, the elders asked her to teach. She agreed. The title of her first lecture was: ""Why the things you refuse to learn are so often the ones you most need to.""",小传 ★5 解锁
+hero.anvil.name,铁砧,Anvil,银月法师塔 · 重装
+hero.anvil.title,攻城魔像,Siege Golem,名字后面的称号，显示为“名字 · 称号”
+hero.anvil.skill1.name,攻城重拳,Siege Fist,专属技能（草案）
+hero.anvil.skill1.desc,对建筑和魔网节点伤害 ×3,×3 damage to structures and Mana Web nodes,
+bio.anvil.1,赛琳亲手造的攻城魔像，一拳能砸碎骨碑。它只听赛琳一个人的话。,"A siege golem Celine built with her own hands, able to shatter a Bone Obelisk with one punch. He obeys no one but Celine.",小传 ★1，招募时可看
+bio.anvil.2,铁砧的身体是法师塔的铁门和实验室的工作台拼起来的，胸口嵌着一颗赛琳省吃俭用买来的法力水晶。它的名字来自赛琳垫在实验台上的那块铁砧。,"Anvil's body is pieced together from the Tower's iron doors and her workshop benches, and set in his chest is a Mana Crystal Celine scrimped and saved to buy. He's named after the anvil she propped on her workbench.",小传 ★2 解锁
+bio.anvil.3,它不会说话，只会发出低沉的嗡嗡声。赛琳说她听得懂，开心是短的，难过是长的。,"He can't speak, only hum, deep and low. Celine says she understands him: short hums are happy, long ones are sad.",小传 ★3 解锁
+bio.anvil.4,法师塔被围的那些天，铁砧一直守在门口，被亡灵砸掉了一条胳膊也没退后一步。赛琳哭着给它装新胳膊，它嗡嗡了很久，很短很短的那种。,"Through the days of the siege, Anvil stood guard at the gate, and didn't step back even when the undead tore off one of his arms. Celine cried as she fitted him with a new one, and he hummed for a long time, very short hums.",小传 ★4 解锁
+bio.anvil.5,有一天，铁砧第一次没等赛琳下令，自己挡在了一个孩子前面。赛琳愣了很久，说她好像造出了一个比自己还勇敢的东西。,"One day, for the first time, Anvil didn't wait for Celine's order. He stepped in front of a child on his own. Celine stared for a long while, and said she seemed to have built something braver than herself.",小传 ★5 解锁
+hero.owen.name,欧文,Owen,银月法师塔 · 远程
+hero.owen.title,炎术士,Pyromancer,名字后面的称号，显示为“名字 · 称号”
+hero.owen.skill1.name,火墙,Firewall,专属技能（草案）
+hero.owen.skill1.desc,在一条格线上燃起火焰，持续伤害,"Sets a grid line ablaze, dealing damage over time",
+bio.owen.1,脾气和法术一样火爆的炎术士，一出手就是一整面火墙。亡灵最怕火，所以他在亡灵面前一直很神气。,"A pyromancer whose temper is as fiery as his spells, conjuring a whole wall of flame at a time. The undead fear fire above all, so he always struts in front of them.",小传 ★1，招募时可看
+bio.owen.2,欧文是饥饿的城邦里土生土长的法师学徒，城邦陷落时他躲在地窖里，用一根蜡烛的火苗练了半年法术。,Owen is a mage's apprentice born and raised in the Hungering City. When it fell he hid in a cellar and practised magic on a single candle flame for half a year.,小传 ★2 解锁
+bio.owen.3,他点起的第一面火墙，挡住了一整群扑向地窖的亡灵。那天他救了二十个人，也烧掉了他家的房子。,"The first firewall he ever raised stopped a whole pack of undead charging the cellar. He saved twenty people that day, and burned his own house down.",小传 ★3 解锁
+bio.owen.4,他和苏菲是一对冤家，一个玩火，一个玩冰，在一起时总能把实验室弄得又湿又焦。他嘴上说她碍事，却总在她身边留出一条退路。,"He and Sophie are natural rivals, one playing with fire, the other with ice, and together they always leave the workshop both soaked and scorched. He says she's in the way, but he always leaves her an escape route.",小传 ★4 解锁
+bio.owen.5,欧文说火能烧掉一切，也能照亮一切。等星线亮起来，他要回城邦，在广场上放一场最大的烟花，告诉所有人：这里有人活下来了。,"Owen says fire can burn anything away, and light anything up. Once the Starline shines again, he'll go back to his city and set off the biggest fireworks in the square, to tell everyone: people survived here.",小传 ★5 解锁
+hero.sophie.name,苏菲,Sophie,银月法师塔 · 远程
+hero.sophie.title,冰霜法师,Frost Mage,名字后面的称号，显示为“名字 · 称号”
+hero.sophie.skill1.name,冰霜新星,Frost Nova,专属技能（草案）
+hero.sophie.skill1.desc,减速周围敌人,Slows nearby enemies,
+bio.sophie.1,银月法师塔的冰霜法师，冷静得像她的法术一样。她释放冰霜新星时，周围的亡灵都会慢下来。,"A frost mage of the Silver Moon Tower, as calm as her magic. When she casts Frost Nova, every undead around her slows to a crawl.",小传 ★1，招募时可看
+bio.sophie.2,苏菲是阿尔德大法师最小的学生，被塔里的人叫作“小冰块”。她不爱笑，但会记住每个人喜欢喝什么茶。,"Sophie is Archmage Alder's youngest student, nicknamed ""Little Ice Cube"" in the Tower. She rarely smiles, but she remembers what tea everyone likes.",小传 ★2 解锁
+bio.sophie.3,法师塔被围时，她用冰墙封住了藏书馆的大门，保住了塔里一半的典籍。她说书比人重要，说完又第一个冲出去救人。,"During the siege, she sealed the library doors with a wall of ice and saved half the Tower's books. She said books matter more than people, then was the first to run out and save someone.",小传 ★3 解锁
+bio.sophie.4,她和欧文吵架从来不赢，因为她吵架的时候会结巴。后来她学会了不说话，直接把欧文的茶冻成冰块。,"She never wins an argument with Owen, because she stutters when she argues. So she learned to skip the talking and just freeze his tea solid.",小传 ★4 解锁
+bio.sophie.5,阿尔德说出莫德雷德的秘密之后，苏菲是唯一一个去安慰他的学生。她说老师有错，但老师也在改，这就够了。,"After Alder revealed Mordred's secret, Sophie was the only student who went to comfort him. She said her teacher had done wrong, but he was trying to set it right, and that was enough.",小传 ★5 解锁
+hero.alder.name,阿尔德,Alder,银月法师塔 · 支援
+hero.alder.title,大法师,Archmage,名字后面的称号，显示为“名字 · 称号”
+hero.alder.skill1.name,法力潮汐,Mana Tide,专属技能（草案）
+hero.alder.skill1.desc,全体友军法力回复一次,Restores mana to all allies once,
+bio.alder.1,银月法师塔的大法师，能让全体友军的法力回复一次。他被困在塔顶，和赛琳一起被远征军救了出来。,"The Archmage of the Silver Moon Tower, able to restore every ally's mana at once. He was trapped at the top of the Tower and rescued by the expedition along with Celine.",小传 ★1，招募时可看
+bio.alder.2,阿尔德年轻时是莫德雷德最得意的学生，跟着老师研究星线的原理。他是第一个知道封印在衰竭的人，也知道老师打算独自去撑住它。他劝过一次，然后选择了沉默。,"As a young man Alder was Mordred's favourite student, researching the principles of the Starline at his side. He was the first to learn the seal was failing, and knew his teacher meant to hold it up alone. He tried to talk him out of it once, then chose silence.",小传 ★2 解锁
+bio.alder.3,断线日那天，他看着莫德雷德打开初源水晶，没能阻止。从那天起，他把自己关在塔顶，用余生去研究怎么修补老师留下的裂缝。,"On Severance Day he watched Mordred open the Prime Crystal and couldn't stop him. From that day on he shut himself in the top of the Tower, spending the rest of his life trying to mend the crack his teacher left behind.",小传 ★3 解锁
+bio.alder.4,他一直不敢说出真相，直到雷恩爵士牺牲的那一夜。他对着雷恩留下的水晶，第一次说出了老师当年真正想做的事：不是为了永生，是想一个人扛下整道封印。,"He never dared tell the truth, until the night Sir Rayne fell. Facing the crystal that held Rayne, he finally said what his teacher had really meant to do: not to live forever, but to carry the whole seal on his own.",小传 ★4 解锁
+bio.alder.5,阿尔德说，他这辈子最大的错误不是跟错了老师，而是在该开口的时候闭了嘴。决战前，他请求和莫德雷德说最后一次话，不是为了打败他，是为了把当年没说的话说完。,"Alder says his greatest mistake wasn't following the wrong teacher, it was keeping quiet when he should have spoken. Before the final battle, he asked to speak to Mordred one last time, not to defeat him, but to finish what he never said.",小传 ★5 解锁
+hero.glimmer.name,微光,Glimmer,银月法师塔 · 轻装
+hero.glimmer.title,水晶傀儡,Crystal Puppet,名字后面的称号，显示为“名字 · 称号”
+hero.glimmer.skill1.name,折光,Refraction,专属技能（草案）
+hero.glimmer.skill1.desc,被远程攻击时有几率反弹,Has a chance to reflect ranged attacks,
+bio.glimmer.1,用法力水晶碎片拼成的傀儡，身体会折射光线，被远程攻击时有时能把攻击反弹回去。它总是一闪一闪的。,"A puppet pieced together from Mana Crystal shards. Its body refracts light, and sometimes it bounces ranged attacks back. It's always flickering.",小传 ★1，招募时可看
+bio.glimmer.2,微光是在水晶枢纽的碎晶堆里被发现的，没人知道是谁造了它。它的核心是一颗被亡灵啃了一半的水晶，却还在发光。,"Glimmer was found in a heap of crystal shards at the nexus, and nobody knows who made it. Its core is a crystal half-gnawed by the undead, yet it still glows.",小传 ★2 解锁
+bio.glimmer.3,它不会说话，但会模仿。它学罗兰走路，学泽恩站在高处，学小麦哼歌，学得很像，也很难听。,"It can't speak, but it imitates. It copies Roland's walk, Zane standing somewhere high, Wheat humming. The imitations are very good, and very off-key.",小传 ★3 解锁
+bio.glimmer.4,诺娃说，微光的水晶里有星线留下的一点点记忆。它会在夜里对着远处亮起来的水晶闪光，像在和它们打招呼。,"Nova says Glimmer's crystal holds a tiny fragment of the Starline's memory. At night it flashes at distant crystals as they light up, as if saying hello.",小传 ★4 解锁
+bio.glimmer.5,星线一段段亮起来，微光身上的裂痕也一点点愈合了。有一天它停止了闪烁，发出了一道稳定的光。赛琳说，它大概终于想起来自己是谁了。,"As the Starline lit up stretch by stretch, the cracks in Glimmer slowly healed. One day it stopped flickering and gave off a steady light. Celine says it probably finally remembered who it is.",小传 ★5 解锁
+hero.kalan.name,卡兰,Kalan,银月法师塔 · 重装
+hero.kalan.title,秘法骑士,Spellblade Knight,名字后面的称号，显示为“名字 · 称号”
+hero.kalan.skill1.name,法盾,Arcane Shield,专属技能（草案）
+hero.kalan.skill1.desc,护盾按己方魔网节点数加厚,His shield grows thicker with each allied Mana Web node,
+bio.kalan.1,银月法师塔的守卫骑士，既会剑术也会法术。他的护盾会随着魔网节点的增多变厚，站在水晶旁边的他几乎打不穿。,"A guardian knight of the Silver Moon Tower, trained in both sword and spell. His shield thickens as the Mana Web grows, and standing beside a crystal he's nearly impossible to break.",小传 ★1，招募时可看
+bio.kalan.2,卡兰是法师塔历史上少有的“半吊子”：剑术不如骑士，法术不如法师。他用了二十年证明，半吊子也能守住一座塔。,"Kalan is one of the Tower's rare ""dabblers"": a worse swordsman than a knight, a worse caster than a mage. He spent twenty years proving that a dabbler can still hold a tower.",小传 ★2 解锁
+bio.kalan.3,断线日后，他带着十二名护卫守在法师塔的大门外，最后只剩下他一个。他把十二把剑插在塔门前，说这是他的十二道护盾。,"After Severance Day he held the Tower's gate with twelve guards, until he was the only one left. He planted their twelve swords before the gate and called them his twelve shields.",小传 ★3 解锁
+bio.kalan.4,他和加文一见面就成了朋友，两人比剑比到天黑，谁也没赢。加文说他是法师里最像骑士的，他说加文是骑士里最不像法师的，两人都当成了夸奖。,"He and Gavin became friends the moment they met, and duelled until dark without either winning. Gavin says Kalan is the most knightly of mages; Kalan says Gavin is the least magelike of knights. Both took it as a compliment.",小传 ★4 解锁
+bio.kalan.5,星线修复后，卡兰想把骑士团和法师塔合在一起，开一所既教剑也教法的学校。他说这样以后就不会再有“半吊子”这个词了。,"Once the Starline is restored, Kalan wants to join the Order and the Tower into one school that teaches both sword and spell. Then, he says, no one will ever need the word ""dabbler"" again.",小传 ★5 解锁
+faction.undead.name,亡灵,The Undead,阵营
+faction.undead.theme,救赎。想起自己是谁，就能选择站在哪一边。,"Redemption. Remember who you are, and you can choose your side.",阵营主题，也是它的那根线
+hero.greyclaw.name,灰爪,Greyclaw,亡灵 · 轻装
+hero.greyclaw.title,食尸鬼,Ghoul,名字后面的称号，显示为“名字 · 称号”
+hero.greyclaw.skill1.name,撕咬,Rend,专属技能（草案）
+hero.greyclaw.skill1.desc,攻击使目标流血,Attacks make the target bleed,
+bio.greyclaw.1,第一个被林大师唤醒的亡灵。它的爪子又长又利，咬一口能让人流血不止。被唤醒后，它站在了远征军这边。,"The first undead Master Lin awakened. His claws are long and sharp, and one bite leaves a wound that won't stop bleeding. Once awakened, he stood with the expedition.",小传 ★1，招募时可看
+bio.greyclaw.2,灰爪生前是骸骨要塞所在城邦的一名守军斥候，跑得最快，总是第一个冲出城门报信。断线日那天，他没能跑回城里。,"In life, Greyclaw was a scout in the garrison of the city-state where the Ossuary Fortress now stands. He was the fastest runner, always first out the gate with a message. On Severance Day, he never made it back inside.",小传 ★2 解锁
+bio.greyclaw.3,被唤醒时，他想起的第一件事不是自己的名字，而是一扇门：他一直想跑回去，却怎么也跑不到的那扇门。,"When he was awakened, the first thing he remembered wasn't his name, but a door: the door he kept trying to run back to and could never reach.",小传 ★3 解锁
+bio.greyclaw.4,林大师给他起名叫“灰爪”，因为他想不起原来的名字。艾琳给他包扎伤口时，他第一次说了话：“谢谢。”,"Master Lin named him Greyclaw because he couldn't remember his old name. When Eileen dressed his wounds, he spoke for the first time: ""Thank you.""",小传 ★4 解锁
+bio.greyclaw.5,灰爪后来想起了自己的名字，可他没有改回去。他说那个名字属于没跑回去的那个人，现在的他，是终于跑回来的那个。,"Greyclaw did remember his name in the end, but he didn't take it back. He says that name belongs to the man who didn't make it home. Now he's the one who finally did.",小传 ★5 解锁
+hero.big_tom.name,胖汤姆,Big Tom,亡灵 · 重装
+hero.big_tom.title,憎恶,Abomination,名字后面的称号，显示为“名字 · 称号”
+hero.big_tom.skill1.name,钩锁,Grappling Hook,专属技能（草案）
+hero.big_tom.skill1.desc,把远处的敌人拉到身前,Drags a distant enemy right up to him,
+bio.big_tom.1,体型巨大的憎恶，能用钩锁把远处的敌人拉到身前。被唤醒后，它是远征军里最结实的一堵墙。,"A colossal abomination who can hook distant enemies and drag them close. Once awakened, he's the sturdiest wall the expedition has.",小传 ★1，招募时可看
+bio.big_tom.2,胖汤姆生前是边境村口的磨坊主，胖胖的，爱笑，烤的面包全村最香。孩子们都喜欢去他的磨坊玩，他总会偷偷塞给他们一块面包。,"In life, Big Tom was the miller at the edge of a border village: round, cheerful, and baker of the best bread in the village. The children loved playing at his mill, and he always slipped them a loaf.",小传 ★2 解锁
+bio.big_tom.3,断线日那天，他把村里的孩子们都藏进了磨坊的地窖里，自己守在门口。孩子们活下来了，小麦也在其中。他没有。,"On Severance Day he hid all the village children in the mill's cellar and guarded the door himself. The children lived, and Wheat was one of them. He didn't.",小传 ★3 解锁
+bio.big_tom.4,变成憎恶后，他什么都不记得了，只是一直在磨坊附近徘徊。直到小麦站在他面前，叫了一声“汤姆大叔”。,"As an abomination he remembered nothing, only wandered around the mill. Until Wheat stood in front of him and said, ""Uncle Tom.""",小传 ★4 解锁
+bio.big_tom.5,被唤醒后，胖汤姆最喜欢的事是听小麦讲磨坊的事。他说他想再烤一次面包，可他的手已经太大了，揉不了面团。小麦说没关系，她来揉，他来烧火。,"Since his awakening, Big Tom's favourite thing is listening to Wheat talk about the mill. He says he'd like to bake bread again, but his hands are too big to knead dough now. Wheat says that's fine: she'll knead, and he can tend the fire.",小传 ★5 解锁
+hero.whisper.name,低语,Whisper,亡灵 · 飞骑
+hero.whisper.title,怨灵,Wraith,名字后面的称号，显示为“名字 · 称号”
+hero.whisper.skill1.name,啃噬连线,Gnaw the Web,专属技能（草案）
+hero.whisper.skill1.desc,攻击敌方魔网连线时伤害加倍,Double damage when attacking enemy Mana Web links,
+bio.whisper.1,飞在空中的怨灵，专门撕咬魔网连线。它的声音很轻，像风吹过空房间。,"A wraith that flies through the air and tears at Mana Web links. Her voice is soft, like wind through an empty room.",小传 ★1，招募时可看
+bio.whisper.2,低语生前是玛塔的妹妹，一个喜欢采浆果、喜欢唱歌的女孩。断线日那天，她和姐姐在城外，被亡灵冲散了。,"In life, Whisper was Marta's little sister, a girl who loved picking berries and singing. On Severance Day she was outside the town with her sister when the undead scattered them.",小传 ★2 解锁
+bio.whisper.3,变成怨灵后，她一直在找一个人，可她想不起那个人是谁。她只记得一只手，一只拉着她跑的手。,"As a wraith she kept searching for someone, but couldn't remember who. All she remembered was a hand, a hand pulling her along as she ran.",小传 ★3 解锁
+bio.whisper.4,怨灵啃食魔网，是因为它们饿，也是因为它们冷。低语说，靠近光的时候，她会想起一点点以前的事。,"Wraiths gnaw at the Mana Web because they're hungry, and because they're cold. Whisper says that when she's near the light, she remembers a little of before.",小传 ★4 解锁
+bio.whisper.5,玛塔叫出她的名字时，低语想起来了。她没有哭，因为怨灵哭不出来。她只是轻轻地飞到姐姐身边，像小时候一样，把手放进了姐姐的手里。,"When Marta called her name, Whisper remembered. She didn't cry, because wraiths can't. She just drifted gently to her sister's side, and put her hand in her sister's, just like when they were small.",小传 ★5 解锁
+hero.victor.name,维克多,Victor,亡灵 · 支援
+hero.victor.title,死灵法师,Necromancer,名字后面的称号，显示为“名字 · 称号”
+hero.victor.skill1.name,亡者复苏,Raise the Fallen,专属技能（草案）
+hero.victor.skill1.desc,把倒下的敌人变成己方骷髅兵,Turns fallen enemies into allied skeletons,
+bio.victor.1,叛逃的死灵法师，能把倒下的敌人变成己方的骷髅兵。他帮林大师研究唤醒亡灵的方法。,A renegade necromancer who can raise fallen enemies as skeletons on his side. He helps Master Lin research how to awaken the undead.,小传 ★1，招募时可看
+bio.victor.2,维克多原本是银月法师塔的学徒，研究的是生命和死亡的边界。他在断线日后加入了巫妖王的军队，因为他想知道死亡的另一边是什么。,"Victor was once an apprentice of the Silver Moon Tower, studying the line between life and death. After Severance Day he joined the Lich King's army, because he wanted to know what lay on the other side of death.",小传 ★2 解锁
+bio.victor.3,他在亡灵的军队里待了三年，看着一座座城邦陷落，看着一个个活人变成没有记忆的亡灵。他终于明白，巫妖王给的不是永生，是遗忘。,"He spent three years among the undead, watching city-state after city-state fall, and living people become undead with no memories. At last he understood: what the Lich King offered wasn't eternal life, it was forgetting.",小传 ★3 解锁
+bio.victor.4,他在一个夜里逃了出来，带着他所有的研究笔记，找到了林大师。林大师问他为什么，他说：“因为我想起了我母亲的名字。”,"He fled one night with all his research notes and found Master Lin. When Lin asked him why, he said: ""Because I remembered my mother's name.""",小传 ★4 解锁
+bio.victor.5,维克多说他不配被原谅，所以他从不求原谅。他只想把每一个亡灵都唤醒，让他们想起自己是谁。这是他欠他们的。,"Victor says he doesn't deserve forgiveness, so he never asks for it. He only wants to awaken every one of the undead and help them remember who they are. That's what he owes them.",小传 ★5 解锁
+hero.venomeye.name,毒眼,Venomeye,亡灵 · 远程
+hero.venomeye.title,毒雾骨塔,Miasma Bone Tower,名字后面的称号，显示为“名字 · 称号”
+hero.venomeye.skill1.name,毒雾,Miasma,专属技能（草案）
+hero.venomeye.skill1.desc,不移动，命中处留下毒云,Does not move; leaves a poison cloud where it hits,
+bio.venomeye.1,亡灵用碎水晶和骸骨垒起的骨塔，不会移动，命中处会留下毒云。被唤醒后，它守在远征军的后方。,"A bone tower the undead built from shattered crystal and bones. It never moves, and leaves a poison cloud wherever it hits. Once awakened, it guards the expedition's rear.",小传 ★1，招募时可看
+bio.venomeye.2,毒眼生前是一座水晶瞭望塔的守望人，每天站在塔顶看着星线的光。断线日那天，他眼睁睁看着光一段段熄灭，最后连他守着的那颗水晶也碎了。,"In life, Venomeye was the watchman of a crystal watchtower, standing at the top every day looking out at the light of the Starline. On Severance Day he watched the light go out stretch by stretch, until even the crystal he guarded shattered.",小传 ★2 解锁
+bio.venomeye.3,亡灵把他的骨头垒进了那座瞭望塔，于是他变成了骨塔的一部分。他看不到星线了，只剩一只发绿的眼睛，盯着任何靠近的东西。,"The undead built his bones into that watchtower, and he became part of the bone tower. He can't see the Starline anymore. All that's left is one glowing green eye, staring at anything that comes close.",小传 ★3 解锁
+bio.venomeye.4,被唤醒后，毒眼一直没有说话。直到远征军在他的塔下重新点亮了一颗水晶，他的眼睛第一次不是绿色的。,"After his awakening, Venomeye said nothing at all. Until the expedition relit a crystal beneath his tower, and for the first time, his eye wasn't green.",小传 ★4 解锁
+bio.venomeye.5,他说他还是想当守望人。他守不住那颗水晶，但他可以守住现在这些人。他的毒云从此只朝一个方向飘：亡灵来的方向。,"He says he still wants to be a watchman. He couldn't protect that crystal, but he can protect these people now. From then on his poison clouds drift only one way: towards wherever the undead come from.",小传 ★5 解锁
+hero.mog.name,莫格,Mog,亡灵 · 重装
+hero.mog.title,缝合巨怪,Stitched Colossus,名字后面的称号，显示为“名字 · 称号”
+hero.mog.skill1.name,重击,Crushing Blow,专属技能（草案）
+hero.mog.skill1.desc,每第三次攻击震晕一片,Every third attack stuns an area,
+bio.mog.1,用许多尸体缝合在一起的巨怪，每第三次攻击会震晕一片。它是游侠的森林里的噩梦，被唤醒后成了远征军最可怕的盟友。,"A colossus stitched together from many corpses, whose every third attack stuns everything around it. Once the nightmare of the rangers' forest, now the expedition's most fearsome ally.",小传 ★1，招募时可看
+bio.mog.2,莫格的身体里缝着很多人：一个铁匠、一个渔夫、一个老兵、一个年轻的母亲。被唤醒时，它的脑子里同时响起了很多声音。,"Many people are sewn into Mog's body: a blacksmith, a fisherman, an old soldier, a young mother. When Mog was awakened, all their voices started talking in his head at once.",小传 ★2 解锁
+bio.mog.3,那些声音有时候会吵架。铁匠想往前冲，母亲想往后退，老兵说听指挥官的。莫格说它很累，但它不想让任何一个声音消失。,"Sometimes the voices argue. The blacksmith wants to charge, the mother wants to fall back, the old soldier says listen to the Commander. Mog says he's very tired, but he doesn't want any of the voices to disappear.",小传 ★3 解锁
+bio.mog.4,托恩是第一个敢靠近莫格的人。他给莫格的每一个声音都起了名字，莫格第一次觉得，它不只是一堆缝起来的尸体。,"Thorne was the first who dared come close to Mog. He gave each of Mog's voices a name, and for the first time Mog felt he was more than a heap of stitched-up corpses.",小传 ★4 解锁
+bio.mog.5,莫格说，它的力气不是一个人的，所以它不能只为一个人打仗。它要为身体里的每一个人，把他们回不去的家乡夺回来。,"Mog says his strength doesn't belong to one person, so he can't fight for just one person. He'll fight for everyone inside him, to win back the homes they can never return to.",小传 ★5 解锁
+hero.sevi.name,赛薇,Sevi,亡灵 · 对空
+hero.sevi.title,女妖,Banshee,名字后面的称号，显示为“名字 · 称号”
+hero.sevi.skill1.name,尖啸,Shriek,专属技能（草案）
+hero.sevi.skill1.desc,打断周围敌人的施法,Interrupts the spellcasting of nearby enemies,
+bio.sevi.1,尖啸能打断施法的女妖，曾经守在银月法师塔外，把塔里的法师困了很久。被唤醒后，她的尖啸转向了亡灵。,"A banshee whose shriek interrupts spellcasting. She once haunted the outside of the Silver Moon Tower, trapping the mages inside for a long time. Once awakened, she turned her shriek on the undead.",小传 ★1，招募时可看
+bio.sevi.2,赛薇生前是法师塔的歌唱家，她的歌声能让水晶发出共鸣。法师们说，她唱歌的时候，整座塔的法力都会变得更亮。,"In life, Sevi was the Tower's singer, and her voice could make crystals resonate. The mages said that when she sang, the whole Tower's mana shone brighter.",小传 ★2 解锁
+bio.sevi.3,断线日那天，她站在塔顶唱歌，想用歌声撑住塔的结界。结界碎了，她的歌声也变成了尖啸。,"On Severance Day she stood at the top of the Tower and sang, trying to hold up its barrier with her voice. The barrier shattered, and her song turned into a shriek.",小传 ★3 解锁
+bio.sevi.4,她守在法师塔外，不是为了困住法师，而是因为她记不起别的地方。她一直在唱，只是谁也听不出那是歌了。,"She stayed outside the Tower not to trap the mages, but because she couldn't remember anywhere else. She never stopped singing. It's just that no one could tell it was a song anymore.",小传 ★4 解锁
+bio.sevi.5,苏菲和赛琳一起为她重新调音，用水晶找回了她原来的声音。赛薇第一次唱完一整首歌的时候，塔里的水晶都亮了。她说，这一次她要唱给活着的人听。,"Sophie and Celine retuned her together, using crystals to find her old voice. The first time Sevi sang a whole song through, every crystal in the Tower lit up. This time, she says, she'll sing for the living.",小传 ★5 解锁
+hero.kass.name,卡斯,Kass,亡灵 · 远程
+hero.kass.title,吸魔者,Manaleech,名字后面的称号，显示为“名字 · 称号”
+hero.kass.skill1.name,吸魔,Drain Mana,专属技能（草案）
+hero.kass.skill1.desc,靠近敌方魔网时伤害提高,Deals more damage near the enemy Mana Web,
+bio.kass.1,靠近敌方魔网时伤害会提高的吸魔者。他曾是被困在饥饿的城邦里的法师，被死气困住，变成了吞食法力的亡灵。,"A manaleech who hits harder near the enemy's Mana Web. He was once a mage trapped in the Hungering City, caught by the death-mist and turned into an undead that feeds on mana.",小传 ★1，招募时可看
+bio.kass.2,卡斯生前是城邦的守护法师，负责维护城邦的结界水晶。断线日那天，他用自己的身体去堵结界的裂缝，被永夜的死气灌了进去。,"In life, Kass was the city's warden mage, responsible for its barrier crystals. On Severance Day he used his own body to plug a crack in the barrier, and the death-mist of the Endless Night poured into him.",小传 ★2 解锁
+bio.kass.3,他变成了吸魔者，靠吸食法力活着。他一直饿，越吃越饿，城邦里的水晶一颗颗被他和其他吸魔者吃光了。,"He became a manaleech, living on drained mana. He was always hungry, and the more he ate, the hungrier he got. One by one, he and the other manaleeches devoured every crystal in the city.",小传 ★3 解锁
+bio.kass.4,被唤醒后，他第一件事是跪在城邦的废墟前道歉。莫娜说这不是他的错，他说他知道，可他还是要道歉。,"After his awakening, the first thing he did was kneel before the ruins of the city and apologise. Mona told him it wasn't his fault. He said he knew, but he had to apologise anyway.",小传 ★4 解锁
+bio.kass.5,卡斯现在还是会饿，但他学会了只吸亡灵的死气。他说他要把吃掉的法力一点点还回去，还给城邦，还给星线，还给那些他没能守住的人。,"Kass still gets hungry, but he's learned to drain only the undead's death-mist. He says he'll give back the mana he ate, bit by bit: to the city, to the Starline, and to everyone he failed to protect.",小传 ★5 解锁
+hero.valen.name,瓦伦,Valen,亡灵 · 轻装
+hero.valen.title,血族骑士,Blood Knight,名字后面的称号，显示为“名字 · 称号”
+hero.valen.skill1.name,吸血,Lifesteal,专属技能（草案）
+hero.valen.skill1.desc,造成伤害的一部分回复自己,Heals himself for part of the damage he deals,
+bio.valen.1,巫妖王麾下的血族骑士，造成伤害时会吸血回复自己。他是初源之路上最难缠的对手，被打败后，他选择了跟随远征军。,"A Blood Knight in the Lich King's service, healing himself with every wound he deals. He was the hardest foe on the Road to the Prime. Once defeated, he chose to follow the expedition.",小传 ★1，招募时可看
+bio.valen.2,瓦伦生前是王国的骑士，和雷恩是同一批受封的。他们在同一面旗下宣誓，要守护星线。,"In life, Valen was a knight of the Kingdom, knighted in the same class as Rayne. They swore beneath the same banner to protect the Starline.",小传 ★2 解锁
+bio.valen.3,断线日之前，瓦伦的妻子病重，莫德雷德答应他，只要帮自己打开初源水晶，就能救她。瓦伦答应了。妻子没有被救活，他却变成了第一个血族。,"Before Severance Day, Valen's wife fell gravely ill. Mordred promised him that if he helped open the Prime Crystal, she would be saved. Valen agreed. His wife did not survive, and he became the first Blood Knight.",小传 ★3 解锁
+bio.valen.4,他在巫妖王身边待了很多年，一直在等一个能打败他的人。被远征军打败时，他说：“雷恩教出来的人，果然不一样。”,"He stayed at the Lich King's side for many years, waiting for someone who could defeat him. When the expedition did, he said: ""So this is what Rayne's students are like.""",小传 ★4 解锁
+bio.valen.5,瓦伦知道自己罪孽深重，他不求原谅，只求一个机会。决战时，他站在最前面，说当年他为了一个人打开了初源水晶，这一次，他要为所有人把它关上。,"Valen knows how heavy his sins are. He doesn't ask forgiveness, only a chance. In the final battle he stood at the very front and said that long ago he opened the Prime Crystal for one person. This time, he'd close it for everyone.",小传 ★5 解锁
+faction.elves.name,影歌精灵,Shadowsong Elves,阵营
+faction.elves.theme,信任。一千年前的盟约要不要再签一次。,Trust. Should a thousand-year-old pact be signed again?,阵营主题，也是它的那根线
+hero.silva.name,希尔瓦,Silva,影歌精灵 · 轻装
+hero.silva.title,影舞者,Shadowdancer,名字后面的称号，显示为“名字 · 称号”
+hero.silva.skill1.name,隐身,Vanish,专属技能（草案）
+hero.silva.skill1.desc,开战隐身，第一击必定暴击,Starts the battle invisible; her first strike is always a critical hit,
+bio.silva.1,在影子里跳舞的精灵刺客，开战时隐身，第一击必定暴击。她是迷雾森林的守卫，也是第一个和远征军交手的精灵。,"An elven assassin who dances in the shadows. She starts every battle invisible, and her first strike always lands critical. A warden of the Misty Forest, she was the first elf to fight the expedition.",小传 ★1，招募时可看
+bio.silva.2,希尔瓦从小就被教导：人类贪婪，会抢走一切。她一直相信这句话，直到她第一次见到人类。,"Silva was raised on one lesson: humans are greedy and will take everything. She believed it, until she met a human for the first time.",小传 ★2 解锁
+bio.silva.3,她在迷雾森林里伏击过远征军三次，每次都差一点得手。第三次，她看见一个人类士兵把干粮分给了一只受伤的松鼠。,"She ambushed the expedition in the Misty Forest three times, and came close every time. The third time, she saw a human soldier share his rations with an injured squirrel.",小传 ★3 解锁
+bio.silva.4,停战后，她和夜莺成了朋友。两个刺客坐在树上，一句话不说，一坐就是一整夜。,"After the truce, she and Nightingale became friends. The two assassins sit in a tree without saying a word, sometimes for a whole night.",小传 ★4 解锁
+bio.silva.5,希尔瓦说，她还是不太相信人类，但她相信夜莺，相信那个分干粮的士兵。她说信任不是一下子就有的，是一个人一个人攒起来的。,"Silva says she still doesn't quite trust humans, but she trusts Nightingale, and that soldier with the rations. Trust, she says, doesn't come all at once. You gather it one person at a time.",小传 ★5 解锁
+hero.seren.name,塞伦,Seren,影歌精灵 · 轻装
+hero.seren.title,影歌剑士,Shadowsong Blade,名字后面的称号，显示为“名字 · 称号”
+hero.seren.skill1.name,剑舞,Blade Dance,专属技能（草案）
+hero.seren.skill1.desc,连续攻击同一目标时越来越快,Attacks faster and faster while striking the same target,
+bio.seren.1,精灵的剑士，连续攻击同一个目标时会越来越快。他的剑舞像一首歌，越到后面越激烈。,An elven swordsman who strikes faster and faster against the same target. His blade dance is like a song that grows fiercer towards the end.,小传 ★1，招募时可看
+bio.seren.2,塞伦是精灵剑术世家的继承人，一千年前，他的祖先和人类骑士一起织起了星线。他从小听着那段故事长大，却从没见过人类。,"Seren is heir to an elven house of swordsmanship. A thousand years ago, his ancestor wove the Starline alongside human knights. He grew up on that story, yet had never seen a human.",小传 ★2 解锁
+bio.seren.3,他是精灵里少数主张和人类和解的人，被长老们骂过很多次。他说盟约是祖先签的，他们没有资格撕掉。,"He is one of the few elves who argue for peace with the humans, and the elders have scolded him for it many times. He says the pact was signed by their ancestors, and they have no right to tear it up.",小传 ★3 解锁
+bio.seren.4,迷雾森林交战时，他和加文交了手。两人打了一整天，谁也没赢，最后一起坐在地上喘气。加文说他剑舞得真好，他说加文的盾真硬。,"During the battle in the Misty Forest, he crossed swords with Gavin. They fought all day without either winning, and ended up sitting on the ground together, catching their breath. Gavin said his blade dance was beautiful; he said Gavin's shield was really hard.",小传 ★4 解锁
+bio.seren.5,重签盟约那天，塞伦和加文一起把剑插在了初源之路的起点。他说一千年前的骑士和剑士做过的事，他们也能再做一次。,"On the day the pact was signed again, Seren and Gavin planted their swords together at the start of the Road to the Prime. What the knight and the swordsman did a thousand years ago, he says, they can do again.",小传 ★5 解锁
+hero.old_oak.name,老橡,Old Oak,影歌精灵 · 重装
+hero.old_oak.title,树人守卫,Treant Warden,名字后面的称号，显示为“名字 · 称号”
+hero.old_oak.skill1.name,扎根,Take Root,专属技能（草案）
+hero.old_oak.skill1.desc,不移动时每秒回复生命,Regenerates HP every second while not moving,
+bio.old_oak.1,迷雾森林最古老的树人守卫，扎根不动时每秒都在回复生命。他是第 7 章的守关者，结盟后成了远征军最坚实的盾。,"The oldest treant warden of the Misty Forest, regenerating every second while rooted in place. The guardian of Chapter 7, and once allied, the expedition's sturdiest shield.",小传 ★1，招募时可看
+bio.old_oak.2,老橡已经活了一千多年，亲眼见过织网者织起星线。他记得那时人类和精灵并肩站在一起，也记得后来人类是怎么变的。,"Old Oak is more than a thousand years old and saw the Weavers weave the Starline with his own eyes. He remembers humans and elves standing side by side back then, and remembers what humans became afterwards.",小传 ★2 解锁
+bio.old_oak.3,他守着迷雾森林的入口，挡住了所有想进来的人类。只有一个例外：很多年前，一个迷路的小男孩，后来每年春天都会带一壶蜂蜜酒来看他。,"He guards the entrance to the Misty Forest and has turned back every human who tried to enter. With one exception: many years ago, a lost little boy, who ever since has brought him a jug of mead every spring.",小传 ★3 解锁
+bio.old_oak.4,迷雾森林交战时，老橡看见了站在两军中间的托恩。他想起了那个迷路的小男孩，想起了那壶蜂蜜酒，停下了脚步。,"When the battle broke out in the Misty Forest, Old Oak saw Thorne standing between the two armies. He remembered that lost little boy, remembered that jug of mead, and stopped.",小传 ★4 解锁
+bio.old_oak.5,老橡说，他活得太久了，久到快忘了信任是什么感觉。是托恩让他想起来的。他愿意再相信人类一次，为了那个小男孩，也为了一千年前的那些朋友。,"Old Oak says he has lived so long he nearly forgot what trust feels like. Thorne reminded him. He's willing to trust humans once more: for that little boy, and for his friends of a thousand years ago.",小传 ★5 解锁
+hero.lian.name,莉安,Lian,影歌精灵 · 远程
+hero.lian.title,月光射手,Moonlight Archer,名字后面的称号，显示为“名字 · 称号”
+hero.lian.skill1.name,月光箭,Moonlight Arrow,专属技能（草案）
+hero.lian.skill1.desc,射中的敌人显形，无法隐身,Enemies she hits are revealed and cannot turn invisible,
+bio.lian.1,精灵的月光射手，射中的敌人会显形，无法隐身。她的箭在夜里会发出淡淡的银光。,An elven moonlight archer. Enemies she hits are revealed and can't hide. Her arrows glow a faint silver in the dark.,小传 ★1，招募时可看
+bio.lian.2,莉安是月神祭司的女儿，她的箭是用月光织成的。她说月光能照出一切藏起来的东西，包括谎言。,"Lian is the daughter of a priestess of the moon, and her arrows are woven from moonlight. She says moonlight reveals everything hidden, lies included.",小传 ★2 解锁
+bio.lian.3,迷雾森林交战时，她用月光箭照出了远征军的营地，却没有照出任何想抢水晶的人。她把这件事告诉了维拉，维拉决定出面停战。,"During the fighting in the Misty Forest, she lit up the expedition's camp with her moonlight arrows, and found no one there who wanted to steal crystals. She told Vera, and Vera decided to step in and call a truce.",小传 ★3 解锁
+bio.lian.4,她和约翰都是神射手，第一次见面时互相看了很久。约翰说她的箭真亮，她说约翰的箭真慢。两人后来成了射箭的搭档。,"She and John are both marksmen, and the first time they met they stared at each other for a long time. John said her arrows were bright; she said his were slow. Later they became archery partners.",小传 ★4 解锁
+bio.lian.5,莉安说，月光照不出人心，但能照出一个人站在哪里。她看见人类站在了星线的这一边，这就够了。,"Lian says moonlight can't reveal a person's heart, but it can show where they stand. She saw humans standing on the Starline's side, and that's enough.",小传 ★5 解锁
+hero.karei.name,卡蕾,Karei,影歌精灵 · 远程
+hero.karei.title,德鲁伊,Druid,名字后面的称号，显示为“名字 · 称号”
+hero.karei.skill1.name,缠绕,Entangle,专属技能（草案）
+hero.karei.skill1.desc,藤蔓定身一名敌人,Roots one enemy in place with vines,
+bio.karei.1,能召唤藤蔓的德鲁伊，可以把一名敌人缠住动弹不得。她和森林里的每一棵树都说过话。,A druid who summons vines to bind an enemy where they stand. She has spoken with every tree in the forest.,小传 ★1，招募时可看
+bio.karei.2,卡蕾是老橡的学生，跟着老橡学了三百年的德鲁伊之术。她说老橡是她的老师，也是她的爷爷。,Karei is Old Oak's student and has studied druidry under him for three hundred years. She says Old Oak is her teacher and her grandfather too.,小传 ★2 解锁
+bio.karei.3,她一直不喜欢人类，因为人类砍树。可她在远征军的营地里看到小麦在种草药，看到托恩在照顾飞兽，她开始怀疑自己。,"She has never liked humans, because humans cut down trees. But in the expedition's camp she saw Wheat planting herbs and Thorne caring for his beasts, and began to doubt herself.",小传 ★3 解锁
+bio.karei.4,她和小麦成了朋友，两人一起研究草药，一个教对方精灵的药方，一个教对方人类的偏方。小麦说卡蕾是她见过最懂植物的人，卡蕾说小麦是她见过最不像人类的人类。,"She and Wheat became friends and study herbs together, trading elven recipes for human folk remedies. Wheat says Karei knows plants better than anyone she's met; Karei says Wheat is the least human human she's ever met.",小传 ★4 解锁
+bio.karei.5,卡蕾说，森林和人类不是敌人，只是太久没说话了。她要在灯塔城外种一片小树林，让人类和精灵的孩子们在里面一起长大。,"Karei says the forest and humans aren't enemies, they just haven't talked in too long. She wants to plant a little grove outside Lighthaven, where human and elven children can grow up together.",小传 ★5 解锁
+hero.elan.name,埃兰,Elan,影歌精灵 · 飞骑
+hero.elan.title,风鹰骑手,Windhawk Rider,名字后面的称号，显示为“名字 · 称号”
+hero.elan.skill1.name,风之迅捷,Swiftwind,专属技能（草案）
+hero.elan.skill1.desc,离网时移动速度加倍,Moves twice as fast while off the Mana Web,
+bio.elan.1,骑着风鹰的精灵骑手，离开魔网时速度会加倍。他飞得比任何狮鹫都快，这件事他说过很多遍。,"An elven rider on a windhawk, twice as fast once he leaves the Mana Web. He flies faster than any griffin, as he has mentioned many times.",小传 ★1，招募时可看
+bio.elan.2,埃兰是精灵里最年轻的风鹰骑手，骄傲、张扬，觉得人类的狮鹫又笨又慢。他第一次见到卡西时，当面这么说了。,"Elan is the youngest windhawk rider among the elves, proud and showy, and thinks human griffins are clumsy and slow. The first time he met Cassie, he told her so to her face.",小传 ★2 解锁
+bio.elan.3,卡西跟他比了一场，从初源之路的起点飞到终点。埃兰赢了，但只赢了一个翅膀的距离。从那天起，他再也不说狮鹫慢了。,"Cassie raced him from the start of the Road to the Prime to its end. Elan won, but only by a wingspan. He has never called griffins slow since.",小传 ★3 解锁
+bio.elan.4,他和菲恩年纪差不多，成了最好的朋友。他教菲恩怎么借风，菲恩教他怎么在狮鹫厩里偷吃东西。,He and Finn are about the same age and became best friends. He teaches Finn how to ride the wind; Finn teaches him how to sneak snacks in the griffin stables.,小传 ★4 解锁
+bio.elan.5,埃兰说，他以前觉得天空是精灵的，现在他觉得天空是所有会飞的人的。他想有一天和卡西、菲恩一起，沿着整条星线飞一遍。,Elan says he used to think the sky belonged to the elves. Now he thinks it belongs to anyone who can fly. One day he wants to fly the whole length of the Starline with Cassie and Finn.,小传 ★5 解锁
+hero.vera.name,维拉,Vera,影歌精灵 · 支援
+hero.vera.title,使者,Envoy,名字后面的称号，显示为“名字 · 称号”
+hero.vera.skill1.name,盟约,Pact,专属技能（草案）
+hero.vera.skill1.desc,精灵和人类同时在场时全体加速,"When elves and humans are both on the field, all allies gain speed",
+bio.vera.1,影歌精灵的使者，精灵和人类同时在场时，她能让所有人加速。她是第三幕的关键人物，揭开了星线的真相。,"The envoy of the Shadowsong Elves. When elves and humans fight together, she speeds everyone up. A key figure in Act III, she reveals the truth of the Starline.",小传 ★1，招募时可看
+bio.vera.2,维拉是精灵长老会最年轻的成员，也是唯一一个读过织网者盟约原文的精灵。她知道星线不是精灵的，也不是人类的，是两族一起织起来的封印；她也知道，只靠两根线织的网撑不了太久。,"Vera is the youngest member of the elven council of elders, and the only elf who has read the Weavers' Pact in the original. She knows the Starline belongs to neither elves nor humans, but is a seal both peoples wove together. She also knows a web woven from only two threads can't hold for long.",小传 ★2 解锁
+bio.vera.3,迷雾森林交战时，她出面停战，和长老们争了三天三夜。她说如果精灵和人类再打下去，永夜就会吞掉所有人。,"When the fighting broke out in the Misty Forest, she stepped in to stop it and argued with the elders for three days and nights. She told them that if elves and humans kept fighting, the Endless Night would swallow them all.",小传 ★3 解锁
+bio.vera.4,她第一次见到诺娃时就认了出来：诺娃是最后一位织网者，是一千年前那个把自己留在水晶里的人类女孩。维拉单膝跪下，叫出了她一千年前的名字。,"The first time she saw Nova, she knew her at once: Nova is the last Weaver, the human girl who sealed herself in the crystal a thousand years ago. Vera knelt on one knee and spoke the name Nova had borne a thousand years ago.",小传 ★4 解锁
+bio.vera.5,维拉说，精灵相信人类的唯一理由是诺娃。但她希望有一天，精灵相信人类，不再需要任何理由。,"Vera says the only reason elves trust humans is Nova. But she hopes that one day, elves will trust humans without needing any reason at all.",小传 ★5 解锁
+hero.ina.name,伊娜,Ina,影歌精灵 · 对空
+hero.ina.title,星语者,Starspeaker,名字后面的称号，显示为“名字 · 称号”
+hero.ina.skill1.name,星落,Starfall,专属技能（草案）
+hero.ina.skill1.desc,对空中目标降下星光,Calls down starlight on airborne targets,
+bio.ina.1,能和星星说话的精灵星语者，可以对空中的目标降下星光。她总是在夜里抬头看天，嘴里念着谁也听不懂的话。,"An elven starspeaker who can talk with the stars and call down starlight on airborne targets. She's always looking up at the night sky, murmuring words no one else understands.",小传 ★1，招募时可看
+bio.ina.2,伊娜是精灵的占星师，负责观测星线的光。断线日那天，她看着天上的星线一段段熄灭，哭了整整一夜。,"Ina is the elves' astrologer, charged with watching the light of the Starline. On Severance Day she watched the Starline in the sky go dark stretch by stretch, and wept the whole night.",小传 ★2 解锁
+bio.ina.3,她一直在用星语和诺娃沟通，是精灵里最早知道诺娃存在的人。她说诺娃的声音很微弱，像一颗快要熄灭的星星。,"She has long spoken with Nova in the star-tongue, and was the first elf to know Nova existed. She says Nova's voice is very faint, like a star about to go out.",小传 ★3 解锁
+bio.ina.4,她和泽恩是一对奇怪的组合，一个用星光，一个用闪电，在天上并肩作战。泽恩说她的星光太慢，她说泽恩的闪电太吵。,"She and Zane make an odd pair, one with starlight and one with lightning, fighting side by side in the sky. Zane says her starlight is too slow; she says his lightning is too loud.",小传 ★4 解锁
+bio.ina.5,伊娜说，星线是落在地上的星星，星星是挂在天上的星线。她要把熄灭的星线一颗颗点亮，让天上和地上的光重新连在一起。,"Ina says the Starline is stars fallen to earth, and the stars are a Starline hung in the sky. She means to relight the darkened Starline crystal by crystal, until the light above and the light below are joined again.",小传 ★5 解锁
+hero.fae.name,法埃,Fae,影歌精灵 · 对空
+hero.fae.title,林间哨兵,Forest Sentinel,名字后面的称号，显示为“名字 · 称号”
+hero.fae.skill1.name,警戒,Vigilance,专属技能（草案）
+hero.fae.skill1.desc,首个进入射程的飞行单位必被击中,The first flying unit to enter her range is guaranteed to be hit,
+bio.fae.1,守在森林边界的精灵哨兵，首个进入射程的飞行单位必会被她击中。她站岗时从不眨眼，据说已经站了一千年。,"An elven sentinel guarding the forest's border. The first flyer to enter her range is always hit. She never blinks on watch, and they say she has stood there for a thousand years.",小传 ★1，招募时可看
+bio.fae.2,法埃是精灵最老的哨兵，守着森林和永夜之地的边界。她见过永夜第一次醒来，也见过织网者把它压了回去。,"Fae is the oldest of the elven sentinels, guarding the border between the forest and the Land of Endless Night. She saw the Endless Night wake for the first time, and saw the Weavers force it back.",小传 ★2 解锁
+bio.fae.3,她一直守在边界上，从没离开过。精灵和人类打仗的时候她没去，结盟的时候她也没去。她说她的任务只有一个：看着永夜。,"She has never left the border. When elves and humans went to war, she didn't go. When they made their alliance, she didn't go either. She says she has only one task: to watch the Endless Night.",小传 ★3 解锁
+bio.fae.4,决战前，法埃第一次离开了边界。她说永夜要醒了，她要去最前面看着它，就像一千年前那样。,"Before the final battle, Fae left the border for the first time. She says the Endless Night is about to wake, and she's going to the very front to watch it, just like a thousand years ago.",小传 ★4 解锁
+bio.fae.5,法埃说，她守了一千年，就是为了等这一天。等星线重新织好，她想放下弓，去森林里走一走，看看这一千年里长出来的新树。,"Fae says she has kept watch for a thousand years just to wait for this day. Once the Starline is rewoven, she wants to put down her bow, walk through the forest, and see the new trees that grew while she was watching.",小传 ★5 解锁
+hero.manaeater.name,噬魔巨龙,Manaeater Wyrm,传说角色 · 飞骑
+bio.manaeater.1,吞下了一整座水晶枢纽的骨龙，雷恩爵士就是在和它的战斗中牺牲的。通关后，它被星线的光净化，成了远征军的一员。,"The bone dragon that devoured an entire crystal nexus, and the foe Sir Rayne fell fighting. After the campaign ends, it is purified by the light of the Starline and joins the expedition.",小传 ★1，招募时可看
+bio.manaeater.2,噬魔巨龙原本是一条守护星线的古龙，一千年前和织网者一起封印了永夜。它在初源水晶旁沉睡了一千年。,"The Manaeater Wyrm was once an ancient dragon who guarded the Starline, and a thousand years ago helped the Weavers seal the Endless Night. It slept beside the Prime Crystal for a thousand years.",小传 ★2 解锁
+bio.manaeater.3,断线日那天，莫德雷德打开初源水晶，永夜的死气灌进了它的身体。它醒来时，只剩下了饥饿，开始吞食所有能找到的法力。,"On Severance Day, when Mordred opened the Prime Crystal, the death-mist of the Endless Night poured into its body. It woke with nothing left but hunger, and began devouring every scrap of mana it could find.",小传 ★3 解锁
+bio.manaeater.4,它吞下水晶枢纽的那一夜，雷恩爵士留在了枢纽里。雷恩的剑刺进了它的心脏，那一剑没有杀死它，却在它心里留下了一点光。,"The night it devoured the crystal nexus, Sir Rayne stayed inside. Rayne's sword pierced its heart. That blow didn't kill it, but it left a little light inside its heart.",小传 ★4 解锁
+bio.manaeater.5,被净化后，巨龙想起了一千年前的誓言，也想起了雷恩的那一剑。它对诺娃说，它欠那位老骑士一条命，它要用剩下的岁月守着星线，替他守。卡西花了很长时间才愿意和它说话。,"Once purified, the dragon remembered its oath of a thousand years ago, and Rayne's blow. It told Nova it owes the old knight a life, and will spend its remaining years guarding the Starline in his place. It took Cassie a long time before she would speak to it.",小传 ★5 解锁
+hero.mordred.name,莫德雷德,Mordred,传说角色 · 支援
+hero.mordred.title,巫妖王,Lich King,名字后面的称号，显示为“名字 · 称号”
+bio.mordred.1,银月法师塔的前任塔主，第一个亡灵，巫妖王。他在初源水晶前被打败，放下了执念，以亡灵之身留了下来。,"Former master of the Silver Moon Tower, the first of the undead, the Lich King. Defeated before the Prime Crystal, he let go of his obsession and stayed on in undeath.",小传 ★1，招募时可看
+bio.mordred.2,莫德雷德曾是王国最伟大的法师，研究星线的原理，研究法力的本质。他是阿尔德的老师，也是银月法师塔历史上最年轻的塔主。,"Mordred was once the Kingdom's greatest mage, studying the workings of the Starline and the nature of mana. He was Alder's teacher, and the youngest master in the Silver Moon Tower's history.",小传 ★2 解锁
+bio.mordred.3,他发现星线这道封印在衰竭，永夜迟早会醒。他不信任学生，也不信任精灵，决定独自吞下初源的力量去撑住它。王国纪元 412 年，他打开了初源水晶。,"He discovered that the Starline's seal was failing, and that the Endless Night would wake sooner or later. Trusting neither his students nor the elves, he resolved to take the Prime's power into himself and hold the seal alone. In the Kingdom's year 412, he opened the Prime Crystal.",小传 ★3 解锁
+bio.mordred.4,永夜先吞掉了他。他成了巫妖王，以为自己还在撑着封印，其实只是在替永夜收集法力。他失去了一切：学生、朋友、名字，还有他最想留住的知识。,"The Endless Night swallowed him first. He became the Lich King, believing he was still holding the seal, when in truth he was only gathering mana for the Endless Night. He lost everything: his students, his friends, his name, and the knowledge he most wanted to keep.",小传 ★4 解锁
+bio.mordred.5,决战后，阿尔德对他说完了当年没说的话。莫德雷德看着五根线打成的结，沉默了很久，说：“我当年少的，就是这几根线。”他把自己所有的研究交给了赛琳，说这一次，他想让知识属于所有人。,"After the final battle, Alder finally told him what he had never said. Mordred looked at the knot woven from five threads and was silent for a long time. Then he said: ""These threads are what I was missing."" He gave all his research to Celine, and said that this time, he wanted knowledge to belong to everyone.",小传 ★5 解锁
