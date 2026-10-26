@@ -4,9 +4,9 @@ namespace Starline.Client
 {
     /// <summary>
     /// Live 3D background of the main menu and save slots (art canvas, 主菜单): night over
-    /// 灯塔城. The scene itself is the prefab Resources/StarlineMenuScene, editable in Unity
-    /// (Starline &gt; 生成主菜单夜景预制体 creates it); without the prefab the default layout from
-    /// <see cref="MenuSceneDefaults"/> is built. Placed far from the board and shown only while a
+    /// 灯塔城. The scene itself is the prefab Assets/Resources/StarlineMenuScene.prefab, checked
+    /// into the project and edited in Unity; without it the menu shows an empty night sky.
+    /// Placed far from the board and shown only while a
     /// screen asks for it (<see cref="UiScreen.UsesMenuScene"/>); meanwhile it owns the camera.
     /// </summary>
     public sealed class MenuScene
@@ -45,11 +45,10 @@ namespace Starline.Client
             }
             if (_scene == null)
             {
-                if (prefab != null)
-                {
-                    Debug.LogWarning("Starline：Resources/" + PrefabResource + " 的根物体上没有 MenuSceneRoot，改用默认夜景。");
-                }
-                _scene = MenuSceneDefaults.Build();
+                Debug.LogError("Starline：找不到主菜单夜景预制体 Resources/" + PrefabResource + "（或它的根物体上没有 MenuSceneRoot），主菜单背后只显示夜空。");
+                var empty = new GameObject("Menu Scene");
+                empty.SetActive(false);
+                _scene = empty.AddComponent<MenuSceneRoot>();
             }
             _scene.name = "Menu Scene";
             _scene.transform.SetParent(parent, false);

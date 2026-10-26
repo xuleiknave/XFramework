@@ -38,10 +38,6 @@ namespace Starline.Editor
                 return;
             }
             CreatePanelSettings();
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(MenuScenePrefab.PrefabPath) == null)
-            {
-                MenuScenePrefab.Create();
-            }
             CreateMainScene();
             Debug.Log("Starline：已创建 " + ScenePath + " 并加入构建列表，点击 Play 开始游戏。");
         }
