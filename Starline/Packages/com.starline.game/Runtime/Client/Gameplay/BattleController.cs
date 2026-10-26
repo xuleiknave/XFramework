@@ -8,7 +8,8 @@ namespace Starline.Client
 {
     /// <summary>
     /// Runs a battle in real time: fixed-step simulation at the chosen speed, commander
-    /// skills (the orbital strike is aimed with the mouse), skip, and the event feed.
+    /// skills (the orbital strike is aimed with the mouse), skip, the event feed, and free-look
+    /// camera input.
     /// </summary>
     public sealed class BattleController
     {
@@ -16,6 +17,7 @@ namespace Starline.Client
         private const int FeedLength = 6;
 
         private readonly BattleStage _stage;
+        private readonly ReplayPlayer _replay;
         private float _accumulator;
         private float _endDelay = 1.5f;
 
@@ -23,17 +25,36 @@ namespace Starline.Client
         {
             _stage = stage;
             Encounter = encounter;
-            // Any seed outside the forecast range, so the real fight is not one the player previewed.
-            ulong seed = (ulong)DateTime.Now.Ticks % 900000UL + 1UL;
+            // Stage battles use the stage's fixed seed so they can be recorded and shared as replays
+            // (replay-server.md section 4); hand-built encounters fall back to a time-based seed outside
+            // the forecast range.
+            ulong seed = encounter.Id != null ? StageSeed.For(encounter.Id) : (ulong)DateTime.Now.Ticks % 900000UL + 1UL;
             Battle = new BattleSim(encounter.CreateSetup(player, seed));
             _stage.BeginBattle(Battle);
             _stage.Rig.GoToBattle();
-            AddFeed("开战！");
+            AddFeed(Loc.Ui("feed.start"));
+        }
+
+        /// <summary>Plays a recorded battle back: same stepping and effects, commands come from the replay.</summary>
+        public BattleController(Replay replay, Encounter encounter, BattleStage stage)
+        {
+            _stage = stage;
+            Encounter = encounter;
+            Replay = replay;
+            _replay = new ReplayPlayer(replay, encounter);
+            Battle = _replay.Battle;
+            _stage.BeginBattle(Battle);
+            _stage.Rig.GoToBattle();
+            AddFeed(Loc.Ui("feed.replay_start"));
         }
 
         public Encounter Encounter { get; }
         public BattleSim Battle { get; }
         public int SpeedIndex { get; set; }
+        public bool Paused { get; set; }
+        /// <summary>The replay being played back, or null in a live battle.</summary>
+        public Replay Replay { get; }
+        public bool IsReplay => _replay != null;
         public bool StrikeArmed { get; private set; }
         public List<string> Feed { get; } = new List<string>();
 
@@ -42,10 +63,14 @@ namespace Starline.Client
 
         public bool PlayerWon => Battle.Winner == BoardLayout.PlayerSide;
 
-        public void ToggleStrike() => StrikeArmed = !StrikeArmed && Battle.CanCast(BoardLayout.PlayerSide, CommanderSkill.OrbitalStrike);
+        public void ToggleStrike() => StrikeArmed = !StrikeArmed && !IsReplay && Battle.CanCast(BoardLayout.PlayerSide, CommanderSkill.OrbitalStrike);
 
         public void Cast(CommanderSkillDef skill)
         {
+            if (IsReplay)
+            {
+                return;
+            }
             if (skill.NeedsTarget)
             {
                 ToggleStrike();
@@ -60,7 +85,7 @@ namespace Starline.Client
         {
             while (!Battle.IsOver)
             {
-                Battle.Step();
+                StepOnce();
                 _stage.AfterStep(false, AddFeed);
             }
             _accumulator = 0f;
@@ -68,9 +93,17 @@ namespace Starline.Client
             _stage.RefreshNetworks();
         }
 
-        public void Tick(float deltaTime, bool pointerOverUi)
+        /// <summary>
+        /// Per-frame update. <paramref name="isOverUi"/> tells whether a screen point is over the
+        /// UI, which blocks aiming and camera drags there.
+        /// </summary>
+        public void Tick(float deltaTime, Func<Vector2, bool> isOverUi)
         {
+            // Camera first, so the click that fires an armed strike does not also start a drag.
+            _stage.Rig.TickFreeLook(isOverUi, StrikeArmed);
+
             Mouse mouse = Mouse.current;
+            bool pointerOverUi = mouse != null && isOverUi(mouse.position.ReadValue());
             if (mouse != null && StrikeArmed && mouse.leftButton.wasPressedThisFrame && !pointerOverUi)
             {
                 if (_stage.TryGetGroundPoint(mouse.position.ReadValue(), out Vector3 p))
@@ -87,11 +120,11 @@ namespace Starline.Client
             if (!Battle.IsOver)
             {
                 float tick = 1f / BattleSim.TicksPerSecond;
-                _accumulator += deltaTime * Speeds[SpeedIndex];
+                _accumulator += Paused ? 0f : deltaTime * Speeds[SpeedIndex];
                 _accumulator = Mathf.Min(_accumulator, tick * 12f);
                 while (_accumulator >= tick && !Battle.IsOver)
                 {
-                    Battle.Step();
+                    StepOnce();
                     _stage.AfterStep(true, AddFeed);
                     _accumulator -= tick;
                 }
@@ -103,6 +136,24 @@ namespace Starline.Client
                 Finished = _endDelay <= 0f;
             }
             _stage.Interpolate(Mathf.Clamp01(_accumulator * BattleSim.TicksPerSecond));
+        }
+
+        /// <summary>
+        /// Records the finished live battle as a replay, or null for a replay or a hand-built
+        /// encounter (only stages from the data files can be replayed).
+        /// </summary>
+        public Replay Record() => IsReplay || Encounter.Id == null ? null : Starline.Battle.Replay.Record(Encounter.Id, Battle);
+
+        private void StepOnce()
+        {
+            if (_replay != null)
+            {
+                _replay.Step();
+            }
+            else
+            {
+                Battle.Step();
+            }
         }
 
         /// <summary>"我方魔网：5 / 6 有魔网 · 网络完好" for one side.</summary>
@@ -121,8 +172,8 @@ namespace Starline.Client
                 }
             }
             int lost = Battle.Stats[side].RelaysLost;
-            return (side == BoardLayout.PlayerSide ? "我方魔网：" : "敌方魔网：") + supplied + " / " + combat + " 有魔网"
-                + (lost > 0 ? " · " + lost + " 个节点被毁" : " · 网络完好");
+            return Loc.Ui(side == BoardLayout.PlayerSide ? "battle.net_player" : "battle.net_enemy", supplied, combat)
+                + (lost > 0 ? Loc.Ui("battle.net_lost", lost) : Loc.Ui("battle.net_intact"));
         }
 
         private void AddFeed(string text)

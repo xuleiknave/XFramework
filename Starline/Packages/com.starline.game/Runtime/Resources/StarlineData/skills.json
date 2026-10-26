@@ -1,14 +1,12 @@
 {
-  "_说明": "指挥官技能（设计文档 5.3）。id 对应代码里的 CommanderSkill 枚举，顺序不能改。",
+  "_说明": "指挥官技能（设计文档 5.3）。id 对应代码里的 CommanderSkill 枚举，顺序不能改。名字、说明、剧情等文字在 Localization/Game.csv（key 用这里的 id）。",
   "skills": [
-    {"id": "OrbitalStrike", "name": "陨星术", "cost": 4, "cooldown": 10, "needsTarget": true, "delay": 1, "radius": 3, "damage": 220,
-     "description": "选择落点，1 秒后对范围内敌人造成大量伤害"},
-    {"id": "EmergencyShield", "name": "守护结界", "cost": 3, "cooldown": 15,
-     "description": "全体恢复一半护盾"}
+    {"id": "OrbitalStrike", "cost": 4, "cooldown": 10, "needsTarget": true, "delay": 1, "radius": 3, "damage": 220},
+    {"id": "EmergencyShield", "cost": 3, "cooldown": 15}
   ],
   "stars": {
-    "_说明": "星级倍率，下标 0 = ★1。耐久倍率同时作用于生命、护盾和护盾恢复。",
-    "hp": [1, 1.6, 2.5],
-    "damage": [1, 1.5, 2.2]
+    "_说明": "星级倍率，下标 0 = ★1，共 5 档（设计文档 4.8）。耐久倍率同时作用于生命、护盾和护盾恢复。远征内合成最高到 ★3。",
+    "hp": [1, 1.6, 2.5, 3.5, 4.6],
+    "damage": [1, 1.5, 2.2, 2.9, 3.6]
   }
 }

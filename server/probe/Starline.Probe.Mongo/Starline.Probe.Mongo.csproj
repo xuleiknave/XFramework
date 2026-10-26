@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- 用 MongoDB 实现 IProbeStore：云函数里通过 UOS 的 CRUD SDK 拿连接，本地用连接字符串。 -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Starline.Probe/Starline.Probe.csproj" />
+    <PackageReference Include="UOS.FuncStateless.MongoDB" Version="1.1.8" />
+  </ItemGroup>
+
+</Project>

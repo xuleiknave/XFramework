@@ -1,0 +1,36 @@
+{
+  "_comment": "背景音乐选曲表。曲目 id 对应同目录的 .ogg（tools/music/compose.py 生成），曲目说明见 docs/music.md。",
+  "volume": 0.7,
+  "fadeSeconds": 1.5,
+  "screens": {
+    "menu": "title",
+    "map": "map",
+    "deploy": "deploy",
+    "reward": "map",
+    "runEndVictory": "ending",
+    "runEndDefeat": "deploy"
+  },
+  "stingers": {
+    "win": "victory",
+    "lose": "defeat"
+  },
+  "battle": {
+    "default": "battle_plains",
+    "boss": "boss",
+    "finalBoss": "boss_final"
+  },
+  "acts": {
+    "act1": "battle_plains"
+  },
+  "terrains": {
+    "plains": "battle_plains",
+    "forest": "battle_forest",
+    "bone_waste": "battle_bone_waste",
+    "arcane_court": "battle_arcane_court",
+    "desert": "battle_desert",
+    "lake": "battle_lake",
+    "mist_marsh": "battle_mist_marsh",
+    "night_tundra": "battle_night_tundra",
+    "abyss": "battle_abyss"
+  }
+}

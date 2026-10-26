@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Starline.Battle;
 using Starline.Expedition;
@@ -8,25 +7,31 @@ using Starline.Expedition;
 namespace Starline.Client
 {
     /// <summary>
-    /// The auto-battle: counts and time on top, event feed on the right, supply points and
-    /// commander skills at the bottom, and the result dialog when it ends.
+    /// The auto-battle: counts, time and camera views on top, event feed on the right, supply
+    /// points and commander skills at the bottom, and the result dialog when it ends. Also plays
+    /// replays back: skills are read-only and the dialog offers to watch again.
     /// </summary>
     public sealed class BattleScreen : UiScreen
     {
         private const int SupplyPips = 10;
 
         private readonly BattleController _battle;
+        private readonly (string text, System.Action action) _replayExit;
+        private readonly Button _pause;
         private readonly List<Button> _speedButtons = new List<Button>();
         private readonly List<VisualElement> _pips = new List<VisualElement>();
         private readonly List<(CommanderSkillDef def, Button button, Label state)> _skills = new List<(CommanderSkillDef, Button, Label)>();
         private readonly Label _player, _enemy, _time, _points, _playerNet, _enemyNet;
         private readonly VisualElement _feed;
+        private readonly Button _view;
         private bool _reported;
         private string _feedShown;
 
-        public BattleScreen(GameApp app, BattleController battle) : base(app, "Battle")
+        /// <param name="replayExit">For a replay: the button that leaves it when it ends (text and action).</param>
+        public BattleScreen(GameApp app, BattleController battle, (string text, System.Action action) replayExit = default) : base(app, "Battle")
         {
             _battle = battle;
+            _replayExit = replayExit;
             _player = Find<Label>("player-count");
             _enemy = Find<Label>("enemy-count");
             _time = Find<Label>("time");
@@ -35,6 +40,18 @@ namespace Starline.Client
             _enemyNet = Find<Label>("enemy-net");
             _feed = Find<VisualElement>("feed");
             Button("skip", Skip);
+            _view = Button("view", () => App.Stage.Rig.CycleView());
+            Button("view-reset", () => App.Stage.Rig.ResetView());
+            FrameBoardArea();
+            _pause = Button("pause", () => _battle.Paused = !_battle.Paused);
+
+            Label mode = Find<Label>("mode");
+            mode.SetVisible(battle.IsReplay);
+            if (battle.IsReplay)
+            {
+                mode.text = Loc.Ui("battle.replay_mode", Loc.T(battle.Encounter.Name), battle.Replay.Power);
+                Find<Label>("hint").text = Loc.Ui("battle.replay_hint");
+            }
 
             VisualElement speeds = Find<VisualElement>("speeds");
             for (int i = 0; i < BattleController.Speeds.Length; i++)
@@ -58,11 +75,11 @@ namespace Starline.Client
             {
                 CommanderSkillDef skill = def;
                 Button button = Ui.Button("", () => _battle.Cast(skill), "skill");
-                button.Add(Ui.Label(skill.DisplayName, "skill-name"));
-                button.Add(Ui.Label("补给 " + skill.Cost, "small", "muted"));
+                button.Add(Ui.Label(Loc.T(skill.Name), "skill-name"));
+                button.Add(Ui.Label(Loc.Ui("battle.skill_cost", skill.Cost), "small", "muted"));
                 Label state = Ui.Label("", "small");
                 button.Add(state);
-                button.tooltip = skill.Description;
+                button.tooltip = Loc.T(skill.Description);
                 skills.Add(button);
                 _skills.Add((skill, button, state));
             }
@@ -72,9 +89,7 @@ namespace Starline.Client
 
         public override void Tick(float deltaTime)
         {
-            Mouse mouse = Mouse.current;
-            bool overUi = mouse != null && App.IsPointerOverUi(mouse.position.ReadValue());
-            _battle.Tick(deltaTime, overUi);
+            _battle.Tick(deltaTime, App.IsPointerOverUi);
             Refresh();
             if (_battle.Finished && !_reported)
             {
@@ -94,13 +109,16 @@ namespace Starline.Client
         private void Refresh()
         {
             BattleSim sim = _battle.Battle;
-            _player.text = "我方 " + sim.CountCombatants(BoardLayout.PlayerSide) + " / " + sim.CountInitialCombatants(BoardLayout.PlayerSide);
-            _enemy.text = "敌方 " + sim.CountCombatants(BoardLayout.EnemySide) + " / " + sim.CountInitialCombatants(BoardLayout.EnemySide);
-            _time.text = Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒 / " + _battle.Encounter.TimeLimitSeconds;
+            _player.text = Loc.Ui("battle.player_count", sim.CountCombatants(BoardLayout.PlayerSide), sim.CountInitialCombatants(BoardLayout.PlayerSide));
+            _enemy.text = Loc.Ui("battle.enemy_count", sim.CountCombatants(BoardLayout.EnemySide), sim.CountInitialCombatants(BoardLayout.EnemySide));
+            _view.text = Loc.Ui("battle.view", Loc.Ui(App.Stage.Rig.ViewName));
+            _time.text = Loc.Ui("battle.time", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()), _battle.Encounter.TimeLimitSeconds);
             for (int i = 0; i < _speedButtons.Count; i++)
             {
                 _speedButtons[i].EnableInClassList("btn-toggled", _battle.SpeedIndex == i);
             }
+            _pause.text = Loc.Ui(_battle.Paused ? "battle.resume" : "battle.pause");
+            _pause.EnableInClassList("btn-toggled", _battle.Paused);
 
             string feedNow = string.Join("\n", _battle.Feed);
             if (feedNow != _feedShown)
@@ -116,7 +134,7 @@ namespace Starline.Client
             }
 
             float points = sim.SupplyPoints(BoardLayout.PlayerSide).ToFloat();
-            _points.text = "法术点数  " + points.ToString("0.0") + " / 10   （每秒 +1）";
+            _points.text = Loc.Ui("battle.points", points.ToString("0.0"));
             for (int i = 0; i < _pips.Count; i++)
             {
                 _pips[i].EnableInClassList("pip--full", i < Mathf.FloorToInt(points));
@@ -128,60 +146,90 @@ namespace Starline.Client
             {
                 int cd = sim.SkillCooldownTicks(BoardLayout.PlayerSide, def.Skill);
                 bool can = sim.CanCast(BoardLayout.PlayerSide, def.Skill);
-                string text = cd > 0 ? "冷却 " + Mathf.CeilToInt(cd / (float)BattleSim.TicksPerSecond) + " 秒"
-                    : can ? (def.NeedsTarget ? "点击后选择落点" : "可释放") : "法术点数不足";
+                string text = cd > 0 ? Loc.Ui("battle.cooldown", Mathf.CeilToInt(cd / (float)BattleSim.TicksPerSecond))
+                    : Loc.Ui(can ? (def.NeedsTarget ? "battle.pick_target" : "battle.ready") : "battle.no_points");
                 bool armed = def.NeedsTarget && _battle.StrikeArmed;
                 if (armed)
                 {
-                    text = "在战场上点击落点（右键取消）";
+                    text = Loc.Ui("battle.aiming");
+                }
+                if (_battle.IsReplay)
+                {
+                    text = Loc.Ui("battle.replay_skill");
                 }
                 state.text = text;
-                button.SetEnabled(can || armed);
+                button.SetEnabled(!_battle.IsReplay && (can || armed));
                 button.EnableInClassList("skill--armed", armed);
             }
         }
 
+        private void ShowReplayResult()
+        {
+            BattleSim sim = _battle.Battle;
+            Replay replay = _battle.Replay;
+            string body = Loc.Ui("replay.summary", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()), replay.Power)
+                + (replay.UsesSkills ? Loc.Ui("replay.skills_used", replay.Commands.Count) : Loc.Ui("replay.no_skills"));
+            string title = Loc.Ui(sim.Winner == BoardLayout.PlayerSide ? "replay.end_won" : "replay.end_lost");
+            App.Ui.ShowModal(Ui.Dialog(title, body,
+                _replayExit,
+                (Loc.Ui("replay.again"), () => App.ShowReplay(replay, _replayExit.text, _replayExit.action))));
+        }
+
         private void ShowResult()
         {
+            if (_battle.IsReplay)
+            {
+                ShowReplayResult();
+                return;
+            }
             ExpeditionRun run = App.Run;
             BattleSim sim = _battle.Battle;
             bool won = _battle.PlayerWon;
             run.ReportBattle(won);
+            App.Music.PlayStinger(won ? "win" : "lose");
 
             var lines = new List<string>
             {
-                "用时 " + Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()) + " 秒",
-                "我方损失 " + (sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide))
-                    + " 名，击败敌方 " + (sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide)) + " 个"
-                    + (won ? "（倒下的角色战后全部恢复）" : ""),
+                Loc.Ui("result.time", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat())),
+                Loc.Ui("result.losses", sim.CountInitialCombatants(BoardLayout.PlayerSide) - sim.CountCombatants(BoardLayout.PlayerSide),
+                    sim.CountInitialCombatants(BoardLayout.EnemySide) - sim.CountCombatants(BoardLayout.EnemySide))
+                    + (won ? Loc.Ui("result.recovered") : ""),
             };
             SideStats stats = sim.Stats[BoardLayout.PlayerSide];
             if (stats.RelaysLost > 0)
             {
-                lines.Add("我方有 " + stats.RelaysLost + " 个魔网节点被摧毁");
+                lines.Add(Loc.Ui("result.relays_lost", stats.RelaysLost));
             }
             if (stats.RanDry.Count > 0)
             {
                 var names = new List<string>();
                 foreach (string id in stats.RanDry)
                 {
-                    names.Add(UnitCatalog.Get(id).DisplayName);
+                    names.Add(Loc.T(UnitCatalog.Get(id).Name));
                 }
-                lines.Add("法力耗尽过：" + string.Join("、", names));
+                lines.Add(Loc.Ui("result.ran_dry", string.Join(Loc.Ui("list.separator"), names)));
             }
-            lines.AddRange(run.Messages);
+            lines.AddRange(run.Messages.ConvertAll(Loc.T));
+
+            // Kept in memory only, for the "watch replay" button; nothing is saved on this computer.
+            Replay replay = _battle.Record();
 
             string next;
             switch (run.State)
             {
-                case RunState.Reward: next = "领取战利品"; break;
-                case RunState.Victory: next = "要塞陷落！"; break;
-                case RunState.Defeat: next = "撤回灯塔城"; break;
-                case RunState.Battle: next = "调整布阵，再次挑战 Boss"; break;
-                default: next = "返回地图"; break;
+                case RunState.Reward: next = Loc.Ui("result.next_reward"); break;
+                case RunState.Victory: next = Loc.Ui("result.next_victory"); break;
+                case RunState.Defeat: next = Loc.Ui("result.next_defeat"); break;
+                case RunState.Battle: next = Loc.Ui("result.next_retry"); break;
+                default: next = Loc.Ui("result.next_map"); break;
             }
-            string title = won ? "胜利" : sim.Winner == BoardLayout.EnemySide ? "失败" : "平局（算作失败）";
-            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), (next, App.AfterBattle));
+            string title = Loc.Ui(won ? "result.won" : sim.Winner == BoardLayout.EnemySide ? "result.lost" : "result.draw");
+            var buttons = new List<(string, System.Action)> { (next, App.AfterBattle) };
+            if (replay != null)
+            {
+                buttons.Add((Loc.Ui("result.watch_replay"), () => App.ShowReplay(replay, next, App.AfterBattle)));
+            }
+            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), buttons.ToArray());
             dialog.Q(className: "dialog").AddToClassList(won ? "dialog--win" : "dialog--loss");
             App.Ui.ShowModal(dialog);
         }

@@ -1,6 +1,6 @@
 # Starline（星线）
 
-单机奇幻战略游戏：亡灵吸干了连接人类城邦的法力水晶网络“星线”，你率领晨星远征军一段段重新点亮它。战前排兵布阵，用魔网连接你的角色，开战前先推演一百场战争，然后看远征军自动交火决出胜负。
+奇幻战略游戏（Steam 买断制，需联网登录）：亡灵吸干了连接人类城邦的法力水晶网络“星线”，你率领晨星远征军一段段重新点亮它。战前排兵布阵，用魔网连接你的角色，开战前先推演一百场战争，然后看远征军自动交火决出胜负。
 
 - 游戏设计文档：[docs/game-design.md](docs/game-design.md)
 - 界面原型图：[docs/prototype/](docs/prototype/)
@@ -21,7 +21,8 @@ Starline/                          Unity 工程（用 Unity Hub 直接打开这�
 │   ├── Runtime/Resources/
 │   │   ├── StarlineData/          配置表（JSON）：角色、克制、技能、敌方阵容、远征
 │   │   └── StarlineUI/            界面布局（UXML）和主题样式（USS）
-│   └── Editor/                    编辑器菜单：工程初始化、URP 配置
+│   ├── Localization/              语言表（CSV）：UI.csv 界面文字、Game.csv 角色名/剧情/消息
+│   └── Editor/                    编辑器菜单：工程初始化、URP 配置、导入语言表
 └── ProjectSettings/
 src/Starline.Battle/               用 .NET 编译同一份内核源码（测试与批量模拟用）
 tests/Starline.Battle.Tests/       内核测试
@@ -39,7 +40,9 @@ docs/                              设计文档与原型图
    - 如果 Hub 提示编辑器版本不一致，选择你安装的 Unity 6 版本打开即可。
 3. 第一次打开时如果提示启用新输入系统（Input System），选 **Yes**，编辑器会重启。
 4. **等待 URP 自动配置**：第一次打开时会自动安装 URP（通用渲染管线）包，并在 `Assets/Settings/` 下生成渲染配置，Console 里会依次出现“正在安装 URP”和“已启用 URP 渲染管线”。整个过程需要一两分钟。
-5. 菜单栏点 `Starline > 初始化工程（场景与界面配置）`，会生成并打开 `Assets/Scenes/Main.unity`，然后点 **Play**。
+5. 菜单栏点 `Starline > 初始化工程（场景与界面配置）`，会生成语言表（`Assets/Localization/`，同时创建 Addressables 配置）并生成、打开 `Assets/Scenes/Main.unity`，然后点 **Play**。
+   - 第一次打开时 Unity 会安装 Localization 和 Addressables 包。
+   - 测试其他语言：Play 前在 Game 视图上方的 Localization 下拉框里切换 Locale，或者打包后加命令行参数 `-language=en`。
    - 以前生成过的 `Assets/Scenes/PlayablePrototype.unity` 已经不用了（里面的脚本已删除），可以直接删掉。
 
 ### 中文字体
@@ -48,7 +51,7 @@ docs/                              设计文档与原型图
 
 ### 修改数值
 
-角色、敌人、技能、地图和剧情文本都在 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/` 的 JSON 文件里，改完保存，下次点 Play 就生效。改完建议跑一遍内核测试，看平衡模拟的变化。
+角色、敌人、技能和地图的数值在 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/` 的 JSON 文件里，改完保存，下次点 Play 就生效。名字、说明和剧情等文字在 `Packages/com.starline.game/Localization/*.csv`，保存后 Unity 自动重新导入。改完建议跑一遍内核测试，看平衡模拟的变化。
 
 ### 渲染
 
@@ -74,7 +77,7 @@ docs/                              设计文档与原型图
 | 操作 | 方式 |
 |---|---|
 | 选择要上阵的角色 | 点左侧编队列表中“后备”的角色；点“已上阵”的角色会把它从棋盘上拿起来 |
-| 放置 | 左键点我方（左半边）格子；大型单位以点击的格子为一角占 2×2 |
+| 放置 | 左键点我方（下半边）格子；大型单位以点击的格子为一角占 2×2 |
 | 放置法力水晶 | 选中“法力水晶”后，左键点格子交叉点（会显示绿色小点） |
 | 移动 | 不选任何角色时，左键点已放置的单位把它拿起来，再点新位置 |
 | 撤下 | 右键点已放置的单位（源晶塔只能移动，不能撤下） |
@@ -87,6 +90,8 @@ docs/                              设计文档与原型图
 ### 战斗
 
 - 角色全部自动战斗，可切换 1x / 2x / 4x 或跳过。
+- **视角**：在战场上按住左键（或中键、单指）拖动旋转镜头，滚轮或双指缩放；点顶栏“视角”或按 V 切换默认、俯视、侧面、敌方视角，点“复位”回到默认。
+- 战场竖向摆放（我方在下、敌方在上）。窗口比高宽还高时界面自动换成竖屏布局，可以把 Game 视图设成 1080×1920 试竖屏。
 - **陨星术**（法术点数 4）：点按钮后在战场上左键选落点，右键取消。
 - **守护结界**（法术点数 3）：全体恢复一半护盾。
 - 法术点数每秒 +1。魔网节点被摧毁后，魔网连线会变红，断开的一侧角色失去魔网。
@@ -101,4 +106,10 @@ docs/                              设计文档与原型图
 
 ```
 dotnet run --project tests/Starline.Battle.Tests
+```
+
+重新生成数值平衡表 [docs/balance-sheet.md](docs/balance-sheet.md)（从配置表汇总数值，并跑约 6000 场纯逻辑对战）：
+
+```
+dotnet run --project tests/Starline.Battle.Tests -- --balance
 ```

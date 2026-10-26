@@ -51,9 +51,8 @@ namespace Starline.Battle
                 var def = new UnitDef
                 {
                     Id = u["id"].AsString(),
-                    DisplayName = u["name"].AsString(),
-                    Description = u.String("description", ""),
                     Role = GameData.ParseEnum<UnitRole>(u["role"]),
+                    Faction = u.Get("faction") is JsonValue faction ? GameData.ParseEnum<Faction>(faction) : Faction.None,
                     Size = u.Int("size", 1),
                     CommandCost = u.Int("commandCost"),
                     MaxHp = u.FixValue("hp"),

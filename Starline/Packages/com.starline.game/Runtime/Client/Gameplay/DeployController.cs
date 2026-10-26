@@ -44,7 +44,7 @@ namespace Starline.Client
         public int Intel { get; private set; }
         public ForecastResult Forecast { get; private set; }
         public List<int> ForecastHistory { get; } = new List<int>();
-        public List<string> Errors { get; private set; } = new List<string>();
+        public List<LocText> Errors { get; private set; } = new List<LocText>();
         public string Notice { get; private set; }
         public int SuppliedShips { get; private set; }
         public int DeployedShips { get; private set; }
@@ -259,8 +259,8 @@ namespace Starline.Client
                 }
                 if (!_hoverValid)
                 {
-                    Notice = Selection == DeploySelection.Relay && Fleet.RelaysLeft <= 0 ? "法力水晶已经全部放下"
-                        : "这里放不下，或者指挥点不够";
+                    Notice = Selection == DeploySelection.Relay && Fleet.RelaysLeft <= 0 ? Loc.Ui("deploy.no_relays_left")
+                        : Loc.Ui("deploy.cannot_place");
                     Changed?.Invoke();
                     return;
                 }
@@ -309,7 +309,7 @@ namespace Starline.Client
             }
             if (picked.Def.IsSupplySource)
             {
-                Notice = "源晶塔不能撤下，可以左键拿起来换位置";
+                Notice = Loc.Ui("deploy.source_fixed");
                 Changed?.Invoke();
                 return;
             }

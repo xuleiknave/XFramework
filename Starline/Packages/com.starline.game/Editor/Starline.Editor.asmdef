@@ -2,7 +2,12 @@
     "name": "Starline.Editor",
     "rootNamespace": "Starline.Editor",
     "references": [
-        "Starline.Client"
+        "Starline.Battle",
+        "Starline.Client",
+        "Unity.Localization",
+        "Unity.Localization.Editor",
+        "Unity.Addressables",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

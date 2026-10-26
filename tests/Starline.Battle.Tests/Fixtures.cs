@@ -18,9 +18,56 @@ namespace Starline.Battle.Tests
             });
         }
 
-        private static string FindDataDirectory()
+        public const string LocalizationDirectory = "Starline/Packages/com.starline.game/Localization";
+        public const string SourceLanguage = "zh-Hans";
+
+        private static LocCsv _gameText;
+
+        /// <summary>The string tables in Localization/*.csv, the same list the editor imports.</summary>
+        public static readonly string[] TableNames = { "UI", "Game", "Characters", "Story" };
+
+        /// <summary>Loads one of <see cref="TableNames"/>.</summary>
+        public static LocCsv LoadTable(string name) =>
+            LocCsv.Parse(File.ReadAllText(Path.Combine(FindDirectory(LocalizationDirectory), name + ".csv")));
+
+        /// <summary>Core text in Simplified Chinese, so test output stays readable; fails on a missing key.</summary>
+        public static string Text(LocText text)
         {
-            const string relative = "Starline/Packages/com.starline.game/Runtime/Resources/StarlineData";
+            if (_gameText == null)
+            {
+                _gameText = LoadTable("Game");
+            }
+            LocCsv.Row row = _gameText.Rows.Find(r => r.Key == text.Key);
+            if (row == null)
+            {
+                throw new Exception("Game.csv 缺少 key " + text.Key);
+            }
+            var args = new object[text.Args.Length];
+            for (int i = 0; i < args.Length; i++)
+            {
+                args[i] = text.Args[i] is LocText inner ? Text(inner) : text.Args[i];
+            }
+            return string.Format(row.Get(SourceLanguage), args);
+        }
+
+        public static string Join(string separator, List<LocText> texts) => string.Join(separator, texts.ConvertAll(Text));
+
+        /// <summary>A path inside the repository (the folder that holds the Unity project).</summary>
+        public static string RepositoryPath(string relative)
+        {
+            string data = FindDataDirectory();
+            var root = new DirectoryInfo(data);
+            for (int i = 0; i < 6; i++)
+            {
+                root = root.Parent;
+            }
+            return Path.Combine(root.FullName, relative);
+        }
+
+        private static string FindDataDirectory() => FindDirectory("Starline/Packages/com.starline.game/Runtime/Resources/StarlineData");
+
+        public static string FindDirectory(string relative)
+        {
             foreach (string start in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
             {
                 for (var dir = new DirectoryInfo(start); dir != null; dir = dir.Parent)
@@ -58,7 +105,7 @@ namespace Starline.Battle.Tests
 
             return new Encounter
             {
-                Name = "精英战：古战场伏击",
+                Id = "wreck_ambush",
                 Enemy = enemy,
                 SuggestedPlayer = player,
                 Roster = new List<RosterEntry>

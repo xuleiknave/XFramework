@@ -12,25 +12,47 @@ namespace Starline.Battle
     public static class GameData
     {
         /// <summary>File names (without extension) that make up the data set, in load order.</summary>
-        public static readonly string[] Files = { "units", "counters", "skills", "encounters", "expedition" };
+        public static readonly string[] Files = { "units", "counters", "skills", "encounters", "expedition", "terrains", "power" };
 
         private static Dictionary<string, JsonValue> _files;
 
         public static bool IsLoaded => _files != null;
 
+        /// <summary>
+        /// Hash of every data file's text (16 hex digits). Replays record it: a replay only
+        /// reproduces under the exact numbers it was played with.
+        /// </summary>
+        public static string Fingerprint { get; private set; }
+
+        /// <summary>Drops a byte-order mark and carriage returns so Windows and Linux checkouts hash the same.</summary>
+        private static string NormalizeText(string text)
+        {
+            if (text.Length > 0 && text[0] == '\uFEFF')
+            {
+                text = text.Substring(1);
+            }
+            return text.Replace("\r", "");
+        }
+
         /// <summary>Loads every data file through <paramref name="readFile"/> (name without extension → text).</summary>
         public static void Load(Func<string, string> readFile)
         {
             var files = new Dictionary<string, JsonValue>();
+            ulong fingerprint = Fnv.Offset;
             foreach (string name in Files)
             {
                 string text = readFile(name) ?? throw new InvalidOperationException("找不到数据文件 " + name + ".json");
                 files[name] = Json.Parse(text, name + ".json");
+                fingerprint = Fnv.Mix(fingerprint, name + "\n");
+                fingerprint = Fnv.Mix(fingerprint, NormalizeText(text));
             }
             _files = files;
+            Fingerprint = fingerprint.ToString("x16");
             UnitCatalog.Load(files["units"]);
             CounterTable.Load(files["counters"]);
             CommanderSkillDef.Load(files["skills"]);
+            TerrainCatalog.Load(files["terrains"]);
+            PowerRating.Load(files["power"]);
             Loaded?.Invoke();
         }
 

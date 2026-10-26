@@ -20,9 +20,11 @@ namespace Starline.Battle
     /// <summary>A single battle node: the enemy formation plus what the player may deploy.</summary>
     public sealed class Encounter
     {
-        public string Name;
+        /// <summary>Id in encounters.json (null for hand-built encounters); names its text in the Game table and picks the battle seed, see <see cref="StageSeed"/>.</summary>
+        public string Id;
+        public LocText Name => new LocText("encounter." + Id + ".name");
         /// <summary>One or two sentences shown before deployment.</summary>
-        public string Briefing;
+        public LocText Briefing => new LocText("encounter." + Id + ".briefing");
         public Formation Enemy;
         public List<RosterEntry> Roster = new List<RosterEntry>();
         public int CommandLimit = 22;
@@ -30,6 +32,8 @@ namespace Starline.Battle
         public int TimeLimitSeconds = 90;
         /// <summary>A sensible starting formation the player can edit.</summary>
         public Formation SuggestedPlayer;
+        /// <summary>Battlefield environment and tiles; null for plain ground (GDD 5.5).</summary>
+        public BattleTerrain Terrain;
 
         public int OwnedCount(string unitId)
         {
@@ -49,6 +53,7 @@ namespace Starline.Battle
             Enemy = Enemy,
             Seed = seed,
             TimeLimitSeconds = TimeLimitSeconds,
+            Terrain = Terrain,
         };
     }
 }

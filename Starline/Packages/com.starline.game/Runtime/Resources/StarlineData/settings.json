@@ -1,0 +1,52 @@
+{
+  "_说明": "设置界面的选项和画质预设（客户端读取，内核不用）。id 是存进玩家设置文件的值，name 是界面上显示的文字。",
+  "defaultLanguage": "zh-Hans",
+  "languages": [
+    { "id": "zh-Hans", "name": "简体中文", "available": true, "status": "", "systemLanguages": ["ChineseSimplified", "Chinese"] },
+    { "id": "en", "name": "English", "available": false, "status": "翻译制作中 · Translation in progress", "systemLanguages": ["English"] }
+  ],
+  "onName": "开",
+  "offName": "关",
+  "customPresetName": "自定义",
+  "defaultPreset": "high",
+  "presets": [
+    { "id": "low", "name": "低", "renderScale": 67, "antialiasing": "fxaa", "shadows": "off", "bloom": false },
+    { "id": "medium", "name": "中", "renderScale": 85, "antialiasing": "smaa", "shadows": "low", "bloom": true },
+    { "id": "high", "name": "高", "renderScale": 100, "antialiasing": "smaa", "shadows": "medium", "bloom": true },
+    { "id": "ultra", "name": "极致", "renderScale": 100, "antialiasing": "msaa4", "shadows": "high", "bloom": true }
+  ],
+  "defaultDisplayMode": "fullscreen",
+  "displayModes": [
+    { "id": "fullscreen", "name": "全屏" },
+    { "id": "borderless", "name": "无边框窗口" },
+    { "id": "windowed", "name": "窗口" }
+  ],
+  "displayConfirmSeconds": 15,
+  "defaultVsync": true,
+  "defaultFrameRate": 120,
+  "frameRates": [
+    { "value": 30, "name": "30" },
+    { "value": 60, "name": "60" },
+    { "value": 120, "name": "120" },
+    { "value": 144, "name": "144" },
+    { "value": 0, "name": "不限" }
+  ],
+  "renderScales": [
+    { "value": 50, "name": "50%" },
+    { "value": 67, "name": "67%" },
+    { "value": 85, "name": "85%" },
+    { "value": 100, "name": "100%" }
+  ],
+  "antialiasing": [
+    { "id": "off", "name": "关", "msaa": 1 },
+    { "id": "fxaa", "name": "FXAA", "msaa": 1 },
+    { "id": "smaa", "name": "SMAA", "msaa": 1 },
+    { "id": "msaa4", "name": "MSAA 4×", "msaa": 4 }
+  ],
+  "shadows": [
+    { "id": "off", "name": "关", "distance": 0, "resolution": 0 },
+    { "id": "low", "name": "低", "distance": 30, "resolution": 1024 },
+    { "id": "medium", "name": "中", "distance": 45, "resolution": 2048 },
+    { "id": "high", "name": "高", "distance": 60, "resolution": 4096 }
+  ]
+}

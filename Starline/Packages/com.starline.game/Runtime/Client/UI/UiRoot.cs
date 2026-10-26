@@ -5,15 +5,20 @@ namespace Starline.Client
 {
     /// <summary>
     /// The single UI Toolkit document. Three layers, back to front: world labels over the
-    /// ships, the current screen, and modal dialogs.
+    /// ships, the current screen, and modal dialogs. Switches to the portrait layouts while the
+    /// screen is taller than wide.
     /// </summary>
     public sealed class UiRoot : MonoBehaviour
     {
         /// <summary>Panel settings created by the editor setup (Starline &gt; 初始化工程), with the default runtime theme.</summary>
         public const string PanelSettingsResource = "StarlinePanelSettings";
 
+        /// <summary>Root class that switches Theme.uss to the portrait layouts.</summary>
+        public const string PortraitClass = "portrait";
+
         private UIDocument _document;
         private VisualElement _screen;
+        private bool _portrait;
 
         public VisualElement Root { get; private set; }
         public VisualElement WorldLayer { get; private set; }
@@ -39,7 +44,8 @@ namespace Starline.Client
             PanelSettings settings = Resources.Load<PanelSettings>(PanelSettingsResource);
             if (settings != null)
             {
-                return settings;
+                // A copy, because the orientation switch edits it and must not change the asset.
+                return Instantiate(settings);
             }
             // Fallback so the game still runs before the editor setup has been done; without a
             // theme only our own stylesheet applies, which covers every control we use.
@@ -68,6 +74,27 @@ namespace Starline.Client
             WorldLayer = Layer("world-layer");
             ScreenLayer = Layer("screen-layer");
             ModalLayer = Layer("modal-layer");
+            ApplyOrientation(IsPortraitScreen);
+        }
+
+        public bool IsPortrait => _portrait;
+
+        private static bool IsPortraitScreen => Screen.height > Screen.width;
+
+        /// <summary>Follows window resizes and device rotation between landscape and portrait.</summary>
+        private void Update()
+        {
+            if (IsPortraitScreen != _portrait)
+            {
+                ApplyOrientation(!_portrait);
+            }
+        }
+
+        private void ApplyOrientation(bool portrait)
+        {
+            _portrait = portrait;
+            Ui.ConfigurePanel(_document.panelSettings, portrait);
+            Root.EnableInClassList(PortraitClass, portrait);
         }
 
         private VisualElement Layer(string name)

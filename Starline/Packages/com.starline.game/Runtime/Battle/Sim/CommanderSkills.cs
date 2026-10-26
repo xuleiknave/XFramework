@@ -12,8 +12,8 @@ namespace Starline.Battle
     public sealed class CommanderSkillDef
     {
         public CommanderSkill Skill;
-        public string DisplayName;
-        public string Description = "";
+        public LocText Name => new LocText("skill." + Skill + ".name");
+        public LocText Description => new LocText("skill." + Skill + ".description");
         public int Cost;
         public int CooldownSeconds;
         public bool NeedsTarget;
@@ -31,8 +31,8 @@ namespace Starline.Battle
         public static Fix StrikeRadius => Get(CommanderSkill.OrbitalStrike).Radius;
         public static Fix StrikeDamage => Get(CommanderSkill.OrbitalStrike).Damage;
 
-        internal static Fix[] StarHpScale = { Fix.One, Fix.One, Fix.One };
-        internal static Fix[] StarDamageScale = { Fix.One, Fix.One, Fix.One };
+        internal static Fix[] StarHpScale = { Fix.One, Fix.One, Fix.One, Fix.One, Fix.One };
+        internal static Fix[] StarDamageScale = { Fix.One, Fix.One, Fix.One, Fix.One, Fix.One };
 
         internal static void Load(JsonValue root)
         {
@@ -44,8 +44,6 @@ namespace Starline.Battle
                 all[(int)skill] = new CommanderSkillDef
                 {
                     Skill = skill,
-                    DisplayName = s["name"].AsString(),
-                    Description = s.String("description", ""),
                     Cost = s["cost"].AsInt(),
                     CooldownSeconds = s["cooldown"].AsInt(),
                     NeedsTarget = s.Bool("needsTarget"),
@@ -95,5 +93,18 @@ namespace Starline.Battle
 
         public static Command Cast(int side, CommanderSkill skill, FixVec2 point = default(FixVec2)) =>
             new Command { Side = side, Skill = skill, Point = point };
+    }
+
+    /// <summary>A command together with the tick at whose start it was applied.</summary>
+    public readonly struct IssuedCommand
+    {
+        public readonly int Tick;
+        public readonly Command Command;
+
+        public IssuedCommand(int tick, Command command)
+        {
+            Tick = tick;
+            Command = command;
+        }
     }
 }

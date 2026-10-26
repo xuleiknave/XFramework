@@ -10,7 +10,7 @@ namespace Starline.Battle
         public int Depth;
         /// <summary>Cell row for units; row line for relays.</summary>
         public int Row;
-        /// <summary>Star level 1..3 (merging three copies raises it, GDD 4.5).</summary>
+        /// <summary>Star level 1..5 (shards raise it, GDD 4.8; merging three copies during an expedition, up to 3, GDD 4.5).</summary>
         public int Star = 1;
         /// <summary>The owned ship this placement deploys during an expedition (0 = none).</summary>
         public int ShipId;

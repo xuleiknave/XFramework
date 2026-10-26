@@ -9,6 +9,8 @@ namespace Starline.Battle
         public Formation Enemy;
         public ulong Seed = 1;
         public int TimeLimitSeconds = 90;
+        /// <summary>Environment and tile layout; null fights on plain ground (GDD 5.5).</summary>
+        public BattleTerrain Terrain;
     }
 
     /// <summary>Per-side statistics collected during a battle (used by the forecast).</summary>
@@ -51,6 +53,7 @@ namespace Starline.Battle
         private readonly Fix[] _supplyPoints = { StartingSupplyPoints, StartingSupplyPoints };
         private readonly int[,] _skillReadyTick = new int[2, CommanderSkillDef.All.Length];
         private readonly List<Command> _pendingCommands = new List<Command>();
+        private readonly List<IssuedCommand> _issuedCommands = new List<IssuedCommand>();
         private readonly List<PendingStrike> _strikes = new List<PendingStrike>();
         private readonly List<BattleEvent> _events = new List<BattleEvent>();
         private readonly List<PendingHit> _hits = new List<PendingHit>();
@@ -75,6 +78,8 @@ namespace Starline.Battle
         {
             Setup = setup;
             _random = new DeterministicRandom(setup.Seed);
+            _networks[0].Terrain = setup.Terrain;
+            _networks[1].Terrain = setup.Terrain;
             Stats = new[] { new SideStats(), new SideStats() };
             Spawn(setup.Player, BoardLayout.PlayerSide);
             Spawn(setup.Enemy, BoardLayout.EnemySide);
@@ -117,7 +122,14 @@ namespace Starline.Battle
             && _supplyPoints[side] >= Fix.FromInt(CommanderSkillDef.Get(skill).Cost);
 
         /// <summary>Queues a command; it takes effect at the start of the next tick.</summary>
-        public void Issue(Command command) => _pendingCommands.Add(command);
+        public void Issue(Command command)
+        {
+            _pendingCommands.Add(command);
+            _issuedCommands.Add(new IssuedCommand(Tick, command));
+        }
+
+        /// <summary>Every command issued so far with the tick it was applied at, in order (recorded into replays).</summary>
+        public IReadOnlyList<IssuedCommand> IssuedCommands => _issuedCommands;
 
         public Unit GetUnit(int id) => _unitsById.TryGetValue(id, out Unit unit) ? unit : null;
 
@@ -156,6 +168,7 @@ namespace Starline.Battle
 
             _events.Clear();
             ApplyCommands();
+            UpdateTerrain();
             UpdateSupply(emitEvents: true);
             foreach (Unit unit in _units)
             {
@@ -236,17 +249,18 @@ namespace Starline.Battle
                 };
                 unit.Hp = unit.MaxHp;
                 unit.Shield = unit.MaxShield;
+                UpdateTerrain(unit, force: true);
                 _units.Add(unit);
                 _allUnits.Add(unit);
                 _unitsById.Add(unit.Id, unit);
 
                 if (def.IsSupplySource)
                 {
-                    _networks[side].AddNode(unit, BoardLayout.SourcePort(side, p.Depth, p.Row), true);
+                    _networks[side].AddNode(unit, side, p.Depth, p.Row + 1, true);
                 }
                 else if (def.IsRelay)
                 {
-                    _networks[side].AddNode(unit, position, false);
+                    _networks[side].AddNode(unit, side, p.Depth, p.Row, false);
                 }
             }
         }
@@ -321,6 +335,36 @@ namespace Starline.Battle
         }
 
         // ------------------------------------------------------------------
+        // Terrain
+
+        private void UpdateTerrain()
+        {
+            if (Setup.Terrain == null)
+            {
+                return;
+            }
+            foreach (Unit unit in _units)
+            {
+                UpdateTerrain(unit, force: false);
+            }
+        }
+
+        /// <summary>Recomputes a unit's terrain modifiers when it steps onto a different tile.</summary>
+        private void UpdateTerrain(Unit unit, bool force)
+        {
+            if (Setup.Terrain == null)
+            {
+                return;
+            }
+            TileDef tile = Setup.Terrain.TileAtPosition(unit.Position);
+            if (force || tile != unit.Tile)
+            {
+                unit.Tile = tile;
+                unit.Terrain = TerrainModifiers.For(unit.Def, Setup.Terrain, tile);
+            }
+        }
+
+        // ------------------------------------------------------------------
         // Supply
 
         private void UpdateSupply(bool emitEvents)
@@ -344,7 +388,7 @@ namespace Starline.Battle
                     continue;
                 }
 
-                unit.InCoverage = _networks[unit.Side].IsCovered(unit.Position);
+                unit.InCoverage = _networks[unit.Side].IsCoveredFor(unit.Position, unit.Def);
                 if (unit.InCoverage)
                 {
                     unit.OffGridTicks = 0;
@@ -398,10 +442,11 @@ namespace Starline.Battle
                 return;
             }
 
-            Fix reach = unit.Def.Range + target.Def.Radius;
+            Fix reach = unit.Range + target.Def.Radius;
             if (FixVec2.SqrDistance(unit.Position, target.Position) > reach * reach)
             {
-                unit.Position = ClampToBounds(FixVec2.MoveTowards(unit.Position, target.Position, unit.Def.Speed * TickDuration));
+                Fix speed = unit.Def.Speed * unit.Terrain.Speed;
+                unit.Position = ClampToBounds(FixVec2.MoveTowards(unit.Position, target.Position, speed * TickDuration));
             }
         }
 
@@ -514,7 +559,7 @@ namespace Starline.Battle
                 {
                     continue;
                 }
-                Fix reach = unit.Def.Range + target.Def.Radius;
+                Fix reach = unit.Range + target.Def.Radius;
                 if (FixVec2.SqrDistance(unit.Position, target.Position) > reach * reach)
                 {
                     continue;
@@ -523,6 +568,14 @@ namespace Starline.Battle
                 unit.ShotsFired++;
                 bool critical = unit.Def.HeavySalvoEvery > 0 && unit.ShotsFired % unit.Def.HeavySalvoEvery == 0;
                 Fix damage = unit.Damage * CounterTable.Get(unit.Def.Role, target.Def.Role);
+                if (Setup.Terrain != null)
+                {
+                    damage = damage * unit.Terrain.Damage * target.Terrain.DamageTaken;
+                    if (unit.Def.Role == UnitRole.Artillery || unit.Def.Role == UnitRole.PointDefense)
+                    {
+                        damage = damage * target.Terrain.RangedDamageTaken;
+                    }
+                }
                 damage = damage * (DamageVarianceMin + DamageVarianceSpan * _random.NextFix());
                 if (critical)
                 {
@@ -530,7 +583,7 @@ namespace Starline.Battle
                 }
 
                 _hits.Add(new PendingHit { Source = unit, Target = target, Damage = damage, Critical = critical });
-                unit.CooldownTicks = FireIntervalTicks(unit.Def);
+                unit.CooldownTicks = FireIntervalTicks(unit);
                 _events.Add(new BattleEvent { Type = BattleEventType.Fired, Tick = Tick, SourceId = unit.Id, TargetId = target.Id, Critical = critical });
 
                 if (unit.Def.MaxAmmo > 0)
@@ -585,21 +638,31 @@ namespace Starline.Battle
         {
             foreach (Unit unit in _units)
             {
-                if (!unit.IsAlive || !unit.Supplied)
+                if (!unit.IsAlive)
+                {
+                    continue;
+                }
+                if (unit.Terrain.HpRegen > Fix.Zero && unit.Hp < unit.MaxHp)
+                {
+                    // Terrain healing (bone piles) works on or off the network.
+                    unit.Hp = Fix.Min(unit.MaxHp, unit.Hp + unit.MaxHp * unit.Terrain.HpRegen * TickDuration);
+                }
+                if (!unit.Supplied)
                 {
                     continue;
                 }
                 if (Tick - unit.LastDamagedTick >= ShieldRegenDelayTicks)
                 {
-                    unit.Shield = Fix.Min(unit.MaxShield, unit.Shield + unit.Def.ShieldRegenPerSecond * UnitDef.HpScale(unit.Star) * TickDuration);
+                    Fix regen = unit.Def.ShieldRegenPerSecond * UnitDef.HpScale(unit.Star) * unit.Terrain.ShieldRegen;
+                    unit.Shield = Fix.Min(unit.MaxShield, unit.Shield + regen * TickDuration);
                 }
                 if (unit.Def.MaxAmmo > 0 && unit.Ammo < unit.Def.MaxAmmo)
                 {
-                    unit.AmmoRefillTicks++;
-                    if (unit.AmmoRefillTicks >= RefillTicks(unit.Def))
+                    unit.AmmoRefillProgress += unit.Terrain.ManaRegen;
+                    if (unit.AmmoRefillProgress >= Fix.FromInt(RefillTicks(unit.Def)))
                     {
                         unit.Ammo++;
-                        unit.AmmoRefillTicks = 0;
+                        unit.AmmoRefillProgress = Fix.Zero;
                     }
                 }
             }
@@ -695,9 +758,9 @@ namespace Starline.Battle
             return new FixVec2(Fix.Clamp(p.X, -h.X, h.X), Fix.Clamp(p.Y, -h.Y, h.Y));
         }
 
-        private static int FireIntervalTicks(UnitDef def)
+        private static int FireIntervalTicks(Unit unit)
         {
-            int ticks = (def.FireIntervalSeconds * TicksPerSecond).ToIntFloor();
+            int ticks = (unit.Def.FireIntervalSeconds * unit.Terrain.AttackInterval * TicksPerSecond).ToIntFloor();
             return ticks < 1 ? 1 : ticks;
         }
 

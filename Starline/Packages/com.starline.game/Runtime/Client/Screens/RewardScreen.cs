@@ -23,32 +23,32 @@ namespace Starline.Client
         private VisualElement Card(RewardOption option, int index)
         {
             VisualElement card = Ui.Box("panel", "reward-card");
-            card.Add(Ui.Label(option.Kind == RewardKind.Relay ? "法力水晶 +1" : UnitCatalog.Get(option.UnitId).DisplayName + " " + Ui.Stars(option.Star), "h2"));
+            card.Add(Ui.Label(Loc.T(option.Title), "h2"));
             if (option.Kind == RewardKind.Relay)
             {
-                card.Add(Ui.Label("魔网节点 · 放在格子交叉点 · 指挥 1", "small", "muted"));
-                card.Add(Ui.Label("覆盖周围 2 格，同一条格线上 3 格内的节点自动连成魔网连线。多一个水晶，阵型就能铺得更开。", "body"));
-                card.Add(Ui.Label("当前 " + _run.Fleet.Relays + " 个", "small", "muted"));
+                card.Add(Ui.Label(Loc.Ui("reward.relay_kind"), "small", "muted"));
+                card.Add(Ui.Label(Loc.Ui("reward.relay_body"), "body"));
+                card.Add(Ui.Label(Loc.Ui("reward.relay_owned", _run.Fleet.Relays), "small", "muted"));
             }
             else
             {
                 UnitDef def = UnitCatalog.Get(option.UnitId);
-                card.Add(Ui.Label(Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + " · 指挥 " + def.CommandCost, "small", "muted"));
-                if (!string.IsNullOrEmpty(def.Description))
+                card.Add(Ui.Label(Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + Loc.Ui("reward.command", def.CommandCost), "small", "muted"));
+                if (Loc.Has(def.Description))
                 {
-                    card.Add(Ui.Label(def.Description, "body"));
+                    card.Add(Ui.Label(Loc.T(def.Description), "body"));
                 }
                 card.Add(Ui.Label(Wording.ShipStats(def, option.Star), "body", "stats"));
                 int owned = _run.Fleet.CopiesOwned(option.UnitId, option.Star);
-                if (option.Star < UnitDef.MaxStar && owned > 0)
+                if (option.Star < UnitDef.MaxMergeStar && owned > 0)
                 {
                     card.Add(owned >= 2
-                        ? Ui.Label("已有 2 名同星 → 选它立即合成 " + Ui.Stars(option.Star + 1) + "！", "small", "good")
-                        : Ui.Label("已有 1 名同星（3 名合成 " + Ui.Stars(option.Star + 1) + "）", "small", "muted"));
+                        ? Ui.Label(Loc.Ui("reward.merge_now", Ui.Stars(option.Star + 1)), "small", "good")
+                        : Ui.Label(Loc.Ui("reward.merge_later", Ui.Stars(option.Star + 1)), "small", "muted"));
                 }
             }
             card.Add(Ui.Box("spacer"));
-            card.Add(Ui.Button("选择", () => Choose(index), "btn-primary"));
+            card.Add(Ui.Button(Loc.Ui("reward.choose"), () => Choose(index), "btn-primary"));
             return card;
         }
 

@@ -1,0 +1,6 @@
+{
+  "_说明": "上阵战力（replay-server.md 第 3 节），最低战力榜按它排名。每名角色的战力 = (生命 + 护盾) × 星级耐久倍率 × durability + 每秒伤害 × 星级伤害倍率 × dps，取整后求和。countStructures 为 false 时源晶塔和法力水晶不计战力。以后加入等级和符文后在这里补权重。",
+  "durability": 1,
+  "dps": 10,
+  "countStructures": false
+}
