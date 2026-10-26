@@ -33,11 +33,11 @@ namespace Starline.Client
             name = (name ?? string.Empty).Trim();
             if (name.Length == 0)
             {
-                return "请输入指挥官的名字。";
+                return Loc.Ui("commander.name_empty");
             }
             if (name.Length > MaxNameLength)
             {
-                return "名字最多 " + MaxNameLength + " 个字。";
+                return Loc.Ui("commander.name_too_long", MaxNameLength);
             }
             return null;
         }
@@ -47,7 +47,7 @@ namespace Starline.Client
             int minutes = (int)(seconds / 60.0);
             int hours = minutes / 60;
             minutes %= 60;
-            return hours > 0 ? hours + " 小时 " + minutes + " 分" : minutes + " 分";
+            return hours > 0 ? Loc.Ui("time.hours_minutes", hours, minutes) : Loc.Ui("time.minutes", minutes);
         }
     }
 }

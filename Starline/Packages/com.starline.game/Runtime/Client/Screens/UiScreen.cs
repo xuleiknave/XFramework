@@ -33,6 +33,13 @@ namespace Starline.Client
         {
         }
 
+        /// <summary>
+        /// A fresh copy of this screen in the same state, built after the language changed so that
+        /// its text is in the new language; null when the screen cannot be rebuilt (it only shows
+        /// the new language after the next screen change).
+        /// </summary>
+        public virtual UiScreen Rebuild() => null;
+
         protected T Find<T>(string name) where T : VisualElement => Root.Find<T>(name);
 
         protected Button Button(string name, System.Action onClick)

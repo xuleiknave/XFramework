@@ -48,8 +48,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 | `counters.json` | 克制表：攻击方定位对目标定位的伤害倍率 |
 | `skills.json` | 指挥官技能；星级倍率（★1~★5） |
 | `encounters.json` | 敌方阵容：共用的亡灵祭坛底座 + 各自的单位；可选 `terrain`（战斗场景）和 `layout` / `layoutSeed`（地块布局） |
-| `terrains.json` | 战斗场景（设计文档 5.5）：每章的战场环境和棋盘地块，内核按定点数结算；名字和说明在 `Localization/Game.csv` |
-| `settings.json` | 设置界面的选项（语言、显示模式、帧率、渲染精度、抗锯齿、阴影）和四档画质预设；只有客户端读取 |
+| `terrains.json` | 战斗场景（设计文档 5.5）：每章的战场环境和棋盘地块，内核按定点数结算；名字、说明和效果文字在 `Localization/Game.csv`（`tile.<id>.name/description/effect<n>`、`terrain.<id>.*`，effect 按 effects 里的顺序从 1 数） |
+| `settings.json` | 设置界面的选项（语言、显示模式、帧率、渲染精度、抗锯齿、阴影）和四档画质预设；只有客户端读取。选项名写 `"#key"`（UI 表）或原样显示的文字 |
 | `expedition.json` | 远征规则（耐久、指挥点、水晶上限）、每一幕的开局远征军、地图层、敌人分档、奖池 |
 
 - 数值写成十进制小数（最多 4 位），内核按分数精确转换成定点数，同样的数据在任何电脑上算出同样的结果。
@@ -75,7 +75,9 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 - 加一种语言就是在 CSV 里加一列（列名是语言代码，如 `ja`、`zh-Hant`），导入时自动建 Locale。空单元格表示没翻译，显示简体中文。
 - 占位符用 `{0}`、`{1}`，译文的占位符必须和中文一致（测试会检查）。名字类参数由代码先翻译再填进去。
 - 内核不含任何文字：返回 `LocText`（key + 参数，参数可以是另一个 `LocText`，例如角色名），客户端用 `Loc.T` 翻译。这样服务端重跑战斗、测试都不受语言影响。测试用 `Game.csv` 的中文列输出日志。
-- 启动语言：命令行 `-language=en` → 系统语言 → 简体中文。设置里保存的语言在初始化后用 `Loc.SetLanguage(code)` 应用；`GameApp` 等 `Loc.Initialize()` 完成后才显示主菜单。切换语言后已打开的界面要重建才会换文字（`Loc.LanguageChanged`）。
+- 启动语言：命令行 `-language=en` → 设置里保存的语言 → 系统语言 → 简体中文。`GameApp` 把设置里的语言传给 `Loc.Initialize(language)`，它等语言表加载完、用 `Loc.SetLanguage(code)` 切过去并等新语言的表加载完，才显示主菜单。
+- 切换语言：设置界面点语言卡片后保存设置并调用 `Loc.SetLanguage`；新语言的表加载完后触发 `Loc.LanguageChanged`，`GameApp` 在下一帧用当前界面的 `UiScreen.Rebuild()` 重建它（设置界面重建后停在语言页），所以文字立即换掉。别的界面不重建（返回 null），离开设置后新建的界面自然是新语言。
+- 配置表里给玩家看的选项名（`settings.json` 的预设、显示模式、开 / 关等）写成 `"#key"`，界面用 `Loc.Text(name)` 取 UI 表；不以 `#` 开头的（语言名、FXAA、帧率数字）原样显示。
 - 语言表打进安装包（Addressables 本地分组，随 Player 一起构建），不走 CDN；更新随 Steam 版本发布。
 - 内核测试会检查：每条都有中文、译文占位符一致、每个角色 / 技能 / 阵容 / 幕都有文本、47 名角色都有 5 段小传、UXML 和客户端代码用到的 key 都在 `UI.csv` 里且没有多余的行。
 - 翻译流程、术语对照和英文译名见 [localization.md](localization.md)。
@@ -154,7 +156,7 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 
 - 设置不分存档，所有存档共用，存在 `Application.persistentDataPath/settings.json`（`GameSettings` / `SettingsStore`）。启动时读取并应用（`SettingsApplier.ApplyAll`）；文件缺失、损坏或含有配置表里已没有的选项时，对应项回到默认值。
 - 改动立即生效并保存。显示模式和分辨率改完要在 15 秒内点“保留”，否则自动还原（防止黑屏后无法操作）；在编辑器里这两项不生效，由 Game 视图决定大小。
-- 语言：首次启动跟随系统语言，没有对应翻译时用简体中文。现在只有简体中文可选，English 显示“翻译制作中”；本地化（界面和剧情文本按语言切换）还没做，`GameSettings.language` 已经存好，接入时读取它即可。
+- 语言：首次启动跟随系统语言，没有对应翻译时用简体中文。可选简体中文和 English（英文是初稿，卡片上标“初稿 · Draft”，没翻译的条目显示中文）；点一下立即切换并保存，下次启动沿用（见 2.1 节）。
 - 画质：四档预设（低 / 中 / 高 / 极致）一次设置渲染精度、抗锯齿、阴影和泛光；单独改某一项后预设显示“自定义”。垂直同步、帧率上限、显示模式和分辨率不属于预设。默认“高”、全屏、原生分辨率、垂直同步开。
 - 渲染管线：启动时复制一份工程的 URP 资源再修改（渲染精度、MSAA、阴影距离和分辨率），在编辑器里试玩不会改动资源文件；FXAA / SMAA 设在主摄像机上，阴影关闭时关掉主光源阴影，泛光开关控制 `SceneLook` 的 Bloom。
 - 声音和操作两页先占位（置灰“后续开放”），音量随音频框架一起做。

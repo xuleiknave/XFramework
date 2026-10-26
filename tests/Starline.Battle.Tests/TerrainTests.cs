@@ -29,7 +29,7 @@ namespace Starline.Battle.Tests
             Assert(TerrainCatalog.Tiles.Count == 10, "应有 10 种地块，实际 " + TerrainCatalog.Tiles.Count);
             foreach (string id in TerrainIds)
             {
-                Assert(TerrainCatalog.Get(id).Name.Length > 0, id + " 缺少名字");
+                Assert(Fixtures.Text(TerrainCatalog.Get(id).Name).Length > 0, id + " 缺少名字");
             }
             TerrainDef forest = TerrainCatalog.Get("forest");
             Assert(forest.Effects.Count == 3 && forest.Effects[1].Stat == TerrainStat.Range && forest.Effects[1].Value == -Fix.One, "森林的远程射程 −1");
@@ -71,8 +71,8 @@ namespace Starline.Battle.Tests
                     {
                         int p = layout.Count(0, entry.Tile);
                         int e = layout.Count(1, entry.Tile);
-                        Assert(p == e, id + " 种子 " + seed + "：双方 " + entry.Tile.Name + " 数量应相等（" + p + " / " + e + "）");
-                        Assert(p <= entry.Max, id + " 种子 " + seed + "：" + entry.Tile.Name + " 超过上限");
+                        Assert(p == e, id + " 种子 " + seed + "：双方 " + Fixtures.Text(entry.Tile.Name) + " 数量应相等（" + p + " / " + e + "）");
+                        Assert(p <= entry.Max, id + " 种子 " + seed + "：" + Fixtures.Text(entry.Tile.Name) + " 超过上限");
                     }
                     for (int side = 0; side < 2; side++)
                     {
@@ -299,11 +299,11 @@ namespace Starline.Battle.Tests
                     layouts++;
                 }
                 Assert(layouts > 0, id + "：没有可用的布局");
-                Info(def.Name + "：只算环境效果 " + Percent(effectsOnly) + "；加上地块平均 " + Percent(total / layouts)
+                Info(Fixtures.Text(def.Name) + "：只算环境效果 " + Percent(effectsOnly) + "；加上地块平均 " + Percent(total / layouts)
                     + "（" + string.Join("、", rates) + "）");
                 if (System.Math.Abs(effectsOnly - baseline) > 0.15)
                 {
-                    tooStrong.Add(def.Name);
+                    tooStrong.Add(Fixtures.Text(def.Name));
                 }
             }
             e.Terrain = null;

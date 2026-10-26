@@ -285,5 +285,5 @@
 ```
 
 - 关卡编号 `1-3` 在配置里写成 `ch1_03`，精英关写成 `ch1_e1`。
-- `sceneText` 在关卡选择和布阵界面显示；环境的那段介绍写在 `terrains.json` 的 `description`（第 2 节的文案可以直接替换现在的短描述）。
+- `sceneText` 在关卡选择和布阵界面显示；环境的那段介绍写在 `Localization/Game.csv` 的 `terrain.<id>.description`（第 2 节的文案可以直接替换现在的短描述）。
 - 文本接入多语言表后，`sceneText` 换成文本 key（如 `stage.ch1_03.scene`）。
