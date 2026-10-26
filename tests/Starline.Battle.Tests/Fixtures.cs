@@ -23,7 +23,10 @@ namespace Starline.Battle.Tests
 
         private static LocCsv _gameText;
 
-        /// <summary>The string tables in Localization/*.csv (Game, UI).</summary>
+        /// <summary>The string tables in Localization/*.csv, the same list the editor imports.</summary>
+        public static readonly string[] TableNames = { "UI", "Game", "Characters", "Story" };
+
+        /// <summary>Loads one of <see cref="TableNames"/>.</summary>
         public static LocCsv LoadTable(string name) =>
             LocCsv.Parse(File.ReadAllText(Path.Combine(FindDirectory(LocalizationDirectory), name + ".csv")));
 

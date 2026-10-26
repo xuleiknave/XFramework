@@ -61,7 +61,9 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 |---|---|
 | `Packages/com.starline.game/Localization/UI.csv` | 界面文字：UXML 里的 `text="#key"`、C# 里的 `Loc.Ui("key", 参数…)` |
 | `Packages/com.starline.game/Localization/Game.csv` | 内核产生的文字：`unit.<id>.name/description`、`skill.<id>.*`、`encounter.<id>.name/briefing`、`act.<id>.*`（幕名和剧情），以及远征消息、布阵错误、推演败因和建议 |
-| `Assets/Localization/` | 由 CSV 生成的 Unity 资源：Localization Settings、每种语言一个 Locale、`UI` 和 `Game` 两个字符串表 |
+| `Packages/com.starline.game/Localization/Characters.csv` | 角色：`faction.<id>.*`（阵营名和主题）、`role.<id>.name`（职业）、`hero.<id>.name/title`、`hero.<id>.skill<n>.name/desc`、`bio.<id>.1~5`（小传，★1~★5 解锁）。C# 里用 `Loc.Hero("key")` |
+| `Packages/com.starline.game/Localization/Story.csv` | 主线剧情：`story.act.*`、`story.chapter.<n>.*`（章名、简介、章末钩子、Boss）、`story.thread.*`（五根线）、`story.lore.*`（档案馆）、`story.ending.*`、`story.recap.*`（星线编年）、`story.letter.*`（诺娃的信）。C# 里用 `Loc.Story("key")` |
+| `Assets/Localization/` | 由 CSV 生成的 Unity 资源：Localization Settings、每种语言一个 Locale、`UI`、`Game`、`Characters`、`Story` 四个字符串表 |
 
 - **CSV 是文本的源头**：列为 `key, zh-Hans, en, note`，一行一条。改 CSV（或 git pull 拉到新 CSV）后 Unity 会自动重新导入；也可以点菜单 `Starline > 本地化 > 从 CSV 导入语言表`。在 Unity 的表格编辑器里改了文本，要点 `导出语言表到 CSV` 写回去，否则下次导入会被 CSV 覆盖。
 - 加一种语言就是在 CSV 里加一列（列名是语言代码，如 `ja`、`zh-Hant`），导入时自动建 Locale。空单元格表示没翻译，显示简体中文。
@@ -69,7 +71,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 - 内核不含任何文字：返回 `LocText`（key + 参数，参数可以是另一个 `LocText`，例如角色名），客户端用 `Loc.T` 翻译。这样服务端重跑战斗、测试都不受语言影响。测试用 `Game.csv` 的中文列输出日志。
 - 启动语言：命令行 `-language=en` → 系统语言 → 简体中文。设置里保存的语言在初始化后用 `Loc.SetLanguage(code)` 应用；`GameApp` 等 `Loc.Initialize()` 完成后才显示主菜单。切换语言后已打开的界面要重建才会换文字（`Loc.LanguageChanged`）。
 - 语言表打进安装包（Addressables 本地分组，随 Player 一起构建），不走 CDN；更新随 Steam 版本发布。
-- 内核测试会检查：每条都有中文、译文占位符一致、每个角色 / 技能 / 阵容 / 幕都有文本、UXML 和客户端代码用到的 key 都在 `UI.csv` 里且没有多余的行。
+- 内核测试会检查：每条都有中文、译文占位符一致、每个角色 / 技能 / 阵容 / 幕都有文本、47 名角色都有 5 段小传、UXML 和客户端代码用到的 key 都在 `UI.csv` 里且没有多余的行。
+- 翻译流程、术语对照和英文译名见 [localization.md](localization.md)。
 
 ## 3. 界面（UI Toolkit）
 

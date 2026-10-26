@@ -39,6 +39,7 @@ namespace Starline.Battle.Tests
             Run("敌方阵容都合法", EncountersAreValid);
             Run("语言表：每条都有中文，译文占位符一致", LocalizationTablesAreComplete);
             Run("语言表：角色、技能、阵容、剧情都有文本", GameDataHasText);
+            Run("语言表：每名角色都有 5 段小传", HeroesHaveBios);
             Run("语言表：界面用到的 key 都存在", ClientKeysExist);
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
             RunTerrainTests();

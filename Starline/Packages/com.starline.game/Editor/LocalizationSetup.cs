@@ -28,7 +28,7 @@ namespace Starline.Editor
         private const string AssetFolder = "Assets/Localization";
         private const string LocaleFolder = AssetFolder + "/Locales";
         private const string TableFolder = AssetFolder + "/Tables";
-        private static readonly string[] TableNames = { Loc.UiTable, Loc.GameTable };
+        private static readonly string[] TableNames = { Loc.UiTable, Loc.GameTable, Loc.CharactersTable, Loc.StoryTable };
 
         [MenuItem("Starline/本地化/从 CSV 导入语言表", priority = 20)]
         public static void Import()
