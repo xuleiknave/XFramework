@@ -87,7 +87,10 @@ namespace Starline.Battle
         public bool IsCraft => Role == UnitRole.Craft;
         public bool IsStatic => Speed == Fix.Zero;
 
-        public const int MaxStar = 3;
+        /// <summary>Highest star level (GDD 4.8: ★1~★5, raised with character shards).</summary>
+        public const int MaxStar = 5;
+        /// <summary>Highest star reachable by merging three copies during an expedition (GDD 4.5).</summary>
+        public const int MaxMergeStar = 3;
 
         /// <summary>Durability multiplier for a star level (hull, shield and shield regeneration); from skills.json.</summary>
         public static Fix HpScale(int star) => CommanderSkillDef.StarHpScale[Clamp(star) - 1];

@@ -34,6 +34,7 @@
 
 ```
 dotnet run --project tests/Starline.Battle.Tests   # 内核测试，最后一行应是“全部通过”
+dotnet run --project tests/Starline.Battle.Tests -- --balance   # 重新生成 docs/balance-sheet.md（数值平衡表 + 对战模拟）
 ```
 
 云端会话启动时由 `.claude/hooks/session-start.sh` 从 Ubuntu 源安装 .NET 8 SDK（微软下载站被网络策略拦截），所以内核测试可以直接跑。
@@ -46,6 +47,6 @@ dotnet run --project tests/Starline.Battle.Tests   # 内核测试，最后一行
 - 数值放 JSON 配置表，玩家看到的文字放 `Localization/*.csv`，都不要写死在代码里。界面文字在 UXML 写 `text="#key"`、在 C# 用 `Loc.Ui("key", 参数)`；内核返回 `LocText`，不拼字符串。新增文字只填 `zh-Hans` 列，`en` 留空等翻译
 - 界面用 UI Toolkit：布局写 UXML、样式写 Theme.uss，C# 只负责绑定和动态内容；铺满屏幕的容器设 `picking-mode="Ignore"`
 - 内核代码目标 netstandard2.1 / C# 9（Unity 6 支持的版本）
-- 调整数值后跑测试，看平衡模拟的输出
+- 调整数值后跑测试，看平衡模拟的输出，并用 `-- --balance` 重新生成数值平衡表
 - 设计变更同步更新 `docs/game-design.md`（重大决定补进 `docs/decisions.md`）
 - 用户可见文本用中文，术语与设计文档一致（部队、法力水晶、源晶塔、远征军耐久等）

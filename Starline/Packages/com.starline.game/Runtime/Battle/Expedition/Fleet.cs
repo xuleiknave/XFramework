@@ -58,7 +58,7 @@ namespace Starline.Expedition
             var ship = new OwnedShip { Id = _nextId++, UnitId = unitId, Star = star };
             Ships.Add(ship);
 
-            while (ship.Star < UnitDef.MaxStar)
+            while (ship.Star < UnitDef.MaxMergeStar)
             {
                 List<OwnedShip> group = Ships.FindAll(s => s.UnitId == ship.UnitId && s.Star == ship.Star);
                 if (group.Count < 3)

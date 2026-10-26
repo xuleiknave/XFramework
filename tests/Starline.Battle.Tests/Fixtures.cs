@@ -52,6 +52,18 @@ namespace Starline.Battle.Tests
 
         public static string Join(string separator, List<LocText> texts) => string.Join(separator, texts.ConvertAll(Text));
 
+        /// <summary>A path inside the repository (the folder that holds the Unity project).</summary>
+        public static string RepositoryPath(string relative)
+        {
+            string data = FindDataDirectory();
+            var root = new DirectoryInfo(data);
+            for (int i = 0; i < 6; i++)
+            {
+                root = root.Parent;
+            }
+            return Path.Combine(root.FullName, relative);
+        }
+
         private static string FindDataDirectory() => FindDirectory("Starline/Packages/com.starline.game/Runtime/Resources/StarlineData");
 
         public static string FindDirectory(string relative)

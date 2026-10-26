@@ -117,7 +117,7 @@ namespace Starline.Client
                 int id = ship.Id;
                 Button card = RosterCard(Loc.T(def.Name) + " " + Ui.Stars(ship.Star),
                     Loc.Ui(deployed ? "deploy.state_deployed" : selected ? "deploy.state_placing" : "deploy.state_reserve", def.CommandCost),
-                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxStar ? Loc.Ui("deploy.merge_progress", copies) : ""),
+                    Wording.RoleName(def.Role) + (def.Size >= 2 ? " · 2×2" : "") + (ship.Star < UnitDef.MaxMergeStar ? Loc.Ui("deploy.merge_progress", copies) : ""),
                     () =>
                     {
                         if (selected)

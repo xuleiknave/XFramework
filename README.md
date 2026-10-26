@@ -105,3 +105,9 @@ docs/                              设计文档与原型图
 ```
 dotnet run --project tests/Starline.Battle.Tests
 ```
+
+重新生成数值平衡表 [docs/balance-sheet.md](docs/balance-sheet.md)（从配置表汇总数值，并跑约 6000 场纯逻辑对战）：
+
+```
+dotnet run --project tests/Starline.Battle.Tests -- --balance
+```

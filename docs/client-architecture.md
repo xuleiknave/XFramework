@@ -42,7 +42,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 |---|---|
 | `units.json` | 角色和敌方单位的固有属性（生命、护盾、伤害、射程、法力、索敌偏好等） |
 | `counters.json` | 克制表：攻击方定位对目标定位的伤害倍率 |
-| `skills.json` | 指挥官技能；星级倍率 |
+| `skills.json` | 指挥官技能；星级倍率（★1~★5） |
 | `encounters.json` | 敌方阵容：共用的亡灵祭坛底座 + 各自的单位；可选 `terrain`（战斗场景）和 `layout` / `layoutSeed`（地块布局） |
 | `terrains.json` | 战斗场景（设计文档 5.5）：每章的战场环境和棋盘地块，内核按定点数结算；名字和说明在 `Localization/Game.csv` |
 | `expedition.json` | 远征规则（耐久、指挥点、水晶上限）、每一幕的开局远征军、地图层、敌人分档、奖池 |
@@ -50,6 +50,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 - 数值写成十进制小数（最多 4 位），内核按分数精确转换成定点数，同样的数据在任何电脑上算出同样的结果。
 - 数据出错时会报告文件名、行号和字段路径，例如 `units.json 第 12 行：应为 '}'`、`$.units[3].hp：缺少字段`。
 - Unity 通过 `Resources.Load<TextAsset>` 读取，测试项目直接读同一批文件，不存在两份数据。
+- 所有数值的汇总和对战模拟结果见 [balance-sheet.md](balance-sheet.md)，由 `dotnet run --project tests/Starline.Battle.Tests -- --balance` 生成。
 - 以后可以加一个从 Excel 导出 JSON 的脚本，格式不用改。
 - JSON 里只有数值和 id，玩家看到的文字（名字、说明、简报、剧情）都在语言表里，见下一节。
 

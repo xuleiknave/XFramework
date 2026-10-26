@@ -31,8 +31,8 @@ namespace Starline.Battle
         public static Fix StrikeRadius => Get(CommanderSkill.OrbitalStrike).Radius;
         public static Fix StrikeDamage => Get(CommanderSkill.OrbitalStrike).Damage;
 
-        internal static Fix[] StarHpScale = { Fix.One, Fix.One, Fix.One };
-        internal static Fix[] StarDamageScale = { Fix.One, Fix.One, Fix.One };
+        internal static Fix[] StarHpScale = { Fix.One, Fix.One, Fix.One, Fix.One, Fix.One };
+        internal static Fix[] StarDamageScale = { Fix.One, Fix.One, Fix.One, Fix.One, Fix.One };
 
         internal static void Load(JsonValue root)
         {

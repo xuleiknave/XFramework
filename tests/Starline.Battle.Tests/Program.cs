@@ -10,9 +10,16 @@ namespace Starline.Battle.Tests
     {
         private static int _failures;
 
-        private static int Main()
+        private static int Main(string[] args)
         {
             Fixtures.LoadGameData();
+            if (Array.IndexOf(args, "--balance") >= 0)
+            {
+                // Balance sheet: dotnet run --project tests/Starline.Battle.Tests -- --balance [种子数]
+                int index = Array.IndexOf(args, "--balance");
+                int seeds = index + 1 < args.Length && int.TryParse(args[index + 1], out int n) ? n : 6;
+                return BalanceReport.Write(Fixtures.RepositoryPath("docs/balance-sheet.md"), seeds);
+            }
             Run("配置表：JSON 解析与定点数精确转换", JsonParsing);
             Run("定点数基础运算", FixMath);
             Run("棋盘坐标：格子中心与源口", BoardGeometry);
@@ -32,7 +39,8 @@ namespace Starline.Battle.Tests
             Run("魔网影响胜负：去掉法力水晶后胜率下降", SupplyMatters);
             Run("星级：★2 / ★3 提升耐久和伤害", StarScaling);
             Run("合成：3 支同星部队合成高一星，并保留上阵位置", MergeKeepsPlacement);
-            Run("合成：连锁合成到 ★3", ChainMerge);
+            Run("合成：连锁合成到 ★3，不再往上合成", ChainMerge);
+            Run("星级：★4 / ★5 逐级提升", HighStarScaling);
             Run("地图：结构完整，每个节点都能到达 Boss", StarMapIsConnected);
             Run("远征：失败扣耐久，Boss 失败扣 2，归零结束", DurabilityRules);
             Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
@@ -43,10 +51,27 @@ namespace Starline.Battle.Tests
             Run("语言表：界面用到的 key 都存在", ClientKeysExist);
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
             RunTerrainTests();
+            Run("平衡表：同等指挥点下，我方角色之间的克制关系成立", BalanceCounters);
 
             Console.WriteLine();
             Console.WriteLine(_failures == 0 ? "全部通过" : _failures + " 项失败");
             return _failures == 0 ? 0 : 1;
+        }
+
+        /// <summary>A quick slice of docs/balance-sheet.md section 8 (the full sheet: -- --balance).</summary>
+        private static void BalanceCounters()
+        {
+            var cases = new[]
+            {
+                ("battleship", 3, "frigate", 6), ("battleship", 3, "pd_ship", 12),
+                ("strike_craft", 12, "battleship", 3), ("strike_craft", 12, "missile_ship", 6),
+                ("pd_ship", 12, "strike_craft", 12), ("frigate", 6, "missile_ship", 6), ("missile_ship", 6, "battleship", 3),
+            };
+            foreach ((string a, int na, string b, int nb) in cases)
+            {
+                BalanceReport.Outcome o = BalanceReport.Score(BalanceReport.Squad((a, na, 1)), BalanceReport.Squad((b, nb, 1)), null, 2);
+                Assert(o.Win > 0.5, Fixtures.Text(UnitCatalog.Get(a).Name) + "×" + na + " 应胜 " + Fixtures.Text(UnitCatalog.Get(b).Name) + "×" + nb + "，胜率 " + o.Win);
+            }
         }
 
         private static void Run(string name, Action test)
