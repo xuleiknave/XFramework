@@ -25,7 +25,15 @@ namespace Starline.Battle
         public int LastDamagedTick = int.MinValue / 2;
 
         public int Ammo;
-        public int AmmoRefillTicks;
+        /// <summary>Progress towards the next round, in ticks (terrain can speed it up or slow it down).</summary>
+        public Fix AmmoRefillProgress;
+
+        /// <summary>Terrain modifiers for the tile the unit stands on (see <see cref="TerrainModifiers"/>).</summary>
+        public TerrainModifiers Terrain = TerrainModifiers.Identity;
+        /// <summary>The tile <see cref="Terrain"/> was computed for (null for open ground).</summary>
+        public TileDef Tile;
+        /// <summary>Weapon range after terrain.</summary>
+        public Fix Range => Terrain.ApplyRange(Def.Range);
 
         /// <summary>Inside a connected node's coverage this tick.</summary>
         public bool InCoverage;

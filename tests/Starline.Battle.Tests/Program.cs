@@ -38,6 +38,7 @@ namespace Starline.Battle.Tests
             Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
             Run("敌方阵容都合法", EncountersAreValid);
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
+            RunTerrainTests();
 
             Console.WriteLine();
             Console.WriteLine(_failures == 0 ? "全部通过" : _failures + " 项失败");

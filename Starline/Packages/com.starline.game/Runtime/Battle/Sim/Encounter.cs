@@ -30,6 +30,8 @@ namespace Starline.Battle
         public int TimeLimitSeconds = 90;
         /// <summary>A sensible starting formation the player can edit.</summary>
         public Formation SuggestedPlayer;
+        /// <summary>Battlefield environment and tiles; null for plain ground (GDD 5.5).</summary>
+        public BattleTerrain Terrain;
 
         public int OwnedCount(string unitId)
         {
@@ -49,6 +51,7 @@ namespace Starline.Battle
             Enemy = Enemy,
             Seed = seed,
             TimeLimitSeconds = TimeLimitSeconds,
+            Terrain = Terrain,
         };
     }
 }
