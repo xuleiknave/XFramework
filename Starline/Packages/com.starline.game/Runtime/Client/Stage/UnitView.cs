@@ -6,7 +6,9 @@ namespace Starline.Client
     /// <summary>
     /// Visual for one unit: the generated model from <see cref="ModelLibrary"/> when there is one,
     /// otherwise a placeholder built from primitives. In battle it interpolates between the last
-    /// two simulation positions so movement looks smooth.
+    /// two simulation positions so movement looks smooth. Rigged cartoon models also animate
+    /// (walk while moving, attack when firing, hit, death) and stand on the board without a base;
+    /// a thin glow ring on the ground shows their mana network state instead.
     /// </summary>
     public sealed class UnitView : MonoBehaviour
     {
@@ -20,6 +22,8 @@ namespace Starline.Client
         private Material _hull;
         private Material _glow;
         private Color _glowColor;
+        private UnitAnimator _animator;
+        private LineRenderer _ring;
 
         public int UnitId { get; private set; }
         public int Side { get; private set; }
@@ -53,10 +57,16 @@ namespace Starline.Client
                 : def.Id == "wreck_fortress" ? new Color(0.62f, 0.55f, 0.48f)
                 : def.IsStructure ? (side == BoardLayout.PlayerSide ? ViewUtil.SupplyColor : ViewUtil.EnemyColor * 0.85f)
                 : ViewUtil.SideColor(side);
-            GameObject model = ModelLibrary.Instantiate(def.Id, root.transform);
+            string modelKey = ModelLibrary.ModelKey(def.Id, star);
+            GameObject model = ModelLibrary.Instantiate(modelKey, root.transform);
             if (model != null)
             {
-                view.UseModel(model);
+                view.UseModel(model, modelKey);
+                view._animator = UnitAnimator.Attach(model, ModelLibrary.Clips(modelKey));
+                if (view._animator != null && !def.IsStructure)
+                {
+                    view._ring = view.BuildGroundRing(def.Size >= 2 ? 1.5f : 0.7f);
+                }
             }
             else
             {
@@ -69,8 +79,8 @@ namespace Starline.Client
             view._previous = view._current = position;
             root.transform.position = position;
             root.transform.rotation = Quaternion.LookRotation(side == BoardLayout.PlayerSide ? Vector3.right : Vector3.left);
-            // Higher stars read as slightly bigger ships.
-            root.transform.localScale = Vector3.one * (1f + 0.12f * (star - 1));
+            // Higher stars read as slightly bigger (★5 = 1.24×); each star also has its own costume (see ModelKey).
+            root.transform.localScale = Vector3.one * (1f + 0.06f * (star - 1));
             view._renderers = root.GetComponentsInChildren<Renderer>();
             if (view._hull != null)
             {
@@ -115,6 +125,10 @@ namespace Starline.Client
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(dir), 0.2f);
             }
             transform.position = pos;
+            if (_animator != null)
+            {
+                _animator.SetMoving((_current - _previous).sqrMagnitude > 0.000001f);
+            }
             if (_hull != null)
             {
                 return; // model colours are updated in LateUpdate
@@ -127,11 +141,61 @@ namespace Starline.Client
             }
         }
 
-        public void FlashHit() => _flashUntil = Time.time + 0.06f;
-
-        private void UseModel(GameObject model)
+        public void FlashHit()
         {
-            _hull = ModelLibrary.CreateHullMaterial();
+            _flashUntil = Time.time + 0.06f;
+            if (_animator != null)
+            {
+                _animator.Play("hit");
+            }
+        }
+
+        /// <summary>Plays the attack clip (when the model has one) as the unit fires.</summary>
+        public void PlayAttack()
+        {
+            if (_animator != null)
+            {
+                _animator.Play("attack");
+            }
+        }
+
+        /// <summary>
+        /// Plays the death clip and returns how long to keep the view before removing it
+        /// (0 for models without animation, which disappear at once).
+        /// </summary>
+        public float PlayDeath()
+        {
+            if (_ring != null)
+            {
+                _ring.enabled = false;
+            }
+            return _animator != null ? _animator.Play("death") + 0.6f : 0f;
+        }
+
+        /// <summary>Flat glow ring on the ground under a rigged model; LateUpdate colours it like the model's glow.</summary>
+        private LineRenderer BuildGroundRing(float radius)
+        {
+            LineRenderer ring = ViewUtil.Line(transform, "Ground ring");
+            const int segments = 40;
+            ring.useWorldSpace = false;
+            ring.loop = true;
+            ring.positionCount = segments;
+            ring.startWidth = ring.endWidth = 0.05f;
+            ring.startColor = ring.endColor = Color.white;
+            // Lie flat: the line faces along its own Z, which this rotation points straight down.
+            ring.alignment = LineAlignment.TransformZ;
+            ring.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            for (int i = 0; i < segments; i++)
+            {
+                float a = i * Mathf.PI * 2f / segments;
+                ring.SetPosition(i, new Vector3(Mathf.Cos(a) * radius, Mathf.Sin(a) * radius, -0.02f));
+            }
+            return ring;
+        }
+
+        private void UseModel(GameObject model, string modelKey)
+        {
+            _hull = ModelLibrary.CreateHullMaterial(modelKey);
             _glow = ModelLibrary.CreateGlowMaterial();
             ModelLibrary.AssignMaterials(model, _hull, _glow);
             _glowColor = Def.Id == "brood_mother" ? ViewUtil.HiddenColor
@@ -174,6 +238,10 @@ namespace Starline.Client
                 strength = Mathf.Repeat(Time.time * 2f, 1f) < 0.5f ? 2.5f : 0.8f;
             }
             _glow.SetColor("_EmissionColor", glow * strength);
+            if (_ring != null)
+            {
+                _ring.material.color = glow * strength * 0.6f;
+            }
         }
 
         private void OnDestroy()

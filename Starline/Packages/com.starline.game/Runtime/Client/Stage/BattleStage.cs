@@ -151,6 +151,7 @@ namespace Starline.Client
                         if (withEffects && _views.TryGetValue(e.SourceId, out UnitView src) && _views.TryGetValue(e.TargetId, out UnitView dst))
                         {
                             SpawnShot(src, dst, e.Critical);
+                            src.PlayAttack();
                         }
                         break;
                     case BattleEventType.Damaged:
@@ -170,7 +171,8 @@ namespace Starline.Client
                                 SpawnFlash(dead.transform.position + Vector3.up * 0.5f, def.Size >= 2 ? 4f : 2f, 0.45f, new Color(1f, 0.8f, 0.4f));
                             }
                             _views.Remove(e.TargetId);
-                            UnityEngine.Object.Destroy(dead.gameObject);
+                            // Rigged models play their death clip first; static ones vanish at once.
+                            UnityEngine.Object.Destroy(dead.gameObject, withEffects ? dead.PlayDeath() : 0f);
                             if (def.IsRelay || def.IsSupplySource)
                             {
                                 _tintCountdown = 0;
