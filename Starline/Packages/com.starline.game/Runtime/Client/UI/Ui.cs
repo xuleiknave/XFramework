@@ -28,7 +28,9 @@ namespace Starline.Client
         {
             settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
             settings.referenceResolution = portrait ? PortraitReferenceResolution : ReferenceResolution;
-            settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
+            // Landscape expands: 16:9 and wider scale to the height, narrower screens (16:10, 4:3,
+            // a resized window) scale to the width, so the whole 4K artboard always stays visible.
+            settings.screenMatchMode = portrait ? PanelScreenMatchMode.MatchWidthOrHeight : PanelScreenMatchMode.Expand;
             settings.match = portrait ? 0f : 1f;
         }
 
