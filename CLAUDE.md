@@ -1,6 +1,6 @@
 # Starline（星线）
 
-单机奇幻战略游戏（Steam 买断制）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
+奇幻战略游戏（Steam 买断制，需联网登录）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
 
 ## 先读这些
 
@@ -10,6 +10,8 @@
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
 - `docs/characters.md`：47 名角色的小传（升星逐段解锁的个人小故事）
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
+- `docs/server-design.md`：服务端设计（必须联网登录、服务端为准、战斗登记和重跑结算、接口清单）
+- `docs/server-database.md`：服务端数据结构（CRUD Save 文档、MySQL 表）
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明
 
@@ -23,6 +25,8 @@
   - `Editor/`：菜单 `Starline > 初始化工程（场景与界面配置）`、URP 自动配置
 - `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
+- `server/db/schema.sql`：服务端第二阶段（UOS CRUD Storage / MySQL）的建表语句。服务端是托管在 UOS 的 C# 云函数，第一阶段数据库用 CRUD Save，见 `docs/server-design.md`、`docs/server-database.md`；业务代码还没写
+- `server/probe/`：UOS 验证云函数（S0）：在 UOS 上检查内核重跑、数据库条件写、Steam API、冷启动；`dotnet run --project server/probe/Starline.Probe.Local` 在本机跑
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟
 
 ## 命令
