@@ -34,6 +34,7 @@ namespace Starline.Client
             Button("clear", _deploy.ClearFormation);
             _forecastButton = Button("forecast", _deploy.RunForecast);
             _fightButton = Button("fight", Fight);
+            FrameBoardArea();
         }
 
         public override void Enter()

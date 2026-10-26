@@ -16,12 +16,20 @@ namespace Starline.Client
         /// </summary>
         public static readonly Vector2Int ReferenceResolution = new Vector2Int(3840, 2160);
 
-        public static void ConfigurePanel(PanelSettings settings)
+        /// <summary>
+        /// Portrait screens use the same 4K pixel turned upright and scale to the screen width,
+        /// so a px value is the same physical size in both orientations.
+        /// </summary>
+        public static readonly Vector2Int PortraitReferenceResolution = new Vector2Int(2160, 3840);
+
+        public static void ConfigurePanel(PanelSettings settings) => ConfigurePanel(settings, false);
+
+        public static void ConfigurePanel(PanelSettings settings, bool portrait)
         {
             settings.scaleMode = PanelScaleMode.ScaleWithScreenSize;
-            settings.referenceResolution = ReferenceResolution;
+            settings.referenceResolution = portrait ? PortraitReferenceResolution : ReferenceResolution;
             settings.screenMatchMode = PanelScreenMatchMode.MatchWidthOrHeight;
-            settings.match = 1f;
+            settings.match = portrait ? 0f : 1f;
         }
 
         /// <summary>Instantiates Resources/StarlineUI/{name}.uxml, with its "#key" texts translated.</summary>

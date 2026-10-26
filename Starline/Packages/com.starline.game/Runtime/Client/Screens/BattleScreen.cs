@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 using Starline.Battle;
 using Starline.Expedition;
@@ -8,8 +7,8 @@ using Starline.Expedition;
 namespace Starline.Client
 {
     /// <summary>
-    /// The auto-battle: counts and time on top, event feed on the right, supply points and
-    /// commander skills at the bottom, and the result dialog when it ends.
+    /// The auto-battle: counts, time and camera views on top, event feed on the right, supply
+    /// points and commander skills at the bottom, and the result dialog when it ends.
     /// </summary>
     public sealed class BattleScreen : UiScreen
     {
@@ -21,6 +20,7 @@ namespace Starline.Client
         private readonly List<(CommanderSkillDef def, Button button, Label state)> _skills = new List<(CommanderSkillDef, Button, Label)>();
         private readonly Label _player, _enemy, _time, _points, _playerNet, _enemyNet;
         private readonly VisualElement _feed;
+        private readonly Button _view;
         private bool _reported;
         private string _feedShown;
 
@@ -35,6 +35,9 @@ namespace Starline.Client
             _enemyNet = Find<Label>("enemy-net");
             _feed = Find<VisualElement>("feed");
             Button("skip", Skip);
+            _view = Button("view", () => App.Stage.Rig.CycleView());
+            Button("view-reset", () => App.Stage.Rig.ResetView());
+            FrameBoardArea();
 
             VisualElement speeds = Find<VisualElement>("speeds");
             for (int i = 0; i < BattleController.Speeds.Length; i++)
@@ -72,9 +75,7 @@ namespace Starline.Client
 
         public override void Tick(float deltaTime)
         {
-            Mouse mouse = Mouse.current;
-            bool overUi = mouse != null && App.IsPointerOverUi(mouse.position.ReadValue());
-            _battle.Tick(deltaTime, overUi);
+            _battle.Tick(deltaTime, App.IsPointerOverUi);
             Refresh();
             if (_battle.Finished && !_reported)
             {
@@ -96,6 +97,7 @@ namespace Starline.Client
             BattleSim sim = _battle.Battle;
             _player.text = Loc.Ui("battle.player_count", sim.CountCombatants(BoardLayout.PlayerSide), sim.CountInitialCombatants(BoardLayout.PlayerSide));
             _enemy.text = Loc.Ui("battle.enemy_count", sim.CountCombatants(BoardLayout.EnemySide), sim.CountInitialCombatants(BoardLayout.EnemySide));
+            _view.text = Loc.Ui("battle.view", Loc.Ui(App.Stage.Rig.ViewName));
             _time.text = Loc.Ui("battle.time", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()), _battle.Encounter.TimeLimitSeconds);
             for (int i = 0; i < _speedButtons.Count; i++)
             {

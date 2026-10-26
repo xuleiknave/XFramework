@@ -8,12 +8,14 @@
             <ui:Label name="enemy-count" class="h2 count" />
             <ui:VisualElement name="speeds" class="row speeds" />
             <ui:Button name="skip" text="#battle.skip" class="btn btn-small" />
+            <ui:Button name="view" text="#battle.view_button" tooltip="#battle.view_tooltip" class="btn btn-small view-btn" />
+            <ui:Button name="view-reset" text="#battle.view_reset" class="btn btn-small" />
         </ui:VisualElement>
-        <ui:VisualElement class="row grow" picking-mode="Ignore">
-            <ui:VisualElement class="grow" picking-mode="Ignore" />
+        <ui:VisualElement class="row grow battle-body" picking-mode="Ignore">
+            <ui:VisualElement name="board-area" class="grow" picking-mode="Ignore" />
             <ui:VisualElement name="feed" class="feed" picking-mode="Ignore" />
         </ui:VisualElement>
-        <ui:VisualElement class="bottombar">
+        <ui:VisualElement class="bottombar battle-bottombar">
             <ui:VisualElement class="supply-box">
                 <ui:Label name="points" class="body" />
                 <ui:VisualElement name="pips" class="row pips" />

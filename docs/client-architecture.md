@@ -81,6 +81,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 - 唯一的 `UIDocument` 由 `UiRoot` 在运行时创建，分三层：角色头顶标签（world-layer）→ 当前界面（screen-layer）→ 弹窗（modal-layer）。
 - 每个界面是 `UiScreen` 的子类，布局在 `Resources/StarlineUI/<名字>.uxml`，样式统一在 `Theme.uss`。可以用 Unity 的 UI Builder 直接打开 UXML 调整。
 - 设计分辨率 3840 × 2160（4K），按屏幕高度缩放：Theme.uss 和代码里的像素值都是 4K 像素，1080p 屏幕上整体缩小一半。界面图片素材按 4K 尺寸出图。
+- 竖屏（屏幕高大于宽）时设计分辨率换成 2160 × 3840，按屏幕宽度缩放，根元素加上 `portrait` 类；Theme.uss 里用 `.portrait ...` 选择器改竖屏布局（布阵和战斗界面把面板挪到下方）。UiRoot 每帧检查朝向，窗口转向时自动切换（决策 52）。
+- 3D 镜头（`Stage/CameraRig`）按“棋盘可见区域”取景：布阵和战斗界面各有一个名为 `board-area` 的空白元素，界面把它在屏幕上的位置告诉镜头，镜头用偏心投影把棋盘放在这块区域正中，并自动算距离让整个棋盘装得下。战斗中拖动旋转、滚轮或双指缩放、`V` 键或“视角”按钮切换预设（决策 53）。
 - 清晰度（渲染分辨率，如 1080p / 1440p / 4K）将在设置界面（M3）里选择；界面跟随屏幕自动缩放，不需要为每档分辨率单独调整。
 - 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
 - 中文字体：随包提供 Noto Sans SC Regular（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 协议，见包里的 `ThirdPartyNotices.md`）；万一缺失，退回玩家系统里的中文字体。

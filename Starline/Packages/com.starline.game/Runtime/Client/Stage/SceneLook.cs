@@ -30,7 +30,9 @@ namespace Starline.Client
             sun.color = new Color(0.85f, 0.9f, 1f);
             sun.intensity = 1.3f;
             sun.shadows = LightShadows.Soft;
-            sun.transform.rotation = Quaternion.Euler(50f, -35f, 0f);
+            // The camera looks from the player half (-x) towards the enemy, so the sun shines the same
+            // way and lights the faces turned to the camera.
+            sun.transform.rotation = Quaternion.Euler(50f, 55f, 0f);
 
             // A warm rim light from the enemy side separates units from the dark floor.
             var rim = new GameObject("Rim").AddComponent<Light>();
@@ -38,7 +40,7 @@ namespace Starline.Client
             rim.color = new Color(1f, 0.6f, 0.4f);
             rim.intensity = 0.35f;
             rim.shadows = LightShadows.None;
-            rim.transform.rotation = Quaternion.Euler(25f, 120f, 0f);
+            rim.transform.rotation = Quaternion.Euler(25f, 210f, 0f);
 
 #if STARLINE_URP
             UniversalAdditionalCameraData data = camera.GetUniversalAdditionalCameraData();
