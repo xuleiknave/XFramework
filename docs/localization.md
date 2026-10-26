@@ -1,6 +1,6 @@
 # 本地化与翻译表
 
-本地化方案（Unity Localization + 仓库里的 CSV 语言表）见 [client-architecture.md](client-architecture.md) 2.1 节和决策 50。这里讲翻译表本身：有哪些表、key 怎么起、怎么交给译者，以及中英文术语对照。
+本地化方案（Unity Localization + 仓库里的 CSV 语言表）见 [client-architecture.md](client-architecture.md) 2.1 节和决策 59。这里讲翻译表本身：有哪些表、key 怎么起、怎么交给译者，以及中英文术语对照。
 
 ## 1. 四张表
 

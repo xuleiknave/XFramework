@@ -123,6 +123,10 @@ namespace Starline.Battle.Tests
             {
                 foreach (Match m in pattern.Matches(File.ReadAllText(file)))
                 {
+                    if (m.Groups[1].Value.EndsWith(".json"))
+                    {
+                        continue; // a config file name, not a text key
+                    }
                     used.Add(m.Groups[1].Value);
                     Assert(keys.Contains(m.Groups[1].Value), Path.GetFileName(file) + " 用到的 " + m.Groups[1].Value + " 不在 UI.csv 里");
                 }

@@ -11,7 +11,7 @@ namespace Starline.Battle.Tests
         // Golden replay (see GoldenReplay). When data files change these no longer apply and the test
         // prints the new values; when only the kernel changed, a mismatch means battles play out
         // differently: bump Replay.KernelVersion, then update these.
-        private const string GoldenData = "0801b7a62bed9a05";
+        private const string GoldenData = "4c864cec0d34f04f";
         private const string GoldenHash = "2ac288b92450495f";
         private const int GoldenTicks = 571;
 
