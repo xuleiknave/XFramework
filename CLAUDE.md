@@ -8,6 +8,7 @@
 - `docs/decisions.md`：关键决策和理由，改设计前先看
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
+- `docs/characters.md`：47 名角色的小传（升星逐段解锁的个人小故事）
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
 - `docs/client-architecture.md`：客户端代码结构、配置表、界面流程、里程碑
 - `README.md`：目录结构、在 Unity 中试玩的步骤、操作说明
