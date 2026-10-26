@@ -79,7 +79,7 @@ namespace Starline.Client
             tag.Root.Add(tag.Bars);
 
             bool named = view.Side == BoardLayout.PlayerSide || view.Star > 1 || view.Def.Size >= 2;
-            tag.Name = Ui.Label(view.Def.DisplayName + (view.Star > 1 ? " " + Ui.Stars(view.Star) : ""), "unit-tag-name");
+            tag.Name = Ui.Label(Loc.T(view.Def.Name) + (view.Star > 1 ? " " + Ui.Stars(view.Star) : ""), "unit-tag-name");
             tag.Root.Add(tag.Name);
 
             tag.Bars.SetVisible(_battleMode);
@@ -138,17 +138,17 @@ namespace Starline.Client
             string kind = null;
             if (view.Def.HasWeapon && !view.Supplied)
             {
-                text = _battleMode ? "断魔网" : "✕ 未接入";
+                text = Loc.Ui(_battleMode ? "tag.off_grid_battle" : "tag.off_grid_deploy");
                 kind = "bad";
             }
             else if (view.InGrace)
             {
-                text = "离网 " + Mathf.CeilToInt(view.GraceSecondsLeft) + " 秒";
+                text = Loc.Ui("tag.grace", Mathf.CeilToInt(view.GraceSecondsLeft));
                 kind = "warn";
             }
             if (_battleMode && view.Def.MaxAmmo > 0 && (view.Ammo < view.Def.MaxAmmo || !view.Supplied))
             {
-                text = (text != null ? text + " " : "") + "弹 " + view.Ammo + "/" + view.Def.MaxAmmo;
+                text = (text != null ? text + " " : "") + Loc.Ui("tag.ammo", view.Ammo, view.Def.MaxAmmo);
                 if (view.Ammo == 0)
                 {
                     kind = "bad";

@@ -10,22 +10,26 @@ namespace Starline.Expedition
         public int EliteWeight;
     }
 
-    /// <summary>Story text shown at the start and end of an act.</summary>
+    /// <summary>Story text shown at the start and end of an act (Game table, act.{id}.*).</summary>
     public sealed class ActStory
     {
-        public string IntroTitle;
-        public string Intro;
-        public string VictoryTitle;
-        public string Victory;
-        public string DefeatTitle;
-        public string Defeat;
+        private readonly string _prefix;
+
+        public ActStory(string actId) => _prefix = "act." + actId + ".";
+
+        public LocText IntroTitle => new LocText(_prefix + "intro_title");
+        public LocText Intro => new LocText(_prefix + "intro");
+        public LocText VictoryTitle => new LocText(_prefix + "victory_title");
+        public LocText Victory => new LocText(_prefix + "victory");
+        public LocText DefeatTitle => new LocText(_prefix + "defeat_title");
+        public LocText Defeat => new LocText(_prefix + "defeat");
     }
 
     /// <summary>One act of the expedition (expedition.json → acts[]).</summary>
     public sealed class ActConfig
     {
         public string Id;
-        public string Title;
+        public LocText Title => new LocText("act." + Id + ".title");
         public int StartRelays;
         public Formation StartFormation = new Formation();
         /// <summary>Starting ships with their board positions (unit id, depth, row).</summary>
@@ -37,7 +41,7 @@ namespace Starline.Expedition
         public int[] EliteTierByLayer;
         public string Boss;
         public readonly List<RewardPoolEntry> RewardPool = new List<RewardPoolEntry>();
-        public ActStory Story = new ActStory();
+        public ActStory Story => new ActStory(Id);
 
         public string[] NormalPool(int layer) => NormalTiers[Pick(NormalTierByLayer, layer)];
 
@@ -96,7 +100,6 @@ namespace Starline.Expedition
                 var act = new ActConfig
                 {
                     Id = a["id"].AsString(),
-                    Title = a["title"].AsString(),
                     Boss = a["boss"].AsString(),
                     NormalTierByLayer = Ints(a["normalTierByLayer"]),
                     EliteTierByLayer = Ints(a["eliteTierByLayer"]),
@@ -138,16 +141,6 @@ namespace Starline.Expedition
                         EliteWeight = r.Int("eliteWeight", weight),
                     });
                 }
-                JsonValue story = a["story"];
-                act.Story = new ActStory
-                {
-                    IntroTitle = story["introTitle"].AsString(),
-                    Intro = story["intro"].AsString(),
-                    VictoryTitle = story["victoryTitle"].AsString(),
-                    Victory = story["victory"].AsString(),
-                    DefeatTitle = story["defeatTitle"].AsString(),
-                    Defeat = story["defeat"].AsString(),
-                };
                 config.Acts.Add(act);
             }
             return config;

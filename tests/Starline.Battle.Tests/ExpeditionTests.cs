@@ -164,10 +164,10 @@ namespace Starline.Battle.Tests
             Assert(run.CommandLimit == ExpeditionRun.BaseCommandLimit + ExpeditionRun.CommandLimitPerBattle, "胜利后指挥点上限提高");
             int ships = run.Fleet.Ships.Count;
             int index = run.Rewards.FindIndex(r => r.Kind == RewardKind.Ship);
-            string name = run.Rewards[index].Title;
+            string name = Fixtures.Text(run.Rewards[index].Title);
             run.ChooseReward(index);
             Assert(run.State == RunState.Map, "选完奖励回到地图");
-            Assert(run.Fleet.Ships.Count == ships + 1 || run.Messages.Exists(m => m.Contains("合成")), "应获得部队");
+            Assert(run.Fleet.Ships.Count == ships + 1 || run.Messages.Exists(m => m.Key == "run.merged"), "应获得部队");
             SupplyNetwork network = SupplyNetwork.ForFormation(run.Fleet.Formation, BoardLayout.PlayerSide);
             int deployed = 0, covered = 0;
             foreach (Placement p in run.Fleet.Formation.Placements)
@@ -184,7 +184,7 @@ namespace Starline.Battle.Tests
             Assert(deployed == 4, "新部队应自动上阵");
             Assert(covered == deployed, "自动上阵应放在魔网覆盖内");
             Assert(FormationRules.Validate(run.Fleet.Formation, run.CommandLimit).Count == 0, "阵型应合法");
-            Info("选了 " + name + "：" + string.Join("；", run.Messages));
+            Info("选了 " + name + "：" + Fixtures.Join("；", run.Messages));
         }
 
         private static void EncountersAreValid()
@@ -200,9 +200,9 @@ namespace Starline.Battle.Tests
             foreach (string key in EncounterLibrary.Ids())
             {
                 Encounter e = EncounterLibrary.Create(key);
-                List<string> errors = FormationRules.Validate(e.Enemy, 999);
-                Assert(errors.Count == 0, e.Name + "：" + string.Join("，", errors));
-                Assert(!string.IsNullOrEmpty(e.Briefing), e.Name + " 缺少简报");
+                List<LocText> errors = FormationRules.Validate(e.Enemy, 999);
+                Assert(errors.Count == 0, Fixtures.Text(e.Name) + "：" + Fixtures.Join("，", errors));
+                Assert(!string.IsNullOrEmpty(Fixtures.Text(e.Briefing)), Fixtures.Text(e.Name) + " 缺少简报");
             }
         }
 
@@ -267,7 +267,7 @@ namespace Starline.Battle.Tests
             foreach (string key in keys)
             {
                 wins.TryGetValue(key, out int w);
-                Info(EncounterLibrary.Create(key).Name + "：" + w + " / " + fights[key] + " 胜（" + (100 * w / fights[key]) + "%）");
+                Info(Fixtures.Text(EncounterLibrary.Create(key).Name) + "：" + w + " / " + fights[key] + " 胜（" + (100 * w / fights[key]) + "%）");
             }
             Info("通关 " + cleared + " / " + runs + "，Boss 共挑战 " + bossAttempts + " 次，通关时平均剩余耐久 "
                 + (cleared > 0 ? (durabilityLeft / (double)cleared).ToString("0.0") : "-"));

@@ -11,10 +11,9 @@ namespace Starline.Client
             ExpeditionRun run = app.Run;
             bool won = run.State == RunState.Victory;
             ActStory story = run.Act.Story;
-            Find<Label>("title").text = won ? story.VictoryTitle : story.DefeatTitle;
-            Find<Label>("story").text = won ? story.Victory : story.Defeat;
-            Find<Label>("summary").text = "本次远征：战斗 " + run.BattlesWon + " 胜 / " + run.BattlesFought + " 场，剩余耐久 "
-                + run.Durability + "，远征军 " + run.Fleet.Ships.Count + " 名角色。";
+            Find<Label>("title").text = Loc.T(won ? story.VictoryTitle : story.DefeatTitle);
+            Find<Label>("story").text = Loc.T(won ? story.Victory : story.Defeat);
+            Find<Label>("summary").text = Loc.Ui("run_end.summary", run.BattlesWon, run.BattlesFought, run.Durability, run.Fleet.Ships.Count);
             Find<VisualElement>("panel").EnableInClassList("dialog--win", won);
             Find<VisualElement>("panel").EnableInClassList("dialog--loss", !won);
             Button("again", App.StartRun);

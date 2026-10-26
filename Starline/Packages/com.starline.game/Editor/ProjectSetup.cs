@@ -9,8 +9,8 @@ namespace Starline.Editor
 {
     /// <summary>
     /// One-click project setup: the UI Toolkit panel settings (with the default runtime
-    /// theme) and the Main scene, registered in the build settings. The panel settings are
-    /// also created automatically the first time the project opens.
+    /// theme), the localization tables and the Main scene, registered in the build settings.
+    /// The panel settings are also created automatically the first time the project opens.
     /// </summary>
     [InitializeOnLoad]
     internal static class ProjectSetup
@@ -38,6 +38,7 @@ namespace Starline.Editor
                 return;
             }
             CreatePanelSettings();
+            LocalizationSetup.Import();
             CreateMainScene();
             Debug.Log("Starline：已创建 " + ScenePath + " 并加入构建列表，点击 Play 开始游戏。");
         }

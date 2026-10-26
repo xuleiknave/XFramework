@@ -49,10 +49,10 @@ namespace Starline.Battle
             return true;
         }
 
-        /// <summary>Returns human-readable problems; an empty list means the formation is valid.</summary>
-        public static List<string> Validate(Formation formation, int commandLimit, BattleTerrain terrain = null, int side = BoardLayout.PlayerSide)
+        /// <summary>Returns the problems as text for the UI; an empty list means the formation is valid.</summary>
+        public static List<LocText> Validate(Formation formation, int commandLimit, BattleTerrain terrain = null, int side = BoardLayout.PlayerSide)
         {
-            var errors = new List<string>();
+            var errors = new List<LocText>();
             int sources = 0;
             int combatants = 0;
             var probe = new Formation();
@@ -70,23 +70,23 @@ namespace Starline.Battle
                 }
                 if (!CanPlace(probe, def, p.Depth, p.Row, terrain, side))
                 {
-                    errors.Add(def.DisplayName + " 的位置无效或与其他单位重叠");
+                    errors.Add(new LocText("formation.bad_position", def.Name));
                 }
                 probe.Placements.Add(p);
             }
 
             if (sources != 1)
             {
-                errors.Add("需要且只能有 1 个魔网源头");
+                errors.Add(new LocText("formation.one_source"));
             }
             if (combatants == 0)
             {
-                errors.Add("至少需要上阵 1 名作战角色");
+                errors.Add(new LocText("formation.no_combatant"));
             }
             int used = formation.CommandPointsUsed();
             if (used > commandLimit)
             {
-                errors.Add("指挥点超出上限（" + used + " / " + commandLimit + "）");
+                errors.Add(new LocText("formation.over_command", used, commandLimit));
             }
             return errors;
         }

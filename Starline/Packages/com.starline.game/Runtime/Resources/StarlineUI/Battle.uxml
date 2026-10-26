@@ -7,7 +7,7 @@
             <ui:VisualElement class="grow" picking-mode="Ignore" />
             <ui:Label name="enemy-count" class="h2 count" />
             <ui:VisualElement name="speeds" class="row speeds" />
-            <ui:Button name="skip" text="跳过 »" class="btn btn-small" />
+            <ui:Button name="skip" text="#battle.skip" class="btn btn-small" />
         </ui:VisualElement>
         <ui:VisualElement class="row grow" picking-mode="Ignore">
             <ui:VisualElement class="grow" picking-mode="Ignore" />
@@ -17,7 +17,7 @@
             <ui:VisualElement class="supply-box">
                 <ui:Label name="points" class="body" />
                 <ui:VisualElement name="pips" class="row pips" />
-                <ui:Label text="角色自动战斗，你只需决定何时释放指挥官技能。" class="small muted" />
+                <ui:Label text="#battle.auto_hint" class="small muted" />
             </ui:VisualElement>
             <ui:VisualElement class="net-box">
                 <ui:Label name="player-net" class="body" />

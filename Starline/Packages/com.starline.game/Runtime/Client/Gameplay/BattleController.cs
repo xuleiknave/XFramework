@@ -28,7 +28,7 @@ namespace Starline.Client
             Battle = new BattleSim(encounter.CreateSetup(player, seed));
             _stage.BeginBattle(Battle);
             _stage.Rig.GoToBattle();
-            AddFeed("开战！");
+            AddFeed(Loc.Ui("feed.start"));
         }
 
         public Encounter Encounter { get; }
@@ -121,8 +121,8 @@ namespace Starline.Client
                 }
             }
             int lost = Battle.Stats[side].RelaysLost;
-            return (side == BoardLayout.PlayerSide ? "我方魔网：" : "敌方魔网：") + supplied + " / " + combat + " 有魔网"
-                + (lost > 0 ? " · " + lost + " 个节点被毁" : " · 网络完好");
+            return Loc.Ui(side == BoardLayout.PlayerSide ? "battle.net_player" : "battle.net_enemy", supplied, combat)
+                + (lost > 0 ? Loc.Ui("battle.net_lost", lost) : Loc.Ui("battle.net_intact"));
         }
 
         private void AddFeed(string text)
