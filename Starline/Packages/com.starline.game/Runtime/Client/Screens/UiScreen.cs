@@ -18,6 +18,9 @@ namespace Starline.Client
         protected GameApp App { get; }
         public VisualElement Root { get; }
 
+        /// <summary>True when the 3D night scene of the main menu shows behind this screen.</summary>
+        public virtual bool UsesMenuScene => false;
+
         public virtual void Enter()
         {
         }

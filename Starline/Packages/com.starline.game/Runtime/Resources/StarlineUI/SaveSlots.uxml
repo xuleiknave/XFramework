@@ -1,0 +1,20 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="save-slots" class="screen slots" picking-mode="Ignore">
+        <ui:VisualElement class="slots-head" picking-mode="Ignore">
+            <ui:Label text="STARLINE" class="logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row divider" picking-mode="Ignore">
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+                <ui:VisualElement class="diamond" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="星 线" class="logo-sub" picking-mode="Ignore" />
+            <ui:Label text="存档 · 选择你的指挥官" class="tagline" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="slots" class="row slots-row" picking-mode="Ignore" />
+        <ui:Button name="enter" text="使用这个存档" class="btn btn-primary btn-large slots-enter" />
+        <ui:Label text="双击存档也可以直接使用，然后回到主菜单" class="small muted" picking-mode="Ignore" />
+        <ui:VisualElement class="row slots-corner" picking-mode="Ignore">
+            <ui:Button name="back" text="返回主菜单" class="btn btn-secondary btn-small" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

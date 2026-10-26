@@ -498,47 +498,18 @@ def strike_craft(b):  # 狮鹫骑士（悬空，高度由客户端另加）
 
 
 def supply_ship(b):  # 源晶塔：魔网源头，正面的光环是源口
-    b.rod(P(0, 0, 0), P(0, 0, 0.25), 1.5, 1.4, "stone_dark", 8)
-    b.ring(P(0, 0, 0.12), 1.5, 0.035, GLOW, segments=16)
-    b.rod(P(0, 0, 0.25), P(0, 0, 2.1), 0.75, 0.5, "stone", 8)
-    for z, r in ((0.9, 0.7), (1.6, 0.6)):
-        b.rod(P(0, 0, z), P(0, 0, z + 0.08), r, r, "stone_dark", 8)
-    b.rod(P(0, 0, 2.1), P(0, 0, 2.3), 0.68, 0.68, "stone_dark", 8)
-    for i in range(8):
-        a = i * math.pi / 4
-        b.box(P(0.6 * math.cos(a), 0.6 * math.sin(a), 2.38), (0.16, 0.16, 0.16), "stone_dark")
-    gem(b, P(0, 0, 3.0), (0.32, 0.32, 0.62))
-    b.ring(P(0, 0, 3.0), 0.6, 0.03, GLOW, segments=16)
-    b.box(P(0.68, 0, 0.6), (0.34, 0.12, 0.6), "iron")
-    b.ring(P(0.78, 0, 0.75), 0.27, 0.035, GLOW, axis="f")
-    mirror(lambda s: b.box(P(0, s * 0.62, 1.3), (0.1, 0.1, 0.22), GLOW))
+    _cartoon_supply_ship(b)
 
 
 def relay(b):  # 法力水晶
-    b.rod(P(0, 0, 0), P(0, 0, 0.35), 0.32, 0.22, "stone_dark", 6)
-    b.rod(P(0, 0, 0.35), P(0, 0, 0.45), 0.26, 0.26, "stone", 6)
-    gem(b, P(0, 0, 1.25), (0.22, 0.22, 0.5))
-    for a in (0.3, 2.4, 4.5):
-        gem(b, P(0.45 * math.cos(a), 0.45 * math.sin(a), 1.0), (0.06, 0.06, 0.13))
+    _cartoon_relay(b)
 
 
 # ---- 亡灵 ----------------------------------------------------------------------
 # 灰绿色的骸骨与腐肉，幽绿光；比人类部队更佝偻、更不对称。
 
 def hive(b):  # 亡灵祭坛
-    b.rod(P(0, 0, 0), P(0, 0, 0.3), 1.6, 1.55, "stone_dark", 8)
-    b.ring(P(0, 0, 0.15), 1.6, 0.035, GLOW, segments=16)
-    b.rod(P(0, 0, 0.3), P(0, 0, 0.6), 1.1, 1.05, "stone", 8)
-    for i in range(4):
-        a = math.pi / 4 + i * math.pi / 2
-        c = (1.25 * math.cos(a), 1.25 * math.sin(a))
-        b.rod(P(c[0], c[1], 0.3), P(c[0], c[1], 1.5), 0.12, 0.09, "bone", 6)
-        b.ball(P(c[0], c[1], 1.62), (0.13, 0.14, 0.13), "bone", 6, 4)
-    b.rod(P(0, 0, 0.6), P(0, 0, 0.95), 0.3, 0.45, "iron", 8)
-    b.ball(P(0, 0, 1.05), (0.28, 0.28, 0.22), GLOW, 6, 4)
-    b.rod(P(0, 0, 1.0), P(0, 0, 1.75), 0.3, 0.02, GLOW, 6)
-    for f, x in ((0.85, -0.3), (0.9, 0.15), (0.75, 0.45)):
-        b.ball(P(f, x, 0.72), (0.12, 0.13, 0.12), "bone", 6, 4)
+    _cartoon_hive(b)
 
 
 def hive_node(b):  # 骨碑
@@ -2761,6 +2732,113 @@ def sentinel(b, star=1):  # 法埃 · 林间哨兵：叶纹轻甲、半盔，右
         R(b, c + Vector((s * 0.04, 0, 0.14)), c + Vector((s * 0.05, 0.0, 0.18)), 0.015, 0.003, "hair_brown", 6)
 
 
+# ---- 卡通建筑 ------------------------------------------------------------------
+# 源晶塔、法力水晶、亡灵祭坛改成和卡通角色一样的圆润风格（平滑着色、烘焙贴图、描边），不带骨骼和升星。
+# 尺寸和原来一致：源晶塔和祭坛占 2×2（底座半径约 1.5），水晶放在格子交叉点；底座边上的发光环仍表示魔网状态。
+
+def _ring_of(n, r, z, fn, start=0.0):
+    """在半径 r、高度 z 的一圈上均匀放 n 个零件：fn(点, 角度)。角度从正前方开始。"""
+    for i in range(n):
+        a = start + 2 * math.pi * i / n
+        fn(P(r * math.cos(a), r * math.sin(a), z), a)
+
+
+def _cartoon_supply_ship(b):
+    # 圆润的石台，边上一圈圆石和魔网指示环
+    R(b, P(0, 0, 0), P(0, 0, 0.22), 1.5, 1.45, "stone_dark", 40)
+    b.ring(P(0, 0, 0.11), 1.5, 0.045, GLOW, segments=48, sides=8)
+    _ring_of(16, 1.28, 0.25, lambda c, a: S(b, c, (0.2, 0.18, 0.1), "stone", 12, 8), start=0.2)
+    # 塔身：往上微微收窄，两道石箍
+    R(b, P(0, 0, 0.22), P(0, 0, 2.05), 0.84, 0.64, "stone", 28)
+    for z, r in ((0.78, 0.8), (1.48, 0.72)):
+        b.ring(P(0, 0, z), r, 0.06, "stone_dark", segments=40, sides=8)
+    # 塔顶：外挑的平台和圆润的垛口
+    R(b, P(0, 0, 2.05), P(0, 0, 2.2), 0.64, 0.88, "stone_dark", 28)
+    R(b, P(0, 0, 2.2), P(0, 0, 2.32), 0.88, 0.88, "stone_dark", 28)
+    _ring_of(8, 0.76, 2.45, lambda c, a: b.rbox(c, (0.26, 0.26, 0.26), "stone", 0.5, rot=(0, 0, math.degrees(a))),
+             start=math.pi / 8)
+    # 正面的源口：木门拱，门外一圈发光符文环；两侧和背面的小窗透出光
+    b.rbox(P(0.8, 0, 0.62), (0.52, 0.16, 0.8), "wood", 0.4)
+    b.rbox(P(0.86, 0, 0.62), (0.08, 0.06, 0.66), "iron", 0.4)
+    b.ring(P(0.9, 0, 0.66), 0.36, 0.035, GLOW, axis="f", segments=32, sides=6)
+    rivets(b, [P(0.88, s * 0.18, z) for s in (-1, 1) for z in (0.4, 0.62, 0.84)], "iron", 0.025)
+    for a in (math.pi / 2, -math.pi / 2, math.pi):
+        c = P(0.74 * math.cos(a), 0.74 * math.sin(a), 1.2)
+        b.rbox(c, (0.14, 0.14, 0.26), GLOW, 0.6, rot=(0, 0, math.degrees(a)))
+    # 斜挂在前方两侧的骑士团蓝旗，金色下摆和菱形徽记
+    for s in (-1, 1):
+        a = s * 0.75
+        top = P(0.7 * math.cos(a), 0.7 * math.sin(a), 1.95)
+        b.rbox(top - Vector((0, 0, 0.32)), (0.34, 0.05, 0.62), "cloth_blue", 0.3, rot=(0, 0, math.degrees(a)))
+        b.rbox(top - Vector((0, 0, 0.66)), (0.34, 0.06, 0.08), "gold", 0.4, rot=(0, 0, math.degrees(a)))
+        f, x = 0.74 * math.cos(a), 0.74 * math.sin(a)
+        gem(b, P(f, x, 1.62), (0.06, 0.03, 0.1), "gold", rot=(0, 0, math.degrees(a)))
+    # 托着水晶的石座、金色符文环，悬浮的大水晶和三片碎晶
+    R(b, P(0, 0, 2.32), P(0, 0, 2.5), 0.34, 0.22, "stone", 20)
+    b.ring(P(0, 0, 2.45), 0.3, 0.04, "gold", segments=32, sides=6)
+    gem(b, P(0, 0, 3.15), (0.36, 0.36, 0.72))
+    b.ring(P(0, 0, 3.05), 0.66, 0.035, "gold", segments=40, sides=6)
+    b.ring(P(0, 0, 3.05), 0.66, 0.012, GLOW, segments=40, sides=4)
+    _ring_of(3, 0.95, 2.95, lambda c, a: gem(b, c, (0.08, 0.08, 0.17)), start=0.5)
+
+
+def _cartoon_relay(b):
+    # 小石座，边上的发光环表示魔网状态
+    R(b, P(0, 0, 0), P(0, 0, 0.14), 0.36, 0.34, "stone_dark", 24)
+    b.ring(P(0, 0, 0.07), 0.36, 0.025, GLOW, segments=32, sides=6)
+    R(b, P(0, 0, 0.14), P(0, 0, 0.42), 0.24, 0.17, "stone", 20)
+    b.ring(P(0, 0, 0.3), 0.205, 0.028, "gold", segments=28, sides=6)
+    R(b, P(0, 0, 0.42), P(0, 0, 0.5), 0.27, 0.27, "stone", 24)
+    _ring_of(4, 0.3, 0.16, lambda c, a: S(b, c, (0.07, 0.06, 0.05), "moss", 10, 6), start=0.6)
+    # 三根金爪向上托住水晶
+    _ring_of(3, 0.2, 0.5, lambda c, a: limb(b, [c, P(0.3 * math.cos(a), 0.3 * math.sin(a), 0.66),
+                                                 P(0.2 * math.cos(a), 0.2 * math.sin(a), 0.8)], 0.035, 0.018,
+                                             "gold", 8))
+    gem(b, P(0, 0, 1.18), (0.22, 0.22, 0.46))
+    _ring_of(3, 0.44, 1.02, lambda c, a: gem(b, c, (0.055, 0.055, 0.12)), start=0.3)
+
+
+def _cartoon_hive(b):
+    # 两层圆台，最下沿的发光环表示魔网状态
+    R(b, P(0, 0, 0), P(0, 0, 0.28), 1.6, 1.55, "stone_dark", 40)
+    b.ring(P(0, 0, 0.14), 1.6, 0.045, GLOW, segments=48, sides=8)
+    R(b, P(0, 0, 0.28), P(0, 0, 0.56), 1.12, 1.06, "stone", 32)
+    b.ring(P(0, 0, 0.56), 1.07, 0.05, "stone_dark", segments=40, sides=8)
+    _ring_of(10, 1.36, 0.3, lambda c, a: S(b, c, (0.16, 0.14, 0.08), "rot_dark", 10, 6), start=0.4)
+    # 四角弯向中间的骨柱，柱顶各一颗骷髅
+    for i in range(4):
+        a = math.pi / 4 + i * math.pi / 2
+        ca, sa = math.cos(a), math.sin(a)
+        pts = [P(1.28 * ca, 1.28 * sa, 0.28), P(1.34 * ca, 1.34 * sa, 0.9), P(1.22 * ca, 1.22 * sa, 1.4),
+               P(1.02 * ca, 1.02 * sa, 1.66)]
+        limb(b, pts, 0.14, 0.08, "bone", 14)
+        for z in (0.62, 1.12):
+            b.ring(P(1.32 * ca, 1.32 * sa, z), 0.13, 0.03, "bone_dark", segments=20, sides=6)
+        _skull(b, P(0.98 * ca, 0.98 * sa, 1.82), 0.17)
+    # 中央的铁火盆和幽绿火焰
+    for i in range(3):
+        a = i * 2 * math.pi / 3
+        limb(b, [P(0.4 * math.cos(a), 0.4 * math.sin(a), 0.56), P(0.3 * math.cos(a), 0.3 * math.sin(a), 0.8)],
+             0.05, 0.04, "iron", 10)
+    S(b, P(0, 0, 0.9), (0.5, 0.5, 0.22), "iron", 28, 12)
+    b.ring(P(0, 0, 1.04), 0.46, 0.05, "bone_dark", segments=40, sides=8)
+    rivets(b, [P(0.5 * math.cos(a), 0.5 * math.sin(a), 0.92) for a in (i * math.pi / 4 for i in range(8))],
+           "bone", 0.03)
+    for c, r in ((P(0, 0, 1.12), 0.36), (P(0.04, 0.02, 1.42), 0.26), (P(-0.03, -0.03, 1.66), 0.17),
+                 (P(0.02, 0, 1.86), 0.09)):
+        S(b, c, (r, r, r * 1.2), GLOW, 16, 10)
+    _ring_of(4, 0.3, 1.2, lambda c, a: S(b, c, (0.1, 0.1, 0.16), GLOW, 10, 6), start=0.4)
+    # 前方的一小堆骷髅和两根蜡烛
+    for f, x, r in ((0.92, -0.32, 0.14), (0.98, 0.16, 0.12), (0.82, 0.46, 0.1)):
+        _skull(b, P(f, x, 0.56 + r * 0.8), r)
+    for x in (-0.62, 0.68):
+        R(b, P(0.7, x, 0.56), P(0.7, x, 0.78), 0.05, 0.05, "bone", 10)
+        S(b, P(0.7, x, 0.84), (0.035, 0.035, 0.06), GLOW, 8, 6)
+
+
+SMOOTH_PROPS = {"supply_ship", "relay", "hive"}  # 卡通风格的建筑：烘焙贴图和描边，不带骨骼和升星
+PROP_OUTLINE_SCALE = 1.8  # 建筑比角色大，描边跟着加粗
+
 UNITS = [
     ("supply_ship", supply_ship), ("relay", relay), ("battleship", battleship), ("frigate", frigate),
     ("missile_ship", missile_ship), ("pd_ship", pd_ship), ("strike_craft", strike_craft),
@@ -2785,7 +2863,7 @@ SAMPLE_UNITS = ["shield_guard", "shadow_assassin", "storm_mage", "necromancer", 
 
 # 预览图里发光部位的颜色（游戏里由客户端设置，这里只为看效果）
 PLAYER_GLOW, UNDEAD_GLOW, ELF_GLOW = "5AB8FF", "8EE06A", "B48CFF"
-PREVIEW_GLOW = {"supply_ship": "6FD0B4", "relay": "6FD0B4", "brood_mother": "C48CFF"}
+PREVIEW_GLOW = {"supply_ship": "6FD0B4", "relay": "6FD0B4", "hive": UNDEAD_GLOW, "brood_mother": "C48CFF"}
 
 # 预览图：名字 → (单位 id, 默认发光色)
 PREVIEW_SHEETS = [
@@ -3103,7 +3181,7 @@ def bake_texture(obj, unit_id, out_dir):
     return (rows + strip / 2) / (rows + strip)
 
 
-def add_outline(obj, outline_v):
+def add_outline(obj, outline_v, width=OUTLINE_WIDTH):
     """加反向外壳描边；返回外壳的面索引范围（预览时换成背面透明的材质）。"""
     mesh = obj.data
     b = bmesh.new()
@@ -3114,7 +3192,7 @@ def add_outline(obj, outline_v):
     src = list(b.faces)
     vmap = {}
     for v in list(b.verts):
-        nv = vmap[v] = b.verts.new(v.co + v.normal * OUTLINE_WIDTH)
+        nv = vmap[v] = b.verts.new(v.co + v.normal * width)
         if deform is not None:  # 外壳跟着原来的骨骼动
             for group, weight in v[deform].items():
                 nv[deform][group] = weight
@@ -3441,6 +3519,7 @@ def main():
         if only and unit_id not in only:
             continue
         cartoon = unit_id in SMOOTH_UNITS
+        prop = unit_id in SMOOTH_PROPS
         for star in (STAR_TIERS if cartoon else (1,)):
             mid = model_id(unit_id, star)
             hull, glow = make_materials(palette)
@@ -3454,10 +3533,11 @@ def main():
             flyer = b.has_bone("mount")
             height = max(v.co.z for v in b.bm.verts)
             bones = [list(bn) for bn in b.bones]
-            obj = b.finish(mid, hull, glow, smooth=cartoon)
-            if cartoon:
+            obj = b.finish(mid, hull, glow, smooth=cartoon or prop)
+            if cartoon or prop:
                 outline_v = bake_texture(obj, mid, OUT_DIR)
-                outlines[mid] = add_outline(obj, outline_v)
+                outlines[mid] = add_outline(obj, outline_v, OUTLINE_WIDTH * (PROP_OUTLINE_SCALE if prop else 1.0))
+            if cartoon:
                 rig_obj = rig(obj, bones)
                 animate(rig_obj, ATTACK_STYLE.get(unit_id, "slash"), flyer, height / 1.6)
                 if b.base_spec and not flyer:
@@ -3469,7 +3549,8 @@ def main():
 
     if preview_dir:
         os.makedirs(preview_dir, exist_ok=True)
-        sheets = PREVIEW_SHEETS + [("samples", [u for u, _ in PREVIEW_SAMPLES], None)]
+        sheets = PREVIEW_SHEETS + [("samples", [u for u, _ in PREVIEW_SAMPLES], None),
+                                   ("buildings", ["supply_ship", "relay", "hive"], None)]
         side_glow = dict(PREVIEW_SAMPLES)
         for _, group, colour in PREVIEW_SHEETS + CARTOON_FACTIONS:
             side_glow.update((u, colour) for u in group)

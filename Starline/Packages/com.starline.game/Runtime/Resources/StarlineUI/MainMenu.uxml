@@ -1,14 +1,45 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="main-menu" class="screen backdrop center" picking-mode="Ignore">
-        <ui:VisualElement class="panel menu-card">
-            <ui:Label text="STARLINE" class="logo" />
-            <ui:Label text="#menu.logo_sub" class="logo-sub" />
-            <ui:Label text="#menu.tagline" class="tagline" />
-            <ui:Button name="start" text="#menu.start" class="btn btn-primary btn-large" />
-            <ui:Button name="continue" text="#menu.continue" class="btn btn-large" />
-            <ui:Button name="settings" text="#menu.settings" class="btn btn-large" />
-            <ui:Button name="quit" text="#menu.quit" class="btn btn-large btn-secondary" />
+    <ui:VisualElement name="main-menu" class="screen" picking-mode="Ignore">
+        <ui:VisualElement class="shade-left" picking-mode="Ignore" />
+        <ui:VisualElement class="shade-bottom" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-column" picking-mode="Ignore">
+            <ui:Label text="STARLINE" class="menu-logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row menu-divider" picking-mode="Ignore">
+                <ui:VisualElement class="diamond diamond--start" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="#menu.title" class="menu-title" picking-mode="Ignore" />
+            <ui:Label text="#menu.tagline" class="menu-tagline" picking-mode="Ignore" />
+
+            <ui:Button name="start" class="menu-item menu-item--on">
+                <ui:Label text="#menu.start" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#menu.start_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="continue" class="menu-item">
+                <ui:Label text="#menu.continue" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#menu.continue_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tower" class="menu-item">
+                <ui:Label text="#menu.tower" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#menu.tower_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="workshop" class="menu-item">
+                <ui:Label text="#menu.workshop" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#menu.workshop_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+
+            <ui:VisualElement class="row menu-small" picking-mode="Ignore">
+                <ui:Button name="saves" text="#menu.saves" class="btn btn-secondary btn-small" />
+                <ui:Button name="archive" text="#menu.archive" class="btn btn-secondary btn-small" />
+                <ui:Button name="settings" text="#menu.settings" class="btn btn-secondary btn-small" />
+                <ui:Button name="quit" text="#menu.quit" class="btn btn-secondary btn-small" />
+            </ui:VisualElement>
         </ui:VisualElement>
-        <ui:Label name="version" class="version small muted" picking-mode="Ignore" />
+
+        <ui:Label name="commander" class="commander" picking-mode="Ignore" />
+        <ui:Label name="version" class="menu-version small" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-place" picking-mode="Ignore">
+            <ui:Label text="#menu.place" class="menu-place-title" picking-mode="Ignore" />
+        </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

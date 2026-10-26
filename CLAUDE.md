@@ -46,6 +46,7 @@ dotnet run --project tests/Starline.Battle.Tests -- --balance   # 重新生成 d
 
 - 内核必须保持确定性：不用 float、不用 System.Random、不依赖字典遍历顺序；战斗逻辑放内核，Client 只做表现
 - 数值放 JSON 配置表，玩家看到的文字放 `Localization/*.csv`，都不要写死在代码里。界面文字在 UXML 写 `text="#key"`、在 C# 用 `Loc.Ui("key", 参数)`；内核返回 `LocText`，不拼字符串。新增文字只填 `zh-Hans` 列，`en` 留空等翻译
+- 预制体、场景等资源直接作为文件提交到 Unity 工程里（开发者要求），不要写编辑器脚本在运行时或打开工程时生成它们；新增脚本要连同 `.meta`（固定 GUID）一起提交，预制体才能引用到
 - 界面用 UI Toolkit：布局写 UXML、样式写 Theme.uss，C# 只负责绑定和动态内容；铺满屏幕的容器设 `picking-mode="Ignore"`
 - 内核代码目标 netstandard2.1 / C# 9（Unity 6 支持的版本）
 - 调整数值后跑测试，看平衡模拟的输出，并用 `-- --balance` 重新生成数值平衡表
