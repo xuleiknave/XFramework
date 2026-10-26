@@ -26,11 +26,13 @@ namespace Starline.Client
         public ExpeditionRun Run { get; private set; }
         /// <summary>The save slot in use, or null before the first commander is created.</summary>
         public CommanderProfile Profile { get; private set; }
+        /// <summary>Language and graphics settings, shared by all save slots (changed on the settings screen).</summary>
+        public GameSettings Settings { get; private set; }
 
         private void Awake()
         {
             ClientData.EnsureLoaded();
-            Application.targetFrameRate = 120;
+            Settings = SettingsStore.Load();
 
             Camera camera = Camera.main;
             if (camera == null)
@@ -46,6 +48,8 @@ namespace Starline.Client
             Overlay = new UnitOverlay(Ui, Stage);
             Music = MusicPlayer.Create(transform);
             Menu = new MenuScene(transform, camera, Stage.Rig);
+            // After SceneLook so the sun and bloom it creates pick up the settings too.
+            SettingsApplier.ApplyAll(Settings);
         }
 
         /// <summary>The first screen waits until the language and string tables are ready.</summary>
@@ -122,6 +126,16 @@ namespace Starline.Client
             Stage.Clear();
             Stage.SetVisible(false);
             Show(new SaveSlotsScreen(this));
+        }
+
+        /// <summary>Language and graphics, opened from the main menu.</summary>
+        public void ShowSettings()
+        {
+            SaveProfile();
+            Run = null;
+            Stage.Clear();
+            Stage.SetVisible(false);
+            Show(new SettingsScreen(this));
         }
 
         /// <summary>Switches to a save slot (saving the one in use first).</summary>

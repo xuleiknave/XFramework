@@ -16,12 +16,12 @@ namespace Starline.Client
             Find<Button>("tower").SetEnabled(false);
             Find<Button>("workshop").SetEnabled(false);
             Find<Button>("archive").SetEnabled(false);
-            Find<Button>("settings").SetEnabled(false);
             CommanderProfile profile = App.Profile;
             Find<Label>("commander").text = profile != null
                 ? Loc.Ui("menu.commander", profile.name, profile.slot + 1, CommanderProfile.FormatPlayTime(profile.playSeconds))
                 : Loc.Ui("menu.no_commander");
             Button("saves", App.ShowSaveSlots);
+            Button("settings", App.ShowSettings);
             Button("quit", App.Quit);
             Find<Label>("version").text = Loc.Ui("menu.version", Application.version);
         }

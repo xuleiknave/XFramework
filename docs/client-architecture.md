@@ -49,6 +49,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 | `skills.json` | 指挥官技能；星级倍率（★1~★5） |
 | `encounters.json` | 敌方阵容：共用的亡灵祭坛底座 + 各自的单位；可选 `terrain`（战斗场景）和 `layout` / `layoutSeed`（地块布局） |
 | `terrains.json` | 战斗场景（设计文档 5.5）：每章的战场环境和棋盘地块，内核按定点数结算；名字和说明在 `Localization/Game.csv` |
+| `settings.json` | 设置界面的选项（语言、显示模式、帧率、渲染精度、抗锯齿、阴影）和四档画质预设；只有客户端读取 |
 | `expedition.json` | 远征规则（耐久、指挥点、水晶上限）、每一幕的开局远征军、地图层、敌人分档、奖池 |
 
 - 数值写成十进制小数（最多 4 位），内核按分数精确转换成定点数，同样的数据在任何电脑上算出同样的结果。
@@ -86,7 +87,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 - 设计分辨率 3840 × 2160（4K），按屏幕高度缩放：Theme.uss 和代码里的像素值都是 4K 像素，1080p 屏幕上整体缩小一半。界面图片素材按 4K 尺寸出图。
 - 竖屏（屏幕高大于宽）时设计分辨率换成 2160 × 3840，按屏幕宽度缩放，根元素加上 `portrait` 类；Theme.uss 里用 `.portrait ...` 选择器改竖屏布局（布阵和战斗界面把面板挪到下方）。UiRoot 每帧检查朝向，窗口转向时自动切换（决策 52）。
 - 3D 镜头（`Stage/CameraRig`）按“棋盘可见区域”取景：布阵和战斗界面各有一个名为 `board-area` 的空白元素，界面把它在屏幕上的位置告诉镜头，镜头用偏心投影把棋盘放在这块区域正中，并自动算距离让整个棋盘装得下。战斗中拖动旋转、滚轮或双指缩放、`V` 键或“视角”按钮切换预设（决策 53）。
-- 清晰度（渲染分辨率，如 1080p / 1440p / 4K）将在设置界面（M3）里选择；界面跟随屏幕自动缩放，不需要为每档分辨率单独调整。
+- 分辨率和 3D 渲染精度在设置界面里选择；界面跟随屏幕自动缩放，不需要为每档分辨率单独调整。
 - 铺满屏幕的布局容器设为 `picking-mode="Ignore"`，这样鼠标在面板之外时可以点到棋盘（`UiRoot.IsPointerOverUi`）。
 - 中文字体：随包提供 Noto Sans SC Regular（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 协议，见包里的 `ThirdPartyNotices.md`）；万一缺失，退回玩家系统里的中文字体。
 - UI Toolkit 通过 EventSystem + Input System 接收输入，`GameApp` 会在场景里没有 EventSystem 时自动创建。
@@ -95,6 +96,8 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 
 ```
 启动 ──读取最近玩过的存档──▶ MainMenu ◀──使用存档 / 返回── SaveSlots（主菜单“存档”按钮进入）
+                                  ▲
+                                  └──返回 / Esc── Settings（主菜单“设置”按钮进入）
               （还没有存档时，点“开始远征”先弹出“新的指挥官”起名）
 
 MainMenu ──开始远征──▶ Map ──选战斗节点──▶ Deploy ──开战──▶ Battle ──结果弹窗──┐
@@ -112,6 +115,7 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 | 存档（三个存档位，含删除存档弹窗） | `SaveSlotsScreen` | `SaveSlots.uxml` |
 | 新建指挥官弹窗（主菜单和存档界面共用） | `NewCommanderDialog` | `NewCommander.uxml` |
 | 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
+| 设置（语言、画质；显示设置确认弹窗） | `SettingsScreen` | `Settings.uxml` |
 | 地图（含开场剧情、补给站、放弃远征弹窗） | `MapScreen` + `StarMapView` | `Map.uxml` |
 | 布阵 | `DeployScreen` + `DeployController` | `Deploy.uxml` |
 | 战斗（含结果弹窗） | `BattleScreen` + `BattleController` | `Battle.uxml` |
@@ -146,6 +150,15 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 - 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存。
 - 单机买断制，没有账号；以后接入 Steam 时，云存档同步这个 saves 文件夹即可。
 
+### 设置
+
+- 设置不分存档，所有存档共用，存在 `Application.persistentDataPath/settings.json`（`GameSettings` / `SettingsStore`）。启动时读取并应用（`SettingsApplier.ApplyAll`）；文件缺失、损坏或含有配置表里已没有的选项时，对应项回到默认值。
+- 改动立即生效并保存。显示模式和分辨率改完要在 15 秒内点“保留”，否则自动还原（防止黑屏后无法操作）；在编辑器里这两项不生效，由 Game 视图决定大小。
+- 语言：首次启动跟随系统语言，没有对应翻译时用简体中文。现在只有简体中文可选，English 显示“翻译制作中”；本地化（界面和剧情文本按语言切换）还没做，`GameSettings.language` 已经存好，接入时读取它即可。
+- 画质：四档预设（低 / 中 / 高 / 极致）一次设置渲染精度、抗锯齿、阴影和泛光；单独改某一项后预设显示“自定义”。垂直同步、帧率上限、显示模式和分辨率不属于预设。默认“高”、全屏、原生分辨率、垂直同步开。
+- 渲染管线：启动时复制一份工程的 URP 资源再修改（渲染精度、MSAA、阴影距离和分辨率），在编辑器里试玩不会改动资源文件；FXAA / SMAA 设在主摄像机上，阴影关闭时关掉主光源阴影，泛光开关控制 `SceneLook` 的 Bloom。
+- 声音和操作两页先占位（置灰“后续开放”），音量随音频框架一起做。
+
 ### 新增一个界面
 
 1. 在 `Resources/StarlineUI/` 新建 `Xxx.uxml`，根元素加 `class="screen"` 和 `picking-mode="Ignore"`。
@@ -168,6 +181,6 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 |---|---|---|
 | M1 | 数值迁移到 JSON 配置表，测试结果与迁移前逐字一致 | ✅ |
 | M2 | 客户端重建：GameApp、界面系统、UI Toolkit 全部界面、战斗舞台分层、一键初始化 | ✅ 代码完成，待在 Unity 中验证 |
-| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 进行中：存档位和新建指挥官已完成 |
+| M3 | 存档与继续远征、设置界面（音量、画质、语言）、音频框架 | 进行中：存档位、新建指挥官、设置界面的语言和画质已完成 |
 | M4 | 美术：角色模型（第一幕 15 个单位已由脚本生成并接入）、场景背景、特效、界面美术 | 进行中 |
 | M5 | 设计文档的 P3：符文、商店、事件、剧情对话系统 | |

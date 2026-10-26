@@ -1,0 +1,128 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="settings" class="screen settings" picking-mode="Ignore">
+        <ui:VisualElement class="shade-left" picking-mode="Ignore" />
+
+        <ui:VisualElement class="settings-column" picking-mode="Ignore">
+            <ui:Label text="SETTINGS" class="settings-logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row menu-divider" picking-mode="Ignore">
+                <ui:VisualElement class="diamond diamond--start" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="设置" class="menu-title" picking-mode="Ignore" />
+
+            <ui:Button name="tab-language" class="menu-item settings-tab">
+                <ui:Label text="语言" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label name="tab-language-sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tab-graphics" class="menu-item settings-tab">
+                <ui:Label text="画质" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label name="tab-graphics-sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tab-audio" class="menu-item settings-tab">
+                <ui:Label text="声音" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="后续开放" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+            <ui:Button name="tab-controls" class="menu-item settings-tab">
+                <ui:Label text="操作" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="后续开放" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="panel settings-panel">
+            <ui:VisualElement class="row settings-head" picking-mode="Ignore">
+                <ui:Label name="page-title" class="h2 settings-page-title" picking-mode="Ignore" />
+                <ui:Label text="改动立即生效并自动保存" class="small muted" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="page-language" picking-mode="Ignore">
+                <ui:Label text="界面与剧情文本" class="settings-key" picking-mode="Ignore" />
+                <ui:Label text="菜单、角色说明和剧情都使用这个语言" class="settings-desc" picking-mode="Ignore" />
+                <ui:VisualElement name="languages" class="row settings-languages" picking-mode="Ignore" />
+                <ui:VisualElement class="settings-notes" picking-mode="Ignore">
+                    <ui:Label text="首次启动跟随系统语言；没有对应翻译时使用简体中文。" class="settings-desc" picking-mode="Ignore" />
+                    <ui:Label text="本游戏没有配音，语言只影响文字。" class="settings-desc" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+
+            <ui:VisualElement name="page-graphics" picking-mode="Ignore">
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="画质预设" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="一次调好下面各项；单独改过后显示“自定义”" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-preset" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="显示模式" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="无边框窗口切换程序更快" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-display" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="分辨率" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label name="resolution-desc" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="row settings-stepper" picking-mode="Ignore">
+                        <ui:Button name="res-prev" text="‹" class="btn settings-arrow" />
+                        <ui:Label name="res-value" class="settings-value" picking-mode="Ignore" />
+                        <ui:Button name="res-next" text="›" class="btn settings-arrow" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="垂直同步" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="避免画面撕裂，帧率跟随显示器刷新率" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-vsync" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="帧率上限" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="垂直同步开启时不生效" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-frame-rate" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="渲染精度" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="3D 画面的渲染分辨率，界面文字始终清晰" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-render-scale" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="抗锯齿" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="让角色和源晶塔的边缘更平滑" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-antialiasing" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="阴影" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="角色和地形投下的影子" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-shadows" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+                <ui:VisualElement class="row settings-row settings-row--last" picking-mode="Ignore">
+                    <ui:VisualElement class="settings-row-text" picking-mode="Ignore">
+                        <ui:Label text="泛光" class="settings-key" picking-mode="Ignore" />
+                        <ui:Label text="法术、魔网和法力水晶的发光效果" class="settings-desc" picking-mode="Ignore" />
+                    </ui:VisualElement>
+                    <ui:VisualElement name="opt-bloom" class="row settings-seg" picking-mode="Ignore" />
+                </ui:VisualElement>
+
+                <ui:VisualElement class="row settings-foot" picking-mode="Ignore">
+                    <ui:Button name="reset-graphics" text="恢复默认画质" class="btn btn-small btn-text settings-reset" />
+                    <ui:Label name="device" class="small settings-device" picking-mode="Ignore" />
+                </ui:VisualElement>
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:VisualElement class="row settings-corner" picking-mode="Ignore">
+            <ui:Label text="Esc 也可以返回" class="small settings-device" picking-mode="Ignore" />
+            <ui:Button name="back" text="返回主菜单" class="btn btn-secondary btn-small" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

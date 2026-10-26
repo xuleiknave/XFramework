@@ -17,6 +17,9 @@ namespace Starline.Client
 
         private static Light _sun;
         private static Light _rim;
+#if STARLINE_URP
+        private static Bloom _bloom;
+#endif
 
         public static void Apply(Camera camera)
         {
@@ -64,6 +67,7 @@ namespace Starline.Client
             bloom.intensity.Override(1.4f);
             bloom.threshold.Override(1f);
             bloom.scatter.Override(0.65f);
+            _bloom = bloom;
 
             Tonemapping tonemapping = profile.Add<Tonemapping>(true);
             tonemapping.mode.Override(TonemappingMode.ACES);
@@ -97,6 +101,26 @@ namespace Starline.Client
             {
                 _rim.enabled = !night;
             }
+        }
+
+        /// <summary>Sun (and moon) shadows, switched off by the "阴影 关" graphics setting.</summary>
+        public static void SetShadows(bool on)
+        {
+            if (_sun != null)
+            {
+                _sun.shadows = on ? LightShadows.Soft : LightShadows.None;
+            }
+        }
+
+        /// <summary>Bloom on spells, the mana network and the crystals (graphics setting "泛光").</summary>
+        public static void SetBloom(bool on)
+        {
+#if STARLINE_URP
+            if (_bloom != null)
+            {
+                _bloom.active = on;
+            }
+#endif
         }
 
         /// <summary>Makes a lit material glow a little in its own colour (picked up by bloom).</summary>
