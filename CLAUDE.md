@@ -30,6 +30,8 @@
 dotnet run --project tests/Starline.Battle.Tests   # 内核测试，最后一行应是“全部通过”
 ```
 
+云端会话启动时由 `.claude/hooks/session-start.sh` 从 Ubuntu 源安装 .NET 8 SDK（微软下载站被网络策略拦截），所以内核测试可以直接跑。
+
 云端环境没有 Unity 编辑器，客户端代码无法实际运行，只能靠测试和类型检查（UXML 至少要检查是合法的 XML），改动后要提醒开发者在本地 Unity 中试玩。
 
 ## 约定
