@@ -110,7 +110,7 @@ namespace Starline.Client
                 if (shadowsOn)
                 {
                     pipeline.shadowDistance = shadows.distance;
-                    pipeline.mainLightShadowmapResolution = shadows.resolution;
+                    SetMainLightShadowmapResolution(pipeline, shadows.resolution);
                 }
             }
             Camera camera = Camera.main;
@@ -135,6 +135,29 @@ namespace Starline.Client
                 case "smaa": return AntialiasingMode.SubpixelMorphologicalAntiAliasing;
                 default: return AntialiasingMode.None;
             }
+        }
+
+        private static System.Reflection.PropertyInfo _shadowResolution;
+
+        /// <summary>
+        /// URP 14 (Tuanjie 1.10) keeps the setter internal, so it is called through reflection;
+        /// the asset turns the value back into its ShadowResolution enum.
+        /// </summary>
+        private static void SetMainLightShadowmapResolution(UniversalRenderPipelineAsset pipeline, int resolution)
+        {
+            if (_shadowResolution == null)
+            {
+                _shadowResolution = typeof(UniversalRenderPipelineAsset).GetProperty(
+                    nameof(UniversalRenderPipelineAsset.mainLightShadowmapResolution),
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+            }
+            System.Reflection.MethodInfo setter = _shadowResolution?.GetSetMethod(true);
+            if (setter == null)
+            {
+                Debug.LogWarning("Starline：当前 URP 版本无法设置主光源阴影分辨率。");
+                return;
+            }
+            setter.Invoke(pipeline, new object[] { resolution });
         }
 
         private static UniversalRenderPipelineAsset Pipeline()

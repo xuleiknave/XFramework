@@ -12,7 +12,7 @@
 ## 目录结构
 
 ```
-Starline/                          Unity 工程（用 Unity Hub 直接打开这个文件夹）
+Starline/                          团结引擎工程（用团结 Hub 直接打开这个文件夹）
 ├── Assets/
 ├── Packages/manifest.json
 ├── Packages/com.starline.game/    游戏代码（嵌入式包）
@@ -29,15 +29,14 @@ tests/Starline.Battle.Tests/       内核测试
 docs/                              设计文档与原型图
 ```
 
-## 在 Unity 中试玩
+## 在团结引擎中试玩
 
 内容：**第一幕“边境行省”的完整一局远征**（约 15~25 分钟）：
 
 **地图选节点 → 横向布阵、摆放法力水晶 → 战前推演 → 自动战斗（可放指挥官技能）→ 战利品三选一（3 名同名同星角色自动合成高一星）→ 下一个节点 …… → Boss“骸骨要塞”**
 
-1. 用 Unity Hub 安装 **Unity 6000.6.6**（工程按这个版本配置，其他 Unity 6 版本一般也能打开）。
-2. Unity Hub 里点 **Add → Add project from disk**，选择仓库里的 `Starline` 文件夹。
-   - 如果 Hub 提示编辑器版本不一致，选择你安装的 Unity 6 版本打开即可。
+1. 用团结 Hub 安装 **团结引擎 1.10.4**（基于 Unity 2022.3.62t16，工程按这个版本配置）。
+2. 团结 Hub 里点 **添加 → 从磁盘添加项目**，选择仓库里的 `Starline` 文件夹。
 3. 第一次打开时如果提示启用新输入系统（Input System），选 **Yes**，编辑器会重启。
 4. **等待 URP 自动配置**：第一次打开时会自动安装 URP（通用渲染管线）包，并在 `Assets/Settings/` 下生成渲染配置，Console 里会依次出现“正在安装 URP”和“已启用 URP 渲染管线”。整个过程需要一两分钟。
 5. 菜单栏点 `Starline > 初始化工程（场景与界面配置）`，会生成语言表（`Assets/Localization/`，同时创建 Addressables 配置）并生成、打开 `Assets/Scenes/Main.unity`，然后点 **Play**。

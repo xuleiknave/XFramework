@@ -3,9 +3,9 @@
   "version": "0.3.0",
   "displayName": "Starline",
   "description": "Starline\uff08\u661f\u7ebf\uff09\uff1a\u786e\u5b9a\u6027\u6218\u6597\u5185\u6838\u3001JSON \u914d\u7f6e\u8868\u4e0e Unity \u5ba2\u6237\u7aef\uff08UI Toolkit \u754c\u9762\u3001\u5e03\u9635\u3001\u8865\u7ed9\u7f51\u7edc\u3001\u6218\u524d\u63a8\u6f14\u3001\u81ea\u52a8\u6218\u6597\u3001\u8fdc\u5f81\uff09\u3002",
-  "unity": "6000.3",
+  "unity": "2022.3",
   "dependencies": {
-    "com.unity.inputsystem": "1.11.2",
+    "com.unity.inputsystem": "1.14.4-t4",
     "com.unity.localization": "1.5.3",
     "com.unity.ugui": "1.0.0"
   }
