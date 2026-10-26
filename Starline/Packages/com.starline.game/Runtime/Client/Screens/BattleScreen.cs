@@ -147,6 +147,7 @@ namespace Starline.Client
             BattleSim sim = _battle.Battle;
             bool won = _battle.PlayerWon;
             run.ReportBattle(won);
+            App.Music.PlayStinger(won ? "win" : "lose");
 
             var lines = new List<string>
             {

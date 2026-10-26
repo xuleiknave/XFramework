@@ -19,6 +19,7 @@ namespace Starline.Client
         public BattleStage Stage { get; private set; }
         public UiRoot Ui { get; private set; }
         public UnitOverlay Overlay { get; private set; }
+        public MusicPlayer Music { get; private set; }
         /// <summary>The expedition in progress, or null on the main menu.</summary>
         public ExpeditionRun Run { get; private set; }
 
@@ -39,6 +40,7 @@ namespace Starline.Client
             Stage = new BattleStage(transform, camera);
             Ui = UiRoot.Create(transform);
             Overlay = new UnitOverlay(Ui, Stage);
+            Music = MusicPlayer.Create(transform);
         }
 
         /// <summary>The first screen waits until the language and string tables are ready.</summary>
@@ -86,6 +88,7 @@ namespace Starline.Client
             Stage.Clear();
             Stage.SetVisible(false);
             Show(new MainMenuScreen(this));
+            Music.PlayScreen("menu");
         }
 
         public void StartRun()
@@ -99,6 +102,7 @@ namespace Starline.Client
             Stage.Clear();
             Stage.SetVisible(false);
             Show(new MapScreen(this, showIntro));
+            Music.PlayScreen("map");
         }
 
         /// <summary>After choosing a node on the map: a battle goes to deployment, a supply station opens its dialog.</summary>
@@ -116,11 +120,15 @@ namespace Starline.Client
             Stage.SetVisible(true);
             Stage.Rig.GoToDeploy();
             Show(new DeployScreen(this));
+            Music.PlayScreen("deploy");
         }
 
         public void ShowBattle(Encounter encounter, Formation formation)
         {
             Show(new BattleScreen(this, new BattleController(encounter, formation, Stage)));
+            bool boss = Run.Current != null && Run.Current.Type == NodeType.Boss;
+            var acts = ExpeditionConfig.Current.Acts;
+            Music.PlayBattle(boss, boss && Run.Act == acts[acts.Count - 1] && acts.Count > 1, Run.Act.Id);
         }
 
         /// <summary>Where to go after the battle result, depending on the run state.</summary>
@@ -132,6 +140,7 @@ namespace Starline.Client
                     Stage.Clear();
                     Stage.SetVisible(false);
                     Show(new RewardScreen(this));
+                    Music.PlayScreen("reward");
                     break;
                 case RunState.Battle:
                     // Lost against the boss with durability left: try again.
@@ -152,6 +161,7 @@ namespace Starline.Client
             Stage.Clear();
             Stage.SetVisible(false);
             Show(new RunEndScreen(this));
+            Music.PlayScreen(Run.State == RunState.Victory ? "runEndVictory" : "runEndDefeat");
         }
 
         public void Quit()

@@ -13,6 +13,7 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 │  Gameplay/  DeployController、BattleController：界面背后的逻辑 │
 │  Stage/     BattleStage：3D 棋盘、角色模型、特效、镜头         │
 │  UI/        UiRoot（UI Toolkit 根）、主题、字体、角色头顶标签   │
+│  Audio/     MusicPlayer：按 music.json 选曲、淡入淡出（见 music.md）│
 └───────────────┬──────────────────────────────────────────────┘
                 │ 只调用，不反向依赖
 ┌───────────────▼──────────────────────────────────────────────┐
