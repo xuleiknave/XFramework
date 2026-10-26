@@ -24,12 +24,13 @@ namespace Starline.Client
         private GameSettings _confirmedDisplay;
         private float _confirmLeft;
         private Label _confirmCountdown;
+        private string _tab;
 
         public override bool UsesMenuScene => true;
 
         private GameSettings Settings => App.Settings;
 
-        public SettingsScreen(GameApp app) : base(app, "Settings")
+        public SettingsScreen(GameApp app, string tab = GraphicsTab) : base(app, "Settings")
         {
             Button("tab-language", () => ShowTab(LanguageTab));
             Button("tab-graphics", () => ShowTab(GraphicsTab));
@@ -40,9 +41,12 @@ namespace Starline.Client
 
             BuildLanguages();
             BuildGraphics();
-            ShowTab(GraphicsTab);
+            ShowTab(tab);
             Refresh();
         }
+
+        /// <summary>After switching language: the same tab again, with the new text.</summary>
+        public override UiScreen Rebuild() => new SettingsScreen(App, _tab);
 
         public override void Tick(float deltaTime)
         {
@@ -76,11 +80,12 @@ namespace Starline.Client
 
         private void ShowTab(string tab)
         {
+            _tab = tab;
             Find<Button>("tab-language").EnableInClassList("menu-item--on", tab == LanguageTab);
             Find<Button>("tab-graphics").EnableInClassList("menu-item--on", tab == GraphicsTab);
             Find<VisualElement>("page-language").SetVisible(tab == LanguageTab);
             Find<VisualElement>("page-graphics").SetVisible(tab == GraphicsTab);
-            Find<Label>("page-title").text = tab == LanguageTab ? "语言" : "画质";
+            Find<Label>("page-title").text = Loc.Ui(tab == LanguageTab ? "settings.tab_language" : "settings.tab_graphics");
         }
 
         /// <summary>Saves and updates every chip, stepper and tab subtitle.</summary>
@@ -109,11 +114,17 @@ namespace Starline.Client
                 string id = language.id;
                 Button card = Ui.Button(string.Empty, () =>
                 {
+                    if (Settings.language == id)
+                    {
+                        return;
+                    }
                     Settings.language = id;
                     Changed();
+                    // GameApp rebuilds this screen in the new language once its tables are loaded.
+                    Loc.SetLanguage(id);
                 }, "settings-language");
-                card.Add(Ui.Label(language.name, "settings-language-name"));
-                Label status = Ui.Label(language.status, "settings-language-status");
+                card.Add(Ui.Label(Loc.Text(language.name), "settings-language-name"));
+                Label status = Ui.Label(Loc.Text(language.status), "settings-language-status");
                 card.Add(status);
                 card.SetEnabled(language.available);
                 list.Add(card);
@@ -121,10 +132,10 @@ namespace Starline.Client
                 {
                     bool chosen = Settings.language == id;
                     card.EnableInClassList("settings-language--on", chosen);
-                    status.text = chosen ? "使用中" : language.status;
+                    status.text = chosen ? Loc.Ui("settings.language_in_use") : Loc.Text(language.status);
                 });
             }
-            _refreshers.Add(() => Find<Label>("tab-language-sub").text = _config.FindLanguage(Settings.language)?.name ?? string.Empty);
+            _refreshers.Add(() => Find<Label>("tab-language-sub").text = Loc.Text(_config.FindLanguage(Settings.language)?.name));
         }
 
         // ------------------------------------------------------------------
@@ -199,16 +210,16 @@ namespace Starline.Client
             Choice("opt-bloom", OnOff(), () => OnOffId(Settings.bloom), id => ChangeQuality(s => s.bloom = id == "on"));
 
             Button("reset-graphics", ResetGraphics);
-            _refreshers.Add(() => Find<Label>("tab-graphics-sub").text = _config.PresetName(Settings.preset));
+            _refreshers.Add(() => Find<Label>("tab-graphics-sub").text = Loc.Text(_config.PresetName(Settings.preset)));
 
             Vector2Int native = SettingsApplier.NativeResolution;
-            Find<Label>("device").text = SystemInfo.graphicsDeviceName + " · 显示器 " + native.x + " × " + native.y
-                + " · " + Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value) + " Hz";
+            Find<Label>("device").text = Loc.Ui("settings.device", SystemInfo.graphicsDeviceName, native.x, native.y,
+                Mathf.RoundToInt((float)Screen.currentResolution.refreshRateRatio.value));
         }
 
         /// <summary>
-        /// Fills a row of chips, one per (id, name) option. <paramref name="enabled"/> greys out
-        /// single options (the "custom" preset) or the whole row (frame rate while vsync is on).
+        /// Fills a row of chips, one per (id, name) option; names go through <see cref="Loc.Text"/>.
+        /// <paramref name="enabled"/> greys out single options (the "custom" preset) or the whole row (frame rate while vsync is on).
         /// </summary>
         private void Choice(string container, List<(string id, string name)> options, Func<string> current, Action<string> pick, Func<string, bool> enabled = null)
         {
@@ -216,7 +227,7 @@ namespace Starline.Client
             var chips = new List<(string id, Button chip)>();
             foreach ((string id, string name) in options)
             {
-                Button chip = Ui.Button(name, () =>
+                Button chip = Ui.Button(Loc.Text(name), () =>
                 {
                     pick(id);
                     Changed();
@@ -268,8 +279,8 @@ namespace Starline.Client
             Button previous = Button("res-prev", () => StepResolution(+1));
             Button next = Button("res-next", () => StepResolution(-1));
             Find<Label>("resolution-desc").text = Application.isEditor
-                ? "在编辑器里由 Game 视图决定，打包后生效"
-                : "改动后 " + Mathf.RoundToInt(_config.displayConfirmSeconds) + " 秒内确认，否则自动还原";
+                ? Loc.Ui("settings.resolution_editor")
+                : Loc.Ui("settings.resolution_confirm", Mathf.RoundToInt(_config.displayConfirmSeconds));
             _refreshers.Add(() =>
             {
                 Vector2Int size = SettingsApplier.ResolutionOf(Settings);
@@ -320,16 +331,16 @@ namespace Starline.Client
             }
             _confirmLeft = _config.displayConfirmSeconds;
             App.Ui.CloseModals();
-            VisualElement dialog = Ui.Dialog("保留这个显示设置吗？", string.Empty,
-                ("保留", KeepDisplay),
-                ("还原", RevertDisplay));
+            VisualElement dialog = Ui.Dialog(Loc.Ui("settings.keep_title"), string.Empty,
+                (Loc.Ui("settings.keep"), KeepDisplay),
+                (Loc.Ui("settings.revert"), RevertDisplay));
             _confirmCountdown = dialog.Q<Label>(className: "dialog-body");
             UpdateCountdown();
             App.Ui.ShowModal(dialog);
         }
 
         private void UpdateCountdown() =>
-            _confirmCountdown.text = Mathf.CeilToInt(Mathf.Max(0f, _confirmLeft)) + " 秒后还原为之前的显示设置。";
+            _confirmCountdown.text = Loc.Ui("settings.revert_countdown", Mathf.CeilToInt(Mathf.Max(0f, _confirmLeft)));
 
         private void KeepDisplay()
         {

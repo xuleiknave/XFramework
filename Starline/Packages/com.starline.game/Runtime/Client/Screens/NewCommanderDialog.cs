@@ -13,12 +13,12 @@ namespace Starline.Client
             TextField field = dialog.Find<TextField>("name");
             Label count = dialog.Find<Label>("count");
             Label error = dialog.Find<Label>("error");
-            dialog.Find<Label>("slot-label").text = "存档 " + (slot + 1);
-            count.text = "0 / " + CommanderProfile.MaxNameLength;
+            dialog.Find<Label>("slot-label").text = Loc.Ui("slots.slot", slot + 1);
+            count.text = Loc.Ui("commander.count", 0, CommanderProfile.MaxNameLength);
             field.maxLength = CommanderProfile.MaxNameLength;
             field.RegisterValueChangedCallback(evt =>
             {
-                count.text = evt.newValue.Trim().Length + " / " + CommanderProfile.MaxNameLength;
+                count.text = Loc.Ui("commander.count", evt.newValue.Trim().Length, CommanderProfile.MaxNameLength);
                 error.text = string.Empty;
             });
 

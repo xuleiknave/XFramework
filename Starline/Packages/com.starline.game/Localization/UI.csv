@@ -164,3 +164,78 @@ replay.no_skills, · 没有使用指挥官技能,,
 replay.end_won,回放结束：胜利,,
 replay.end_lost,回放结束：失败,,
 replay.again,重新播放,,
+slots.logo_sub,星 线,,存档界面标志下的副标题（字间有空格）
+slots.tagline,存档 · 选择你的指挥官,,
+slots.enter,使用这个存档,,
+slots.enter_hint,双击存档也可以直接使用，然后回到主菜单,,
+slots.slot,存档 {0},,{0} 存档位编号 1~3
+slots.play_time,游戏时长,,
+slots.last_played,最近游玩,,
+slots.runs,远征,,
+slots.runs_won,通关 {0} 次 · 共 {1} 次,,{0} 通关次数，{1} 出发次数
+slots.runs_none_won,还没有通关 · 共 {0} 次,,{0} 出发次数
+slots.delete,删除存档,,
+slots.new,新的指挥官,,空存档位
+slots.new_hint,从灯塔城出发，重新点亮星线,,
+slots.delete_title,删除存档,,
+slots.delete_body,指挥官“{0}”的存档（游戏时长 {1}）会被永久删除，无法恢复。,,{0} 指挥官名字，{1} 游戏时长
+slots.delete_confirm,删除,,
+common.cancel,取消,,
+commander.title,新的指挥官,,
+commander.body,灯塔城的源晶塔还亮着。塔里的诺娃在等新任指挥官：她该怎么称呼你？,,
+commander.name_label,指挥官名字,,
+commander.name_hint,1~8 个字,,名字长度上限是 8
+commander.count,{0} / {1},,{0} 已输入字数，{1} 上限
+commander.confirm,就任,,
+commander.name_empty,请输入指挥官的名字。,,
+commander.name_too_long,名字最多 {0} 个字。,,{0} 字数上限
+time.minutes,{0} 分,,{0} 分钟
+time.hours_minutes,{0} 小时 {1} 分,,{0} 小时，{1} 分钟
+settings.tab_language,语言,,
+settings.tab_graphics,画质,,
+settings.tab_audio,声音,,
+settings.tab_controls,操作,,
+settings.coming_soon,后续开放,,
+settings.auto_save,改动立即生效并自动保存,,
+settings.language,界面与剧情文本,,
+settings.language_desc,菜单、角色说明和剧情都使用这个语言,,
+settings.language_note_default,首次启动跟随系统语言；没有对应翻译时使用简体中文。,,
+settings.language_note_voice,本游戏没有配音，语言只影响文字。,,
+settings.language_in_use,使用中,,语言卡片上，当前选中的语言
+settings.preset,画质预设,,
+settings.preset_desc,一次调好下面各项；单独改过后显示“自定义”,,“自定义”要和 settings.custom 一致
+settings.display,显示模式,,
+settings.display_desc,无边框窗口切换程序更快,,
+settings.resolution,分辨率,,
+settings.resolution_editor,在编辑器里由 Game 视图决定，打包后生效,,只在 Unity 编辑器里显示
+settings.resolution_confirm,改动后 {0} 秒内确认，否则自动还原,,{0} 秒数
+settings.vsync,垂直同步,,
+settings.vsync_desc,避免画面撕裂，帧率跟随显示器刷新率,,
+settings.frame_rate,帧率上限,,
+settings.frame_rate_desc,垂直同步开启时不生效,,
+settings.render_scale,渲染精度,,
+settings.render_scale_desc,3D 画面的渲染分辨率，界面文字始终清晰,,
+settings.antialiasing,抗锯齿,,
+settings.antialiasing_desc,让角色和源晶塔的边缘更平滑,,
+settings.shadows,阴影,,
+settings.shadows_desc,角色和地形投下的影子,,
+settings.bloom,泛光,,
+settings.bloom_desc,法术、魔网和法力水晶的发光效果,,
+settings.reset_graphics,恢复默认画质,,
+settings.device,{0} · 显示器 {1} × {2} · {3} Hz,,{0} 显卡名，{1}×{2} 显示器分辨率，{3} 刷新率
+settings.esc_hint,Esc 也可以返回,,
+settings.keep_title,保留这个显示设置吗？,,
+settings.keep,保留,,
+settings.revert,还原,,
+settings.revert_countdown,{0} 秒后还原为之前的显示设置。,,{0} 剩余秒数
+settings.on,开,,开关选项（垂直同步、泛光）
+settings.off,关,,开关选项，也用于抗锯齿和阴影
+settings.custom,自定义,,画质预设：单独改过某一项
+settings.level_low,低,,画质预设和阴影档位
+settings.level_medium,中,,画质预设和阴影档位
+settings.level_high,高,,画质预设和阴影档位
+settings.level_ultra,极致,,画质预设
+settings.display_fullscreen,全屏,,
+settings.display_borderless,无边框窗口,,
+settings.display_windowed,窗口,,
+settings.frame_rate_unlimited,不限,,帧率上限

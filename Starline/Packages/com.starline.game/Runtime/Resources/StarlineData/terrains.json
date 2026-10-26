@@ -1,60 +1,60 @@
 {
-  "_说明": "战斗场景（设计文档 5.5）。tiles 是棋盘上的特殊地块，terrains 是每章的战场环境。effects 里 stat 可选 Speed（移速倍率）、Range（射程加减，单位：格）、Damage（造成伤害倍率）、DamageTaken（受到伤害倍率）、RangedDamageTaken（受到远程伤害倍率）、AttackInterval（攻击间隔倍率，大于 1 变慢）、HpRegen（每秒回复最大生命的比例）、ShieldRegen（护盾回复倍率）、ManaRegen（接入魔网时法力恢复倍率）；factions / exceptFactions / roles 过滤生效对象，ground 为 true 时飞骑不受影响。地块对飞骑和建筑无效，exempt 里的阵营也不受影响。terrains 的 tiles 是生成器每方半场放置的 [地块, 最少, 最多]；linkRange / coverage 是全场魔网连线距离和覆盖的加成（格）。",
+  "_说明": "战斗场景（设计文档 5.5）。名字、说明和效果文字在 Localization/Game.csv：tile.<id>.name / .description / .effect<n>（n 是 effects 里的第几条，从 1 开始），战场环境用 terrain.<id>.*。tiles 是棋盘上的特殊地块，terrains 是每章的战场环境。effects 里 stat 可选 Speed（移速倍率）、Range（射程加减，单位：格）、Damage（造成伤害倍率）、DamageTaken（受到伤害倍率）、RangedDamageTaken（受到远程伤害倍率）、AttackInterval（攻击间隔倍率，大于 1 变慢）、HpRegen（每秒回复最大生命的比例）、ShieldRegen（护盾回复倍率）、ManaRegen（接入魔网时法力恢复倍率）；factions / exceptFactions / roles 过滤生效对象，ground 为 true 时飞骑不受影响。地块对飞骑和建筑无效，exempt 里的阵营也不受影响。terrains 的 tiles 是生成器每方半场放置的 [地块, 最少, 最多]；linkRange / coverage 是全场魔网连线距离和覆盖的加成（格）。",
   "tiles": [
-    {"id": "high_ground", "name": "高地", "symbol": "^", "description": "断墙、土坡和沙丘。站在上面的远程和对空射程 +1 格，受到的远程伤害 −15%。",
+    {"id": "high_ground", "symbol": "^",
      "effects": [
-       {"stat": "Range", "value": 1, "roles": ["Artillery", "PointDefense"], "text": "远程、对空射程 +1 格"},
-       {"stat": "RangedDamageTaken", "value": 0.85, "text": "受到远程伤害 −15%"}]},
-    {"id": "brush", "name": "灌木", "symbol": "*", "description": "低矮的灌木丛，挡住一部分箭矢和法术。受到的远程伤害 −20%。",
+       {"stat": "Range", "value": 1, "roles": ["Artillery", "PointDefense"]},
+       {"stat": "RangedDamageTaken", "value": 0.85}]},
+    {"id": "brush", "symbol": "*",
      "effects": [
-       {"stat": "RangedDamageTaken", "value": 0.8, "text": "受到远程伤害 −20%"}]},
-    {"id": "shallows", "name": "浅水", "symbol": "~", "description": "没过脚踝的水。移速 −30%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。",
+       {"stat": "RangedDamageTaken", "value": 0.8}]},
+    {"id": "shallows", "symbol": "~",
      "relayLink": 1,
      "effects": [
-       {"stat": "Speed", "value": 0.7, "text": "移速 −30%"}]},
-    {"id": "deep_water", "name": "深水", "symbol": "#", "description": "不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。",
+       {"stat": "Speed", "value": 0.7}]},
+    {"id": "deep_water", "symbol": "#",
      "blocksDeploy": true, "relayLink": 1,
      "effects": [
-       {"stat": "Speed", "value": 0.4, "text": "移速 −60%"}]},
-    {"id": "quicksand", "name": "流沙", "symbol": "s", "description": "陷脚的流沙。移速 −40%；熟悉荒野的边境游侠会不受影响。",
+       {"stat": "Speed", "value": 0.4}]},
+    {"id": "quicksand", "symbol": "s",
      "exempt": ["Rangers"],
      "effects": [
-       {"stat": "Speed", "value": 0.6, "text": "移速 −40%"}]},
-    {"id": "marsh", "name": "沼泽", "symbol": "m", "description": "泥泞的沼泽。移速 −30%，攻击间隔 +10%；影歌精灵不受影响。",
+       {"stat": "Speed", "value": 0.6}]},
+    {"id": "marsh", "symbol": "m",
      "exempt": ["Elves"],
      "effects": [
-       {"stat": "Speed", "value": 0.7, "text": "移速 −30%"},
-       {"stat": "AttackInterval", "value": 1.1, "text": "攻速 −10%"}]},
-    {"id": "ice", "name": "冰面", "symbol": "i", "description": "光滑的冰面。移速 +25%，但站在上面不回复护盾。",
+       {"stat": "Speed", "value": 0.7},
+       {"stat": "AttackInterval", "value": 1.1}]},
+    {"id": "ice", "symbol": "i",
      "effects": [
-       {"stat": "Speed", "value": 1.25, "text": "移速 +25%"},
-       {"stat": "ShieldRegen", "value": 0, "text": "不回复护盾"}]},
-    {"id": "bone_pile", "name": "骨堆", "symbol": "x", "description": "守军的遗骨堆成的小丘。亡灵站在上面每秒回复 2% 生命。",
+       {"stat": "Speed", "value": 1.25},
+       {"stat": "ShieldRegen", "value": 0}]},
+    {"id": "bone_pile", "symbol": "x",
      "effects": [
-       {"stat": "HpRegen", "value": 0.02, "factions": ["Undead"], "text": "亡灵每秒回复 2% 生命"}]},
-    {"id": "mana_spring", "name": "法力泉", "symbol": "+", "description": "地脉涌出的法力泉。放在它角上交叉点的法力水晶覆盖 +1 格。",
+       {"stat": "HpRegen", "value": 0.02, "factions": ["Undead"]}]},
+    {"id": "mana_spring", "symbol": "+",
      "relayCoverage": 1},
-    {"id": "drained", "name": "枯竭区", "symbol": "-", "description": "法力被吸干的土地。站在上面不算接入魔网，角上的交叉点不能放法力水晶；亡灵不受影响。",
+    {"id": "drained", "symbol": "-",
      "noNetwork": true, "exempt": ["Undead"]}
   ],
   "terrains": [
-    {"id": "plains", "name": "城郊草原", "description": "灯塔城外的草原和小河。没有环境效果，用来熟悉高地和浅水。",
+    {"id": "plains",
      "tiles": [["high_ground", 2, 3], ["shallows", 0, 3]]},
-    {"id": "forest", "name": "古木森林", "description": "游侠会守了多年的林子。树冠遮住视线，重甲在林间转身不便。",
+    {"id": "forest",
      "effects": [
-       {"stat": "Speed", "value": 1.15, "factions": ["Rangers", "Elves"], "text": "边境游侠会、影歌精灵移速 +15%"},
-       {"stat": "Range", "value": -1, "roles": ["Artillery"], "text": "远程射程 −1 格（树冠遮挡）"},
-       {"stat": "Speed", "value": 0.9, "roles": ["Heavy"], "text": "重装移速 −10%"}],
+       {"stat": "Speed", "value": 1.15, "factions": ["Rangers", "Elves"]},
+       {"stat": "Range", "value": -1, "roles": ["Artillery"]},
+       {"stat": "Speed", "value": 0.9, "roles": ["Heavy"]}],
      "tiles": [["brush", 4, 6], ["high_ground", 0, 2]]},
-    {"id": "desert", "name": "灰沙荒漠", "description": "永夜吸干了城邦的法力，田野化成了灰沙。",
+    {"id": "desert",
      "effects": [
-       {"stat": "Speed", "value": 0.9, "ground": true, "exceptFactions": ["Rangers"], "text": "地面部队移速 −10%（边境游侠会不受影响）"},
-       {"stat": "ManaRegen", "value": 0.6, "exceptFactions": ["Undead"], "text": "法力枯竭：接入魔网时法力恢复 −40%（亡灵不受影响）"}],
+       {"stat": "Speed", "value": 0.9, "ground": true, "exceptFactions": ["Rangers"]},
+       {"stat": "ManaRegen", "value": 0.6, "exceptFactions": ["Undead"]}],
      "tiles": [["quicksand", 2, 4], ["high_ground", 2, 3], ["drained", 1, 3]]},
-    {"id": "lake", "name": "湖心枢纽", "description": "建在湖心的水晶枢纽，夜色里只有水晶在发光。飞骑掠过水面不受影响。",
+    {"id": "lake",
      "effects": [
-       {"stat": "Range", "value": -1, "roles": ["Artillery"], "text": "夜战：远程射程 −1 格"},
-       {"stat": "ShieldRegen", "value": 1.3, "factions": ["Morningstar"], "text": "背水守护：晨星骑士团护盾回复 +30%"}],
+       {"stat": "Range", "value": -1, "roles": ["Artillery"]},
+       {"stat": "ShieldRegen", "value": 1.3, "factions": ["Morningstar"]}],
      "tiles": [["shallows", 4, 6], ["deep_water", 2, 4]]}
   ]
 }

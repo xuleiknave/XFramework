@@ -46,7 +46,7 @@ namespace Starline.Battle.Tests
             Run("远征：胜利后三选一，部队自动上阵", RewardsAndAutoDeploy);
             Run("敌方阵容都合法", EncountersAreValid);
             Run("语言表：每条都有中文，译文占位符一致", LocalizationTablesAreComplete);
-            Run("语言表：角色、技能、阵容、剧情都有文本", GameDataHasText);
+            Run("语言表：角色、技能、阵容、剧情、地形都有文本", GameDataHasText);
             Run("语言表：每名角色都有 5 段小传", HeroesHaveBios);
             Run("语言表：界面用到的 key 都存在", ClientKeysExist);
             RunReplayTests();
