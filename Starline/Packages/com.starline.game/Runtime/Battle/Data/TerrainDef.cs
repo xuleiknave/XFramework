@@ -36,8 +36,8 @@ namespace Starline.Battle
         public UnitRole[] Roles = new UnitRole[0];
         /// <summary>Skips flying units (role Craft).</summary>
         public bool GroundOnly;
-        /// <summary>Short description for the deployment screen.</summary>
-        public string Text = "";
+        /// <summary>Short description for the deployment screen (Game table: tile.&lt;id&gt;.effect&lt;n&gt; or terrain.&lt;id&gt;.effect&lt;n&gt;).</summary>
+        public LocText Text;
 
         /// <summary>Structures are only affected when the effect names the Structure role.</summary>
         public bool AppliesTo(UnitDef def)
@@ -68,10 +68,11 @@ namespace Starline.Battle
         /// <summary>Position in <see cref="TerrainCatalog.Tiles"/>; layouts store this.</summary>
         public int Index;
         public string Id;
-        public string Name;
+        /// <summary>Name and description (Game table: tile.&lt;id&gt;.name / .description).</summary>
+        public LocText Name => new LocText("tile." + Id + ".name");
+        public LocText Description => new LocText("tile." + Id + ".description");
         /// <summary>Character used in hand-written layouts.</summary>
         public char Symbol;
-        public string Description = "";
         public readonly List<TerrainEffect> Effects = new List<TerrainEffect>();
         /// <summary>Factions that ignore this tile completely. Flying units always ignore tiles.</summary>
         public Faction[] ExemptFactions = new Faction[0];
@@ -100,8 +101,9 @@ namespace Starline.Battle
     public sealed class TerrainDef
     {
         public string Id;
-        public string Name;
-        public string Description = "";
+        /// <summary>Name and description (Game table: terrain.&lt;id&gt;.name / .description).</summary>
+        public LocText Name => new LocText("terrain." + Id + ".name");
+        public LocText Description => new LocText("terrain." + Id + ".description");
         /// <summary>Applies to both sides for the whole battle.</summary>
         public readonly List<TerrainEffect> Effects = new List<TerrainEffect>();
         /// <summary>Added to every node's link range (cells).</summary>
@@ -172,16 +174,14 @@ namespace Starline.Battle
                 {
                     Index = _tiles.Count,
                     Id = t["id"].AsString(),
-                    Name = t["name"].AsString(),
                     Symbol = symbol[0],
-                    Description = t.String("description", ""),
                     ExemptFactions = ReadEnums<Faction>(t.Get("exempt")),
                     BlocksDeploy = t.Bool("blocksDeploy"),
                     NoNetwork = t.Bool("noNetwork"),
                     RelayCoverageBonus = t.Int("relayCoverage"),
                     RelayLinkBonus = t.Int("relayLink"),
                 };
-                ReadEffects(t.Get("effects"), tile.Effects);
+                ReadEffects(t.Get("effects"), tile.Effects, "tile." + tile.Id);
                 if (TileBySymbol(tile.Symbol) != null)
                 {
                     throw new System.FormatException(t.Path + "：重复的地块符号 " + symbol);
@@ -194,12 +194,10 @@ namespace Starline.Battle
                 var terrain = new TerrainDef
                 {
                     Id = t["id"].AsString(),
-                    Name = t["name"].AsString(),
-                    Description = t.String("description", ""),
                     LinkRangeBonus = t.Int("linkRange"),
                     CoverageBonus = t.Int("coverage"),
                 };
-                ReadEffects(t.Get("effects"), terrain.Effects);
+                ReadEffects(t.Get("effects"), terrain.Effects, "terrain." + terrain.Id);
                 if (t.Get("tiles") is JsonValue palette)
                 {
                     foreach (JsonValue entry in palette.Elements)
@@ -216,7 +214,8 @@ namespace Starline.Battle
             }
         }
 
-        private static void ReadEffects(JsonValue list, List<TerrainEffect> into)
+        /// <summary>Effect n (from 1) gets the text key &lt;textPrefix&gt;.effect&lt;n&gt;.</summary>
+        private static void ReadEffects(JsonValue list, List<TerrainEffect> into, string textPrefix)
         {
             if (list == null)
             {
@@ -232,7 +231,7 @@ namespace Starline.Battle
                     ExceptFactions = ReadEnums<Faction>(e.Get("exceptFactions")),
                     Roles = ReadEnums<UnitRole>(e.Get("roles")),
                     GroundOnly = e.Bool("ground"),
-                    Text = e.String("text", ""),
+                    Text = new LocText(textPrefix + ".effect" + (into.Count + 1)),
                 });
             }
         }

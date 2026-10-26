@@ -93,3 +93,49 @@ forecast.advice_craft,{0} 怕点防御，避开敌方点防御单位所在的一
 forecast.advice_heavy,敌方骨塔和怨灵克制重装单位，先用狮鹫骑士或游侠解决它们。,Enemy bone towers and wraiths counter heavy units. Take them out first with Griffin Knights or Rangers.,
 forecast.advice_point_defense,{0} 很脆，放在第二排，让前排替它挡伤害。,{0} is fragile. Put them in the second row and let the front line take the hits.,
 forecast.advice_default,前排太薄，考虑多放一个耐打的单位。,Your front line is too thin. Consider adding one more sturdy unit.,
+tile.high_ground.name,高地,,地块名
+tile.high_ground.description,断墙、土坡和沙丘。站在上面的远程和对空射程 +1 格，受到的远程伤害 −15%。,,地块说明（布阵时显示）
+tile.high_ground.effect1,远程、对空射程 +1 格,,地块第 1 条效果的简短说明
+tile.high_ground.effect2,受到远程伤害 −15%,,地块第 2 条效果的简短说明
+tile.brush.name,灌木,,地块名
+tile.brush.description,低矮的灌木丛，挡住一部分箭矢和法术。受到的远程伤害 −20%。,,地块说明（布阵时显示）
+tile.brush.effect1,受到远程伤害 −20%,,地块第 1 条效果的简短说明
+tile.shallows.name,浅水,,地块名
+tile.shallows.description,没过脚踝的水。移速 −30%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。,,地块说明（布阵时显示）
+tile.shallows.effect1,移速 −30%,,地块第 1 条效果的简短说明
+tile.deep_water.name,深水,,地块名
+tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。,,地块说明（布阵时显示）
+tile.deep_water.effect1,移速 −60%,,地块第 1 条效果的简短说明
+tile.quicksand.name,流沙,,地块名
+tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的边境游侠会不受影响。,,地块说明（布阵时显示）
+tile.quicksand.effect1,移速 −40%,,地块第 1 条效果的简短说明
+tile.marsh.name,沼泽,,地块名
+tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；影歌精灵不受影响。,,地块说明（布阵时显示）
+tile.marsh.effect1,移速 −30%,,地块第 1 条效果的简短说明
+tile.marsh.effect2,攻速 −10%,,地块第 2 条效果的简短说明
+tile.ice.name,冰面,,地块名
+tile.ice.description,光滑的冰面。移速 +25%，但站在上面不回复护盾。,,地块说明（布阵时显示）
+tile.ice.effect1,移速 +25%,,地块第 1 条效果的简短说明
+tile.ice.effect2,不回复护盾,,地块第 2 条效果的简短说明
+tile.bone_pile.name,骨堆,,地块名
+tile.bone_pile.description,守军的遗骨堆成的小丘。亡灵站在上面每秒回复 2% 生命。,,地块说明（布阵时显示）
+tile.bone_pile.effect1,亡灵每秒回复 2% 生命,,地块第 1 条效果的简短说明
+tile.mana_spring.name,法力泉,,地块名
+tile.mana_spring.description,地脉涌出的法力泉。放在它角上交叉点的法力水晶覆盖 +1 格。,,地块说明（布阵时显示）
+tile.drained.name,枯竭区,,地块名
+tile.drained.description,法力被吸干的土地。站在上面不算接入魔网，角上的交叉点不能放法力水晶；亡灵不受影响。,,地块说明（布阵时显示）
+terrain.plains.name,城郊草原,,战场环境名
+terrain.plains.description,灯塔城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
+terrain.forest.name,古木森林,,战场环境名
+terrain.forest.description,游侠会守了多年的林子。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
+terrain.forest.effect1,边境游侠会、影歌精灵移速 +15%,,战场环境第 1 条效果的简短说明
+terrain.forest.effect2,远程射程 −1 格（树冠遮挡）,,战场环境第 2 条效果的简短说明
+terrain.forest.effect3,重装移速 −10%,,战场环境第 3 条效果的简短说明
+terrain.desert.name,灰沙荒漠,,战场环境名
+terrain.desert.description,永夜吸干了城邦的法力，田野化成了灰沙。,,战场环境说明（布阵时显示）
+terrain.desert.effect1,地面部队移速 −10%（边境游侠会不受影响）,,战场环境第 1 条效果的简短说明
+terrain.desert.effect2,法力枯竭：接入魔网时法力恢复 −40%（亡灵不受影响）,,战场环境第 2 条效果的简短说明
+terrain.lake.name,湖心枢纽,,战场环境名
+terrain.lake.description,建在湖心的水晶枢纽，夜色里只有水晶在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
+terrain.lake.effect1,夜战：远程射程 −1 格,,战场环境第 1 条效果的简短说明
+terrain.lake.effect2,背水守护：晨星骑士团护盾回复 +30%,,战场环境第 2 条效果的简短说明

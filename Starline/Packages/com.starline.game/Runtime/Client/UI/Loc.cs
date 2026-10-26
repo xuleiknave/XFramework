@@ -27,8 +27,12 @@ namespace Starline.Client
         public const char KeyPrefix = '#';
 
         private static bool _warned;
+        private static bool _listening;
 
-        /// <summary>Raised after the language changes; screens built before it keep their old text until rebuilt.</summary>
+        /// <summary>
+        /// Raised after the language changes and its tables are loaded; screens built before it keep
+        /// their old text until rebuilt (<see cref="UiScreen.Rebuild"/>).
+        /// </summary>
         public static event Action LanguageChanged;
 
         public static bool IsReady => LocalizationSettings.HasSettings && LocalizationSettings.InitializationOperation.IsDone;
@@ -39,10 +43,11 @@ namespace Starline.Client
             : SourceLanguage;
 
         /// <summary>
-        /// Waits for the locales and the preloaded tables. On first launch the language follows
-        /// the system (Localization Settings → Locale Selectors), falling back to Simplified Chinese.
+        /// Waits for the locales and the preloaded tables, then switches to the language saved in the
+        /// settings (<paramref name="language"/>). A -language=xx command line argument wins over the
+        /// saved one; without either, the Locale Selectors pick the system language or Simplified Chinese.
         /// </summary>
-        public static IEnumerator Initialize()
+        public static IEnumerator Initialize(string language)
         {
             if (!LocalizationSettings.HasSettings)
             {
@@ -50,7 +55,16 @@ namespace Starline.Client
                 yield break;
             }
             yield return LocalizationSettings.InitializationOperation;
-            LocalizationSettings.SelectedLocaleChanged += _ => LanguageChanged?.Invoke();
+            if (!HasCommandLineLanguage() && SetLanguage(language))
+            {
+                // The new language's tables load before the first screen is built.
+                yield return LocalizationSettings.InitializationOperation;
+            }
+            if (!_listening)
+            {
+                _listening = true;
+                LocalizationSettings.SelectedLocaleChanged += _ => WhenTablesLoaded(() => LanguageChanged?.Invoke());
+            }
         }
 
         /// <summary>Switches language by code; unknown codes are ignored. Returns whether the language exists.</summary>
@@ -65,9 +79,15 @@ namespace Starline.Client
             {
                 return false;
             }
-            LocalizationSettings.SelectedLocale = locale;
+            if (LocalizationSettings.SelectedLocale != locale)
+            {
+                LocalizationSettings.SelectedLocale = locale;
+            }
             return true;
         }
+
+        /// <summary>Config text such as an option name in settings.json: "#key" is a UI table entry, anything else is shown as written.</summary>
+        public static string Text(string text) => IsKey(text) ? Ui(text.Substring(1)) : text ?? string.Empty;
 
         /// <summary>Interface text from the UI table.</summary>
         public static string Ui(string key, params object[] args) => Get(UiTable, key, args);
@@ -106,6 +126,23 @@ namespace Starline.Client
                     element.tooltip = Ui(element.tooltip.Substring(1));
                 }
             });
+        }
+
+        private static bool HasCommandLineLanguage() =>
+            Array.Exists(Environment.GetCommandLineArgs(), arg => arg.StartsWith("-language=", StringComparison.OrdinalIgnoreCase));
+
+        /// <summary>Changing the locale reloads the preloaded tables; text looked up before that finishes would come out empty.</summary>
+        private static void WhenTablesLoaded(Action action)
+        {
+            var operation = LocalizationSettings.InitializationOperation;
+            if (operation.IsDone)
+            {
+                action();
+            }
+            else
+            {
+                operation.Completed += _ => action();
+            }
         }
 
         private static bool IsKey(string text) => !string.IsNullOrEmpty(text) && text.Length > 1 && text[0] == KeyPrefix;

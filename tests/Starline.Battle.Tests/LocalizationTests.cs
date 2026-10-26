@@ -96,6 +96,18 @@ namespace Starline.Battle.Tests
                 Fixtures.Text(e.Name);
                 Fixtures.Text(e.Briefing);
             }
+            foreach (TileDef tile in TerrainCatalog.Tiles)
+            {
+                Fixtures.Text(tile.Name);
+                Fixtures.Text(tile.Description);
+                tile.Effects.ForEach(e => Fixtures.Text(e.Text));
+            }
+            foreach (TerrainDef terrain in TerrainCatalog.Terrains)
+            {
+                Fixtures.Text(terrain.Name);
+                Fixtures.Text(terrain.Description);
+                terrain.Effects.ForEach(e => Fixtures.Text(e.Text));
+            }
             foreach (ActConfig act in ExpeditionConfig.Current.Acts)
             {
                 ActStory s = act.Story;
@@ -107,9 +119,9 @@ namespace Starline.Battle.Tests
         }
 
         /// <summary>
-        /// UI.csv matches the client: every "#key" in the UXML layouts and every key-shaped
-        /// string literal in the client code ("map.title", including both sides of a ?:) exists,
-        /// and every row is used. This is the only check possible without Unity.
+        /// UI.csv matches the client: every "#key" in the UXML layouts and in settings.json (option
+        /// names), and every key-shaped string literal in the client code ("map.title", including
+        /// both sides of a ?:) exists, and every row is used. This is the only check possible without Unity.
         /// </summary>
         private static void ClientKeysExist()
         {
@@ -135,6 +147,7 @@ namespace Starline.Battle.Tests
             {
                 Check(file, uxml);
             }
+            Check(Path.Combine(package, "Resources/StarlineData/settings.json"), new Regex("\"#([^\"]+)\""));
             foreach (string file in Directory.GetFiles(Path.Combine(package, "Client"), "*.cs", SearchOption.AllDirectories))
             {
                 if (file.Replace('\\', '/').Contains("/Client/Audio/"))

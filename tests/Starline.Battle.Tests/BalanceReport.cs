@@ -398,7 +398,7 @@ namespace Starline.Battle.Tests
             var texts = new List<string>();
             foreach (TerrainEffect e in effects)
             {
-                texts.Add(e.Text);
+                texts.Add(Fixtures.Text(e.Text));
             }
             return texts.Count == 0 ? "无" : string.Join("；", texts);
         }
@@ -418,10 +418,10 @@ namespace Starline.Battle.Tests
                 var tiles = new List<string>();
                 foreach (TilePaletteEntry e in t.Palette)
                 {
-                    tiles.Add(e.Tile.Name + " " + e.Min + "~" + e.Max);
+                    tiles.Add(Fixtures.Text(e.Tile.Name) + " " + e.Min + "~" + e.Max);
                 }
                 string network = (t.LinkRangeBonus != 0 ? "；魔网连线 +" + t.LinkRangeBonus + " 格" : "") + (t.CoverageBonus != 0 ? "；覆盖 +" + t.CoverageBonus + " 格" : "");
-                md.AppendLine("| " + t.Name + " | `" + t.Id + "` | " + EffectList(t.Effects) + network + " | " + string.Join("、", tiles) + " |");
+                md.AppendLine("| " + Fixtures.Text(t.Name) + " | `" + t.Id + "` | " + EffectList(t.Effects) + network + " | " + string.Join("、", tiles) + " |");
             }
             md.AppendLine();
             md.AppendLine("**地块**（飞骑和建筑不受影响）");
@@ -448,7 +448,7 @@ namespace Starline.Battle.Tests
                 {
                     exempt.Add(FactionName(f));
                 }
-                md.AppendLine("| " + t.Name + " | `" + t.Id + "` | " + EffectList(t.Effects) + " | " + (network.Count > 0 ? string.Join("；", network) : "—")
+                md.AppendLine("| " + Fixtures.Text(t.Name) + " | `" + t.Id + "` | " + EffectList(t.Effects) + " | " + (network.Count > 0 ? string.Join("；", network) : "—")
                     + " | " + (exempt.Count > 0 ? string.Join("、", exempt) : "—") + " | " + (t.BlocksDeploy ? "**不能**" : "能") + " |");
             }
             md.AppendLine();
@@ -773,7 +773,7 @@ namespace Starline.Battle.Tests
             var line = new StringBuilder("|---|---|---|");
             foreach (TerrainDef t in terrains)
             {
-                header.Append(" " + t.Name + " |");
+                header.Append(" " + Fixtures.Text(t.Name) + " |");
                 line.Append("---|");
             }
             md.AppendLine(header.ToString());
@@ -854,7 +854,7 @@ namespace Starline.Battle.Tests
             var line = new StringBuilder("|---|");
             foreach (TileDef t in tiles)
             {
-                header.Append(" " + t.Name + " |");
+                header.Append(" " + Fixtures.Text(t.Name) + " |");
                 line.Append("---|");
             }
             md.AppendLine(header.ToString());

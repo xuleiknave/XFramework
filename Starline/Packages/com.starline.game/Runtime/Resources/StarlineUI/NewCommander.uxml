@@ -2,18 +2,18 @@
     <ui:VisualElement class="modal-backdrop">
         <ui:VisualElement class="panel dialog name-dialog">
             <ui:Label name="slot-label" class="small muted eyebrow" />
-            <ui:Label text="新的指挥官" class="h2" />
-            <ui:Label text="灯塔城的源晶塔还亮着。塔里的诺娃在等新任指挥官：她该怎么称呼你？" class="body dialog-body" />
-            <ui:Label text="指挥官名字" class="small muted" />
+            <ui:Label text="#commander.title" class="h2" />
+            <ui:Label text="#commander.body" class="body dialog-body" />
+            <ui:Label text="#commander.name_label" class="small muted" />
             <ui:TextField name="name" max-length="8" class="name-field" />
             <ui:VisualElement class="row name-hints">
-                <ui:Label text="1~8 个字" class="small muted" />
+                <ui:Label text="#commander.name_hint" class="small muted" />
                 <ui:Label name="count" class="small muted" />
             </ui:VisualElement>
             <ui:Label name="error" class="small bad name-error" />
             <ui:VisualElement class="row name-buttons">
-                <ui:Button name="confirm" text="就任" class="btn btn-primary grow" />
-                <ui:Button name="cancel" text="取消" class="btn btn-secondary grow" />
+                <ui:Button name="confirm" text="#commander.confirm" class="btn btn-primary grow" />
+                <ui:Button name="cancel" text="#common.cancel" class="btn btn-secondary grow" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

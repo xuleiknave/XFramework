@@ -15,6 +15,8 @@ namespace Starline.Client
     public sealed class GameApp : MonoBehaviour
     {
         private UiScreen _screen;
+        /// <summary>Set when the language changed; the screen is rebuilt on the next frame, outside the click that changed it.</summary>
+        private bool _languageChanged;
 
         public BattleStage Stage { get; private set; }
         public UiRoot Ui { get; private set; }
@@ -55,12 +57,32 @@ namespace Starline.Client
         /// <summary>The first screen waits until the language and string tables are ready.</summary>
         private IEnumerator Start()
         {
-            yield return Loc.Initialize();
+            yield return Loc.Initialize(Settings.language);
+            Loc.LanguageChanged += OnLanguageChanged;
             ShowMainMenu();
+        }
+
+        private void OnDestroy() => Loc.LanguageChanged -= OnLanguageChanged;
+
+        private void OnLanguageChanged() => _languageChanged = true;
+
+        /// <summary>Rebuilds the current screen so its text follows the language picked on the settings screen.</summary>
+        private void ApplyLanguage()
+        {
+            _languageChanged = false;
+            UiScreen rebuilt = _screen?.Rebuild();
+            if (rebuilt != null)
+            {
+                Show(rebuilt);
+            }
         }
 
         private void Update()
         {
+            if (_languageChanged)
+            {
+                ApplyLanguage();
+            }
             if (Profile != null)
             {
                 Profile.playSeconds += Time.unscaledDeltaTime;

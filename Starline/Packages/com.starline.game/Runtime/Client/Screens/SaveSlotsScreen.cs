@@ -67,15 +67,17 @@ namespace Starline.Client
         private VisualElement SlotCard(int slot, CommanderProfile profile)
         {
             VisualElement card = Ui.Box("panel", "slot-card");
-            card.Add(Ui.Label("存档 " + (slot + 1), "small", "muted", "eyebrow"));
+            card.Add(Ui.Label(Loc.Ui("slots.slot", slot + 1), "small", "muted", "eyebrow"));
             card.Add(Ui.Label(profile.name, "slot-name"));
             card.Add(Ui.Box("slot-line"));
-            card.Add(Row("游戏时长", CommanderProfile.FormatPlayTime(profile.playSeconds)));
-            card.Add(Row("最近游玩", profile.LastPlayed.ToString("yyyy-MM-dd HH:mm")));
-            card.Add(Row("远征", (profile.runsWon > 0 ? "通关 " + profile.runsWon + " 次" : "还没有通关") + " · 共 " + profile.runsStarted + " 次"));
+            card.Add(Row(Loc.Ui("slots.play_time"), CommanderProfile.FormatPlayTime(profile.playSeconds)));
+            card.Add(Row(Loc.Ui("slots.last_played"), profile.LastPlayed.ToString("yyyy-MM-dd HH:mm")));
+            card.Add(Row(Loc.Ui("slots.runs"), profile.runsWon > 0
+                ? Loc.Ui("slots.runs_won", profile.runsWon, profile.runsStarted)
+                : Loc.Ui("slots.runs_none_won", profile.runsStarted)));
             card.Add(Ui.Box("spacer"));
             VisualElement foot = Ui.Box("row", "slot-foot");
-            foot.Add(Ui.Button("删除存档", () => ConfirmDelete(slot), "btn-small", "btn-text"));
+            foot.Add(Ui.Button(Loc.Ui("slots.delete"), () => ConfirmDelete(slot), "btn-small", "btn-text"));
             card.Add(foot);
             card.RegisterCallback<ClickEvent>(evt =>
             {
@@ -96,10 +98,10 @@ namespace Starline.Client
         private VisualElement EmptyCard(int slot)
         {
             VisualElement card = Ui.Box("panel", "slot-card", "slot-card--empty");
-            card.Add(Ui.Label("存档 " + (slot + 1), "small", "muted", "eyebrow"));
+            card.Add(Ui.Label(Loc.Ui("slots.slot", slot + 1), "small", "muted", "eyebrow"));
             card.Add(Ui.Label("+", "slot-plus"));
-            card.Add(Ui.Label("新的指挥官", "slot-new"));
-            card.Add(Ui.Label("从灯塔城出发，重新点亮星线", "small", "muted"));
+            card.Add(Ui.Label(Loc.Ui("slots.new"), "slot-new"));
+            card.Add(Ui.Label(Loc.Ui("slots.new_hint"), "small", "muted"));
             card.RegisterCallback<ClickEvent>(_ => NewCommanderDialog.Show(App, slot, profile =>
             {
                 App.SignIn(profile);
@@ -129,9 +131,9 @@ namespace Starline.Client
         private void ConfirmDelete(int slot)
         {
             CommanderProfile profile = _profiles[slot];
-            VisualElement dialog = Ui.Dialog("删除存档",
-                "指挥官“" + profile.name + "”的存档（游戏时长 " + CommanderProfile.FormatPlayTime(profile.playSeconds) + "）会被永久删除，无法恢复。",
-                ("删除", () =>
+            VisualElement dialog = Ui.Dialog(Loc.Ui("slots.delete_title"),
+                Loc.Ui("slots.delete_body", profile.name, CommanderProfile.FormatPlayTime(profile.playSeconds)),
+                (Loc.Ui("slots.delete_confirm"), () =>
                 {
                     if (App.Profile != null && App.Profile.slot == slot)
                     {
@@ -141,7 +143,7 @@ namespace Starline.Client
                     App.Ui.CloseModals();
                     Reload();
                 }),
-                ("取消", App.Ui.CloseModals));
+                (Loc.Ui("common.cancel"), App.Ui.CloseModals));
             dialog.Q(className: "dialog").AddToClassList("dialog--loss");
             App.Ui.ShowModal(dialog);
         }
