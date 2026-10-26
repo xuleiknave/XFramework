@@ -7,10 +7,12 @@
             <ui:VisualElement class="grow" picking-mode="Ignore" />
             <ui:Label name="enemy-count" class="h2 count" />
             <ui:VisualElement name="speeds" class="row speeds" />
+            <ui:Button name="pause" text="#battle.pause" class="btn btn-small" />
             <ui:Button name="skip" text="#battle.skip" class="btn btn-small" />
             <ui:Button name="view" text="#battle.view_button" tooltip="#battle.view_tooltip" class="btn btn-small view-btn" />
             <ui:Button name="view-reset" text="#battle.view_reset" class="btn btn-small" />
         </ui:VisualElement>
+        <ui:Label name="mode" class="replay-banner" picking-mode="Ignore" />
         <ui:VisualElement class="row grow battle-body" picking-mode="Ignore">
             <ui:VisualElement name="board-area" class="grow" picking-mode="Ignore" />
             <ui:VisualElement name="feed" class="feed" picking-mode="Ignore" />
@@ -19,7 +21,7 @@
             <ui:VisualElement class="supply-box">
                 <ui:Label name="points" class="body" />
                 <ui:VisualElement name="pips" class="row pips" />
-                <ui:Label text="#battle.auto_hint" class="small muted" />
+                <ui:Label name="hint" text="#battle.auto_hint" class="small muted" />
             </ui:VisualElement>
             <ui:VisualElement class="net-box">
                 <ui:Label name="player-net" class="body" />

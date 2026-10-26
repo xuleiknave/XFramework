@@ -8,13 +8,16 @@ namespace Starline.Client
 {
     /// <summary>
     /// The auto-battle: counts, time and camera views on top, event feed on the right, supply
-    /// points and commander skills at the bottom, and the result dialog when it ends.
+    /// points and commander skills at the bottom, and the result dialog when it ends. Also plays
+    /// replays back: skills are read-only and the dialog offers to watch again.
     /// </summary>
     public sealed class BattleScreen : UiScreen
     {
         private const int SupplyPips = 10;
 
         private readonly BattleController _battle;
+        private readonly (string text, System.Action action) _replayExit;
+        private readonly Button _pause;
         private readonly List<Button> _speedButtons = new List<Button>();
         private readonly List<VisualElement> _pips = new List<VisualElement>();
         private readonly List<(CommanderSkillDef def, Button button, Label state)> _skills = new List<(CommanderSkillDef, Button, Label)>();
@@ -24,9 +27,11 @@ namespace Starline.Client
         private bool _reported;
         private string _feedShown;
 
-        public BattleScreen(GameApp app, BattleController battle) : base(app, "Battle")
+        /// <param name="replayExit">For a replay: the button that leaves it when it ends (text and action).</param>
+        public BattleScreen(GameApp app, BattleController battle, (string text, System.Action action) replayExit = default) : base(app, "Battle")
         {
             _battle = battle;
+            _replayExit = replayExit;
             _player = Find<Label>("player-count");
             _enemy = Find<Label>("enemy-count");
             _time = Find<Label>("time");
@@ -38,6 +43,15 @@ namespace Starline.Client
             _view = Button("view", () => App.Stage.Rig.CycleView());
             Button("view-reset", () => App.Stage.Rig.ResetView());
             FrameBoardArea();
+            _pause = Button("pause", () => _battle.Paused = !_battle.Paused);
+
+            Label mode = Find<Label>("mode");
+            mode.SetVisible(battle.IsReplay);
+            if (battle.IsReplay)
+            {
+                mode.text = Loc.Ui("battle.replay_mode", Loc.T(battle.Encounter.Name), battle.Replay.Power);
+                Find<Label>("hint").text = Loc.Ui("battle.replay_hint");
+            }
 
             VisualElement speeds = Find<VisualElement>("speeds");
             for (int i = 0; i < BattleController.Speeds.Length; i++)
@@ -103,6 +117,8 @@ namespace Starline.Client
             {
                 _speedButtons[i].EnableInClassList("btn-toggled", _battle.SpeedIndex == i);
             }
+            _pause.text = Loc.Ui(_battle.Paused ? "battle.resume" : "battle.pause");
+            _pause.EnableInClassList("btn-toggled", _battle.Paused);
 
             string feedNow = string.Join("\n", _battle.Feed);
             if (feedNow != _feedShown)
@@ -137,14 +153,35 @@ namespace Starline.Client
                 {
                     text = Loc.Ui("battle.aiming");
                 }
+                if (_battle.IsReplay)
+                {
+                    text = Loc.Ui("battle.replay_skill");
+                }
                 state.text = text;
-                button.SetEnabled(can || armed);
+                button.SetEnabled(!_battle.IsReplay && (can || armed));
                 button.EnableInClassList("skill--armed", armed);
             }
         }
 
+        private void ShowReplayResult()
+        {
+            BattleSim sim = _battle.Battle;
+            Replay replay = _battle.Replay;
+            string body = Loc.Ui("replay.summary", Mathf.FloorToInt(sim.ElapsedSeconds.ToFloat()), replay.Power)
+                + (replay.UsesSkills ? Loc.Ui("replay.skills_used", replay.Commands.Count) : Loc.Ui("replay.no_skills"));
+            string title = Loc.Ui(sim.Winner == BoardLayout.PlayerSide ? "replay.end_won" : "replay.end_lost");
+            App.Ui.ShowModal(Ui.Dialog(title, body,
+                _replayExit,
+                (Loc.Ui("replay.again"), () => App.ShowReplay(replay, _replayExit.text, _replayExit.action))));
+        }
+
         private void ShowResult()
         {
+            if (_battle.IsReplay)
+            {
+                ShowReplayResult();
+                return;
+            }
             ExpeditionRun run = App.Run;
             BattleSim sim = _battle.Battle;
             bool won = _battle.PlayerWon;
@@ -174,6 +211,9 @@ namespace Starline.Client
             }
             lines.AddRange(run.Messages.ConvertAll(Loc.T));
 
+            // Kept in memory only, for the "watch replay" button; nothing is saved on this computer.
+            Replay replay = _battle.Record();
+
             string next;
             switch (run.State)
             {
@@ -184,7 +224,12 @@ namespace Starline.Client
                 default: next = Loc.Ui("result.next_map"); break;
             }
             string title = Loc.Ui(won ? "result.won" : sim.Winner == BoardLayout.EnemySide ? "result.lost" : "result.draw");
-            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), (next, App.AfterBattle));
+            var buttons = new List<(string, System.Action)> { (next, App.AfterBattle) };
+            if (replay != null)
+            {
+                buttons.Add((Loc.Ui("result.watch_replay"), () => App.ShowReplay(replay, next, App.AfterBattle)));
+            }
+            VisualElement dialog = Ui.Dialog(title, string.Join("\n", lines), buttons.ToArray());
             dialog.Q(className: "dialog").AddToClassList(won ? "dialog--win" : "dialog--loss");
             App.Ui.ShowModal(dialog);
         }

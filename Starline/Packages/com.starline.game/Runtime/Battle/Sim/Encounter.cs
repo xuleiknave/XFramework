@@ -20,7 +20,7 @@ namespace Starline.Battle
     /// <summary>A single battle node: the enemy formation plus what the player may deploy.</summary>
     public sealed class Encounter
     {
-        /// <summary>Id in encounters.json; also names its text in the Game table.</summary>
+        /// <summary>Id in encounters.json (null for hand-built encounters); names its text in the Game table and picks the battle seed, see <see cref="StageSeed"/>.</summary>
         public string Id;
         public LocText Name => new LocText("encounter." + Id + ".name");
         /// <summary>One or two sentences shown before deployment.</summary>

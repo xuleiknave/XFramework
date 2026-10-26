@@ -26,7 +26,7 @@ namespace Starline.Expedition
             }
             return new Encounter
             {
-                Id = e["id"].AsString(),
+                Id = id,
                 Enemy = enemy,
                 Terrain = ReadTerrain(e, id),
             };

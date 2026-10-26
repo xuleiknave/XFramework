@@ -49,6 +49,7 @@ namespace Starline.Battle.Tests
             Run("语言表：角色、技能、阵容、剧情都有文本", GameDataHasText);
             Run("语言表：每名角色都有 5 段小传", HeroesHaveBios);
             Run("语言表：界面用到的 key 都存在", ClientKeysExist);
+            RunReplayTests();
             Run("平衡模拟：自动玩家打第一幕", Act1BalanceSimulation);
             RunTerrainTests();
             Run("平衡表：同等指挥点下，我方角色之间的克制关系成立", BalanceCounters);
