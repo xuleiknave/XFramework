@@ -133,6 +133,10 @@ namespace Starline.Battle.Tests
             }
             foreach (string file in Directory.GetFiles(Path.Combine(package, "Client"), "*.cs", SearchOption.AllDirectories))
             {
+                if (file.Replace('\\', '/').Contains("/Client/Audio/"))
+                {
+                    continue; // strings there are music.json routes such as "battle.boss", not text keys
+                }
                 Check(file, code);
             }
             var unused = new List<string>();
