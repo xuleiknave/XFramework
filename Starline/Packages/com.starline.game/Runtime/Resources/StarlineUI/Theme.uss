@@ -360,6 +360,39 @@ Label {
     margin: 0;
 }
 
+/* Signed-in account under the commander, top right of the main menu. */
+.menu-account {
+    position: absolute;
+    right: 115px;
+    top: 226px;
+}
+
+/* Login screen: the login methods take the place of the main menu entries. */
+.login-dev {
+    margin: 34px 0 0 0;
+}
+
+.login-dev-row {
+    align-items: center;
+}
+
+.login-dev-field {
+    width: 620px;
+    margin: 10px 29px 10px 0;
+}
+
+.login-status {
+    font-size: 36px;
+    color: var(--muted);
+    white-space: normal;
+    min-height: 50px;
+    margin: 43px 0 0 0;
+}
+
+.login-status.bad {
+    color: var(--bad);
+}
+
 /* Logo used by the save-slot screen. */
 .logo {
     font-size: 134px;

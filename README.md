@@ -44,6 +44,19 @@ docs/                              设计文档与原型图
    - 测试其他语言：Play 前在 Game 视图上方的 Localization 下拉框里切换 Locale，或者打包后加命令行参数 `-language=en`。
    - 以前生成过的 `Assets/Scenes/PlayablePrototype.unity` 已经不用了（里面的脚本已删除），可以直接删掉。
 
+### 登录
+
+启动后先进登录界面。在编辑器里点 Play 可以直接用 **开发者登录**（随便填一个账号名，不连服务器）；下次启动会自动用上次的方式登录，主菜单的“退出登录”回到登录界面。
+
+**UOS 登录**（UOS Passport）需要先装 SDK，没装时登录界面不显示这个按钮：
+
+1. 在团结 Hub / 编辑器里安装 **UOS Launcher**，登录 UOS 账号，关联（或新建）这个游戏的 UOS 应用。
+2. 在 UOS 后台开通 **Passport Login**，在“登录配置”里打开要用的登录渠道（手机号、微信等，第三方渠道要填各自申请的 ID 和 Secret）。
+3. 在 UOS Launcher 里安装 **Passport Login SDK**；提示导入 PassportUI 资源和 TextMeshPro 资源时都选导入（漏了可以从菜单 `UOS > Passport > Import PassportUI` 补导）。
+4. `Project Settings > Player > Other Settings > Scripting Define Symbols` 加上 `STARLINE_UOS_PASSPORT`，点 Apply。这会编译 `Assets/Scripts/Online/UosPassportLogin.cs`，登录界面出现“UOS 账号登录”。
+
+UOS 的应用 ID、密钥只在 UOS Launcher 和 UOS 后台里配置，不要写进代码或提交到仓库。
+
 ### 中文字体
 
 界面字体是随工程提供的 **Noto Sans SC Regular**（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 开源协议，可免费用于商业游戏）。想换字体，用新字体文件替换它即可（文件名不变）。发布时要把 `ThirdPartyNotices.md` 和 `Licenses/` 里的许可证随游戏一起提供。
