@@ -59,7 +59,7 @@ namespace Starline.Client
         {
             yield return Loc.Initialize(Settings.language);
             Loc.LanguageChanged += OnLanguageChanged;
-            ShowMainMenu();
+            ShowLogin(autoLogin: true);
         }
 
         private void OnDestroy() => Loc.LanguageChanged -= OnLanguageChanged;
@@ -195,9 +195,36 @@ namespace Starline.Client
             });
         }
 
-        /// <summary>The home screen; picks up the most recently played save when none is in use.</summary>
+        /// <summary>
+        /// The login screen, shown first at launch and after signing out. At launch it signs in again
+        /// with the login method used last time.
+        /// </summary>
+        public void ShowLogin(bool autoLogin = false)
+        {
+            SaveProfile();
+            Run = null;
+            Stage.Clear();
+            Stage.SetVisible(false);
+            Show(new LoginScreen(this, autoLogin));
+            Music.PlayScreen("menu");
+        }
+
+        /// <summary>Signs out of the account (from the main menu) and goes back to the login screen.</summary>
+        public void LogOut()
+        {
+            SaveProfile();
+            AccountService.SignOut();
+            ShowLogin();
+        }
+
+        /// <summary>The home screen; picks up the most recently played save when none is in use. Needs a signed-in account.</summary>
         public void ShowMainMenu()
         {
+            if (!AccountService.IsSignedIn)
+            {
+                ShowLogin();
+                return;
+            }
             if (Profile == null)
             {
                 Profile = ProfileStore.LoadLastPlayed();

@@ -1,0 +1,42 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="login" class="screen" picking-mode="Ignore">
+        <ui:VisualElement class="shade-left" picking-mode="Ignore" />
+        <ui:VisualElement class="shade-bottom" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-column" picking-mode="Ignore">
+            <ui:Label text="STARLINE" class="menu-logo" picking-mode="Ignore" />
+            <ui:VisualElement class="row menu-divider" picking-mode="Ignore">
+                <ui:VisualElement class="diamond diamond--start" picking-mode="Ignore" />
+                <ui:VisualElement class="divider-line" picking-mode="Ignore" />
+            </ui:VisualElement>
+            <ui:Label text="#menu.title" class="menu-title" picking-mode="Ignore" />
+            <ui:Label text="#menu.tagline" class="menu-tagline" picking-mode="Ignore" />
+
+            <ui:Button name="login-uos" class="menu-item menu-item--on">
+                <ui:Label text="#login.uos" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#login.uos_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
+
+            <ui:VisualElement name="dev-section" class="login-dev" picking-mode="Ignore">
+                <ui:Label text="#login.dev_account" class="small muted" picking-mode="Ignore" />
+                <ui:VisualElement class="row login-dev-row" picking-mode="Ignore">
+                    <ui:TextField name="dev-account" class="name-field login-dev-field" />
+                    <ui:Button name="login-dev" text="#login.dev" class="btn btn-secondary" />
+                </ui:VisualElement>
+                <ui:Label text="#login.dev_hint" class="small muted" picking-mode="Ignore" />
+            </ui:VisualElement>
+
+            <ui:Label name="status" class="login-status" picking-mode="Ignore" />
+
+            <ui:VisualElement class="row menu-small" picking-mode="Ignore">
+                <ui:Button name="cancel" text="#common.cancel" class="btn btn-secondary btn-small" />
+                <ui:Button name="settings" text="#menu.settings" class="btn btn-secondary btn-small" />
+                <ui:Button name="quit" text="#menu.quit" class="btn btn-secondary btn-small" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+
+        <ui:Label name="version" class="menu-version small" picking-mode="Ignore" />
+        <ui:VisualElement class="menu-place" picking-mode="Ignore">
+            <ui:Label text="#menu.place" class="menu-place-title" picking-mode="Ignore" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

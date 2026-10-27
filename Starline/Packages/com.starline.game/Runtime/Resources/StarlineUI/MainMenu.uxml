@@ -32,11 +32,13 @@
                 <ui:Button name="saves" text="#menu.saves" class="btn btn-secondary btn-small" />
                 <ui:Button name="archive" text="#menu.archive" class="btn btn-secondary btn-small" />
                 <ui:Button name="settings" text="#menu.settings" class="btn btn-secondary btn-small" />
+                <ui:Button name="logout" text="#menu.logout" class="btn btn-secondary btn-small" />
                 <ui:Button name="quit" text="#menu.quit" class="btn btn-secondary btn-small" />
             </ui:VisualElement>
         </ui:VisualElement>
 
         <ui:Label name="commander" class="commander" picking-mode="Ignore" />
+        <ui:Label name="account" class="menu-account small muted" picking-mode="Ignore" />
         <ui:Label name="version" class="menu-version small" picking-mode="Ignore" />
         <ui:VisualElement class="menu-place" picking-mode="Ignore">
             <ui:Label text="#menu.place" class="menu-place-title" picking-mode="Ignore" />

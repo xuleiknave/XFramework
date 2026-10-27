@@ -97,7 +97,9 @@ Starline 正式工程的代码结构。设计以 [game-design.md](game-design.md
 ### 界面流程
 
 ```
-启动 ──读取最近玩过的存档──▶ MainMenu ◀──使用存档 / 返回── SaveSlots（主菜单“存档”按钮进入）
+启动 ──▶ Login ──登录成功、读取最近玩过的存档──▶ MainMenu ◀──使用存档 / 返回── SaveSlots（主菜单“存档”按钮进入）
+          ▲                                   │
+          └──────────── 退出登录 ─────────────┘
                                   ▲
                                   └──返回 / Esc── Settings（主菜单“设置”按钮进入）
               （还没有存档时，点“开始远征”先弹出“新的指挥官”起名）
@@ -114,6 +116,7 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 
 | 界面 | 类 | 布局 |
 |---|---|---|
+| 登录（UOS 账号、开发者登录） | `LoginScreen` | `Login.uxml` |
 | 存档（三个存档位，含删除存档弹窗） | `SaveSlotsScreen` | `SaveSlots.uxml` |
 | 新建指挥官弹窗（主菜单和存档界面共用） | `NewCommanderDialog` | `NewCommander.uxml` |
 | 主菜单 | `MainMenuScreen` | `MainMenu.uxml` |
@@ -144,13 +147,22 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 - 场景放在离棋盘很远的地方（z = 400），界面的 `UsesMenuScene` 为 true 时显示，期间镜头跟着 `Camera Anchor`，棋盘的太阳光和轮廓光关掉（`SceneLook.SetNight`）；离开时镜头回到布阵位置。
 - 界面上用两张小渐变贴图（`StarlineUI/FadeLeft.png`、`FadeBottom.png`）压暗左侧和底部，保证文字清楚；它们的 .meta 设成不重复平铺、无 mipmap，避免边缘出现细线。
 
+### 登录
+
+- 启动后先进登录界面（决策 62），没登录时 `GameApp.ShowMainMenu` 也会退回这里。界面上每种登录方式一个按钮，登录中按钮锁住，“取消”可以放弃等待（第三方面板被关掉却没有回调时用）；失败时显示原因，再点一次就是重试。
+- 登录方式是 `ILoginProvider`（`Runtime/Client/Online/`），由 `AccountService` 统一管理：`Register` 注册、`SignIn` 登录并记住这次的方式（PlayerPrefs `StarlineLastLogin`，下次启动自动用它登录）、`SignOut` 退出并忘掉。登录结果是 `AuthSession`（登录方式、账号 id、显示名、游戏服务器令牌）。
+- `DevLogin`：只在编辑器和开发版注册，填任意账号名，不需要密码也不连服务器，名字记在 PlayerPrefs `StarlineDevAccount`。服务端写好后对应服务端的 `dev` 登录（server-design.md 第 8 节 S1）。
+- `UosPassportLogin`（`Assets/Scripts/Online/`）：UOS Passport 登录，用 SDK 自带的登录面板 `PassportUI`（`InvokeLoginManually`，点按钮才弹出）。放在 Assets 里是为了不用在 asmdef 里写 SDK 的程序集名；它启动时自己注册到 `AccountService`。整个文件包在 `#if STARLINE_UOS_PASSPORT` 里，没装 SDK 时工程照常编译，登录界面只显示开发者登录。
+- 现在 UOS 登录只确认身份，`AuthSession.AccessToken` 还是空的：按 server-design.md 第 7 节，以后客户端把 Passport 令牌交给云函数，由云函数签发游戏自己的令牌。
+- 新增一种登录方式（Steam、微信小游戏）：写一个 `ILoginProvider`，在 `LoginMethods` 加 id，在 `Login.uxml` 加按钮、`LoginScreen` 里绑定，`LoginScreen.MethodName` 加名字。
+
 ### 存档位
 
-- 启动后直接进主菜单，自动读取最近玩过的存档；主菜单显示当前指挥官，“存档”按钮进入存档界面切换、新建或删除。
+- 登录后进主菜单，自动读取最近玩过的存档；主菜单显示当前指挥官，“存档”按钮进入存档界面切换、新建或删除。
 - 一共 3 个存档位，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
 - 现在存档只记指挥官名字、游戏时长、最近游玩时间和远征次数（`CommanderProfile`）；远征进度、角色收集在 M3 加进同一个文件。
 - 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存。
-- 单机买断制，没有账号；以后接入 Steam 时，云存档同步这个 saves 文件夹即可。
+- 存档暂时还在本地；服务端写好后改为服务端快照（server-design.md 第 8 节 S3）。
 
 ### 设置
 
