@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    服务端的游戏规则：登录、存档（S1），以后加战斗登记和重跑结算、养成、远征、录像榜。
+    纯 .NET 类库，不依赖 UOS，也不直接碰数据库（docs/server-design.md 第 6.2 节）。
+    和客户端共用的消息格式在内核目录的 Online/ 里，直接编进这个程序集。
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="../../../Starline/Packages/com.starline.game/Runtime/Battle/Online/*.cs" Link="Protocol/%(Filename)%(Extension)" />
+    <ProjectReference Include="../Starline.Server.Data/Starline.Server.Data.csproj" />
+    <!-- UOS 的 C# 云函数运行环境自带 Newtonsoft.Json -->
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>

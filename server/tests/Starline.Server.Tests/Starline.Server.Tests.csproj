@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    服务端规则的测试，用法见 server/README.md（最后一行应是“全部通过”）。
+    默认用内存数据库，也可以指定 MongoDB 连接字符串，用 CRUD Save 的实现再跑一遍。
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../../src/Starline.Server.Game/Starline.Server.Game.csproj" />
+    <ProjectReference Include="../../src/Starline.Server.Data.CrudSave/Starline.Server.Data.CrudSave.csproj" />
+  </ItemGroup>
+
+</Project>

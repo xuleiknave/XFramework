@@ -57,6 +57,8 @@ docs/                              设计文档与原型图
 
 UOS 的应用 ID、密钥只在 UOS Launcher 和 UOS 后台里配置，不要写进代码或提交到仓库。
 
+**游戏服务器**（UOS 云函数，存档放在服务器上）的部署步骤见 [server/README.md](server/README.md)。没部署时（没定义 `STARLINE_UOS_FUNC`）游戏照旧把存档存在本机。
+
 ### 中文字体
 
 界面字体是随工程提供的 **Noto Sans SC Regular**（`Runtime/Resources/StarlineUIFont.ttf`，SIL OFL 开源协议，可免费用于商业游戏）。想换字体，用新字体文件替换它即可（文件名不变）。发布时要把 `ThirdPartyNotices.md` 和 `Licenses/` 里的许可证随游戏一起提供。

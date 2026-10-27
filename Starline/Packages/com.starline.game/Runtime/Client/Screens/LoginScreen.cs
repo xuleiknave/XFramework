@@ -26,7 +26,8 @@ namespace Starline.Client
 
         public override bool UsesMenuScene => true;
 
-        public LoginScreen(GameApp app, bool autoLogin) : base(app, "Login")
+        /// <param name="message">Shown instead of "choose a login method", e.g. why the game server ended the session.</param>
+        public LoginScreen(GameApp app, bool autoLogin, string message = null) : base(app, "Login")
         {
             _status = Find<Label>("status");
             _uos = Button("login-uos", () => SignIn(AccountService.Find(LoginMethods.Uos)));
@@ -53,7 +54,14 @@ namespace Starline.Client
                 _devAccount.value = devLogin.Account;
             }
             SetBusy(false);
-            SetStatus(AccountService.HasAnyMethod ? Loc.Ui("login.choose") : Loc.Ui("login.none"), !AccountService.HasAnyMethod);
+            if (message != null)
+            {
+                SetStatus(message, true);
+            }
+            else
+            {
+                SetStatus(AccountService.HasAnyMethod ? Loc.Ui("login.choose") : Loc.Ui("login.none"), !AccountService.HasAnyMethod);
+            }
             if (autoLogin)
             {
                 _autoLogin = AccountService.Find(AccountService.LastMethod);
@@ -103,6 +111,13 @@ namespace Starline.Client
             try
             {
                 await AccountService.SignIn(provider);
+                SetStatus(Loc.Ui("login.loading_saves"), false);
+                await App.LoadSaves();
+            }
+            catch (ServerCallException e)
+            {
+                Fail(attempt, Loc.Ui(LoginException.ServerRefused, e.Describe()));
+                return;
             }
             catch (LoginException e)
             {

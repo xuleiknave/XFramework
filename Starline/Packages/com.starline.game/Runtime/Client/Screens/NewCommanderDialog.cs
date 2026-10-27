@@ -22,7 +22,10 @@ namespace Starline.Client
                 error.text = string.Empty;
             });
 
-            void Confirm()
+            Button confirm = dialog.Find<Button>("confirm");
+            bool busy = false;
+
+            async void Confirm()
             {
                 string name = field.value;
                 string problem = CommanderProfile.ValidateName(ref name);
@@ -31,8 +34,24 @@ namespace Starline.Client
                     error.text = problem;
                     return;
                 }
-                CommanderProfile profile = CommanderProfile.Create(slot, name);
-                ProfileStore.Save(profile);
+                if (busy)
+                {
+                    return;
+                }
+                busy = true;
+                confirm.SetEnabled(false);
+                CommanderProfile profile;
+                try
+                {
+                    profile = await app.Saves.Create(slot, name);
+                }
+                catch (ServerCallException e)
+                {
+                    busy = false;
+                    confirm.SetEnabled(true);
+                    error.text = e.Describe();
+                    return;
+                }
                 app.Ui.CloseModals();
                 onCreated(profile);
             }
@@ -44,7 +63,7 @@ namespace Starline.Client
                     Confirm();
                 }
             }, TrickleDown.TrickleDown);
-            dialog.Find<Button>("confirm").clicked += Confirm;
+            confirm.clicked += Confirm;
             dialog.Find<Button>("cancel").clicked += app.Ui.CloseModals;
             app.Ui.ShowModal(dialog);
             field.schedule.Execute(() => field.Focus());

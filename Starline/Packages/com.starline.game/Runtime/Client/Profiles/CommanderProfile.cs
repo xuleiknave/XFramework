@@ -9,7 +9,7 @@ namespace Starline.Client
     [Serializable]
     public sealed class CommanderProfile
     {
-        public const int MaxNameLength = 8;
+        public const int MaxNameLength = Starline.Online.ServerLimits.MaxCommanderName;
 
         public int slot;
         public string name;

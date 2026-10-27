@@ -151,18 +151,20 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 
 - 启动后先进登录界面（决策 62），没登录时 `GameApp.ShowMainMenu` 也会退回这里。界面上每种登录方式一个按钮，登录中按钮锁住，“取消”可以放弃等待（第三方面板被关掉却没有回调时用）；失败时显示原因，再点一次就是重试。
 - 登录方式是 `ILoginProvider`（`Runtime/Client/Online/`），由 `AccountService` 统一管理：`Register` 注册、`SignIn` 登录并记住这次的方式（PlayerPrefs `StarlineLastLogin`，下次启动自动用它登录）、`SignOut` 退出并忘掉。登录结果是 `AuthSession`（登录方式、账号 id、显示名、游戏服务器令牌）。
-- `DevLogin`：只在编辑器和开发版注册，填任意账号名，不需要密码也不连服务器，名字记在 PlayerPrefs `StarlineDevAccount`。服务端写好后对应服务端的 `dev` 登录（server-design.md 第 8 节 S1）。
+- `DevLogin`：只在编辑器和开发版注册，填任意账号名，不需要密码，名字记在 PlayerPrefs `StarlineDevAccount`。有游戏服务器时对应服务端的 `dev` 登录，只有设了 `STARLINE_DEV_LOGIN=1` 的开发用 UOS 应用接受。
 - `UosPassportLogin`（`Assets/Scripts/Online/`）：UOS Passport 登录，用 SDK 自带的登录面板 `PassportUI`（`InvokeLoginManually`，点按钮才弹出）。放在 Assets 里是为了不用在 asmdef 里写 SDK 的程序集名；它启动时自己注册到 `AccountService`。整个文件包在 `#if STARLINE_UOS_PASSPORT` 里，没装 SDK 时工程照常编译，登录界面只显示开发者登录。
-- 现在 UOS 登录只确认身份，`AuthSession.AccessToken` 还是空的：按 server-design.md 第 7 节，以后客户端把 Passport 令牌交给云函数，由云函数签发游戏自己的令牌。
+- 有游戏服务器时，`AccountService.SignIn` 在登录方式成功后再登录服务器（`auth.login`）：云函数校验 Passport 令牌（开发者登录则交账号名），返回账号 id 和会话令牌，`AuthSession.AccessToken` 就是这个令牌。服务器拒绝或连不上时登录界面显示“无法登录游戏服务器：原因”，登录方式本身保持登录，再点一次只重试服务器。没有游戏服务器时 `AccessToken` 为空。
 - 新增一种登录方式（Steam、微信小游戏）：写一个 `ILoginProvider`，在 `LoginMethods` 加 id，在 `Login.uxml` 加按钮、`LoginScreen` 里绑定，`LoginScreen.MethodName` 加名字。
 
 ### 存档位
 
 - 登录后进主菜单，自动读取最近玩过的存档；主菜单显示当前指挥官，“存档”按钮进入存档界面切换、新建或删除。
-- 一共 3 个存档位，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
+- 一共 3 个存档位，登录后由 `SaveRepository` 一次读进内存（`GameApp.LoadSaves`），界面直接读它：
+  - **有游戏服务器**（装了 Func Stateless SDK、定义了 `STARLINE_UOS_FUNC`）：`ServerSaveRepository`，存档在 UOS 上（server/README.md）。新建、删除要等服务器回复，失败时弹窗里显示原因；游戏时长和远征次数按增量上报，最多一分钟报一次（远征次数变了、切到后台、退出时马上报）。服务器说账号在别处登录或会话过期时（`GameServerClient.SessionLost`），回到登录界面并显示原因。
+  - **没有游戏服务器**：`LocalSaveRepository`，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
+- 网络层是 `GameServerClient`（`Runtime/Client/Online/`）：把 `ServerRequest` 转成 JSON 交给 `IServerTransport`，修改类请求自动带幂等键、网络错误时用同一个键重发两次。UOS 的实现 `UosGameServer` 在 `Assets/Scripts/Online/`，和 `UosPassportLogin` 一样放在 Assets 里、用宏开关。
 - 现在存档只记指挥官名字、游戏时长、最近游玩时间和远征次数（`CommanderProfile`）；远征进度、角色收集在 M3 加进同一个文件。
-- 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存。
-- 存档暂时还在本地；服务端写好后改为服务端快照（server-design.md 第 8 节 S3）。
+- 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存（服务器版按上面的节奏上报）。
 
 ### 设置
 

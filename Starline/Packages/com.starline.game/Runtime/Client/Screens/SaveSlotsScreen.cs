@@ -8,8 +8,8 @@ namespace Starline.Client
     /// </summary>
     public sealed class SaveSlotsScreen : UiScreen
     {
-        private readonly CommanderProfile[] _profiles = new CommanderProfile[ProfileStore.SlotCount];
-        private readonly VisualElement[] _cards = new VisualElement[ProfileStore.SlotCount];
+        private readonly CommanderProfile[] _profiles = new CommanderProfile[SaveRepository.SlotCount];
+        private readonly VisualElement[] _cards = new VisualElement[SaveRepository.SlotCount];
         private readonly VisualElement _slots;
         private readonly Button _enter;
         private int _selected = -1;
@@ -30,7 +30,7 @@ namespace Starline.Client
             int lastPlayed = -1;
             for (int i = 0; i < _profiles.Length; i++)
             {
-                _profiles[i] = ProfileStore.Load(i);
+                _profiles[i] = App.Saves.Get(i);
                 if (_profiles[i] != null && (lastPlayed < 0 || _profiles[i].lastPlayedTicks > _profiles[lastPlayed].lastPlayedTicks))
                 {
                     lastPlayed = i;
@@ -131,15 +131,31 @@ namespace Starline.Client
         private void ConfirmDelete(int slot)
         {
             CommanderProfile profile = _profiles[slot];
-            VisualElement dialog = Ui.Dialog(Loc.Ui("slots.delete_title"),
+            bool busy = false;
+            VisualElement dialog = null;
+            dialog = Ui.Dialog(Loc.Ui("slots.delete_title"),
                 Loc.Ui("slots.delete_body", profile.name, CommanderProfile.FormatPlayTime(profile.playSeconds)),
-                (Loc.Ui("slots.delete_confirm"), () =>
+                (Loc.Ui("slots.delete_confirm"), async () =>
                 {
+                    if (busy)
+                    {
+                        return;
+                    }
+                    busy = true;
+                    try
+                    {
+                        await App.Saves.Delete(slot);
+                    }
+                    catch (ServerCallException e)
+                    {
+                        busy = false;
+                        dialog.Q<Label>(className: "dialog-body").text = Loc.Ui("slots.delete_failed", e.Describe());
+                        return;
+                    }
                     if (App.Profile != null && App.Profile.slot == slot)
                     {
                         App.SignOut();
                     }
-                    ProfileStore.Delete(slot);
                     App.Ui.CloseModals();
                     Reload();
                 }),

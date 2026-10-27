@@ -36,6 +36,8 @@ namespace Starline.Client
         public const string Cancelled = "login.cancelled";
         public const string Failed = "login.failed";
         public const string EmptyAccount = "login.empty_account";
+        /// <summary>Signed in with the provider, but the game server refused or could not be reached; {0} says why.</summary>
+        public const string ServerRefused = "login.server_failed";
 
         public LoginException(string reasonKey, string detail = null) : base(detail ?? reasonKey)
         {
