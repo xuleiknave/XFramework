@@ -1,6 +1,6 @@
 # 星线服务端（UOS）
 
-服务端全部托管在 UOS（决策 50、57、63、64）：同一套规则可以部署成 UOS 的**服务器程序镜像**（常驻的 HTTP 进程 `starline-server`，现在用这个），也可以部署成 C# **云函数**（`StarlineService`）。数据放在 MongoDB，账号用 Passport。设计见 [server-design.md](../docs/server-design.md)，数据结构见 [server-database.md](../docs/server-database.md)。
+服务端全部托管在 UOS（决策 50、57、63、64、65）：同一套规则部署成 C# **云函数**（`StarlineService`，**现在用这个**），也可以部署成 UOS 的**服务器程序镜像**（常驻的 HTTP 进程 `starline-server`，留给本机调试和以后的对战服务器）。数据放在 MongoDB，账号用 Passport。设计见 [server-design.md](../docs/server-design.md)，数据结构见 [server-database.md](../docs/server-database.md)。
 
 现在做到 **S1**：登录（UOS Passport、开发者登录）、一个账号同时只能在一台设备上登录、存档位的列出 / 新建 / 删除、上报游戏时长和远征次数。战斗结算（S2）、养成（S4）、录像榜（S5）还没写。
 
@@ -47,7 +47,7 @@ dotnet run --project server/tests/Starline.Server.Tests -- --mongo mongodb://127
 
 规则和数据层只有一份，外面有两个入口，按 UOS 后台选的产品用其中一个：
 
-| | 服务器程序镜像（Func Stateful，**现在用这个**） | 云函数（Func Stateless） |
+| | 服务器程序镜像（Func Stateful / Multiverse） | 云函数（Func Stateless，**现在用这个**） |
 |---|---|---|
 | 入口 | `Starline.Server.Host`，打包成 zip 上传 | `Starline.Server.Uos`，在团结编辑器里用插件上传 |
 | 客户端怎么连 | HTTP：`StarlineData/server.json` 里填服务器地址 | 插件生成的调用代码，要定义 `STARLINE_UOS_FUNC` |
@@ -102,6 +102,10 @@ Multiverse 要求服务器进程启动后报告“就绪”（`sdk.ready()`）�
 2. 把 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/server.json` 的 `url` 改成 `http://IP:端口`（或者启动参数 `-server http://IP:端口` 临时覆盖），在编辑器里点 Play，用开发者登录进游戏，新建指挥官、删掉，再重新登录确认存档还在。客户端会走 HTTP，不需要装 Func Stateless SDK。
 3. 现在是明文 HTTP：工程设置里已经把“Allow downloads over HTTP”设成只在开发版允许（`insecureHttpOption: 1`）。正式发布前要换成 HTTPS（域名、证书和备案），不然正式包连不上。
 
+### 为什么不用它做账号和存档服务
+
+在 Multiverse 上实测过（2026-10-28）：镜像能通过启动测试，但 Multiverse 是“一局一台”的对战服务器托管，免费试用单台服务器最长存活 **1 小时**（“The allocation TTL ... has exceeded max allocation TTL 1h0m0s”），每次分配 IP 都会变，客户端没有固定地址可连，所以账号和存档服务改用云函数（决策 65）。
+
 ### 还要解决的
 
 - **UOS 账号登录**：服务器要能校验 Passport 令牌才能确认玩家身份。需要知道 UOS 给常驻服务器的校验方式（JWT 公钥或校验接口），可以在 UOS 后台或问 UOS 客服：“自建 / Func Stateful 服务器怎么校验 Passport 的 access token 并拿到 userId”。知道以后我在 `Starline.Server.Host` 里接上，客户端把令牌放进请求头 `X-UOS-Token`。
@@ -109,7 +113,7 @@ Multiverse 要求服务器进程启动后报告“就绪”（`sdk.ready()`）�
 
 ## 部署成云函数
 
-这一节是 Func Stateless（云函数）的做法，现在没用它；留着以备 UOS 账号登录需要 `FuncContext.ValidateToken` 时切回来。UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UOS 文档“开发指南(C#)”），代码放在工程的 `Assets/Scripts/CloudService/`，所有函数代码都要在这一个目录里。服务端代码平时放在 `server/src`，部署前用脚本复制过去。
+这一节是 Func Stateless（云函数）的做法，账号和存档服务现在用它（决策 65）。UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UOS 文档“开发指南(C#)”），代码放在工程的 `Assets/Scripts/CloudService/`，所有函数代码都要在这一个目录里。服务端代码平时放在 `server/src`，部署前用脚本复制过去。
 
 > 云端开发环境里没有团结编辑器，也装不了 UOS 的编辑器插件，所以下面的步骤是按 UOS 文档写的，**没有实际跑过**。哪一步和后台或插件对不上，把截图或报错发给我。
 

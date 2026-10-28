@@ -162,7 +162,7 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 - 一共 3 个存档位，登录后由 `SaveRepository` 一次读进内存（`GameApp.LoadSaves`），界面直接读它：
   - **有游戏服务器**（`server.json` 填了地址，或装了 Func Stateless SDK、定义了 `STARLINE_UOS_FUNC`）：`ServerSaveRepository`，存档在 UOS 上（server/README.md）。新建、删除要等服务器回复，失败时弹窗里显示原因；游戏时长和远征次数按增量上报，最多一分钟报一次（远征次数变了、切到后台、退出时马上报）。服务器说账号在别处登录或会话过期时（`GameServerClient.SessionLost`），回到登录界面并显示原因。
   - **没有游戏服务器**：`LocalSaveRepository`，每个存档是 `Application.persistentDataPath/saves/slot<N>.json`（`ProfileStore`，先写临时文件再替换，崩溃不会留下半个存档）。
-- 网络层是 `GameServerClient`（`Runtime/Client/Online/`）：把 `ServerRequest` 转成 JSON 交给 `IServerTransport`，修改类请求自动带幂等键、网络错误时用同一个键重发两次。两种实现：`HttpGameServer`（`StarlineData/server.json` 填了地址或带启动参数 `-server <地址>` 时启用，连 UOS 服务器程序镜像，优先）和云函数版 `UosGameServer`（`Assets/Scripts/Online/`，和 `UosPassportLogin` 一样放在 Assets 里、用宏 `STARLINE_UOS_FUNC` 开关）。
+- 网络层是 `GameServerClient`（`Runtime/Client/Online/`）：把 `ServerRequest` 转成 JSON 交给 `IServerTransport`，修改类请求自动带幂等键、网络错误时用同一个键重发两次。两种实现：`HttpGameServer`（`StarlineData/server.json` 填了地址或带启动参数 `-server <地址>` 时启用，连 UOS 服务器程序镜像或本机的 `starline-server`，优先，正式部署时 `url` 留空）和云函数版 `UosGameServer`（`Assets/Scripts/Online/`，和 `UosPassportLogin` 一样放在 Assets 里、用宏 `STARLINE_UOS_FUNC` 开关，正式用这个，决策 65）。
 - 现在存档只记指挥官名字、游戏时长、最近游玩时间和远征次数（`CommanderProfile`）；远征进度、角色收集在 M3 加进同一个文件。
 - 游戏时长在 `GameApp.Update` 里累加，切换界面、开始和结束远征、退出游戏时保存（服务器版按上面的节奏上报）。
 
