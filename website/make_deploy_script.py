@@ -1,9 +1,10 @@
-"""把官网文件打包进一个 PowerShell 脚本，在 Windows 服务器上以管理员身份运行即可部署到 IIS。
+"""把官网文件压缩打包进一个 PowerShell 脚本（控制在 16 KB 内，能直接粘进阿里云云助手），在 Windows 服务器上以管理员身份运行即可部署到 IIS。
 
 用法：python3 website/make_deploy_script.py [输出路径]
 默认输出到 website/dist/deploy-website.ps1。
 """
 import base64
+import gzip
 import pathlib
 import sys
 
@@ -36,7 +37,8 @@ $files = @{
 __FILES__
 }
 foreach ($name in $files.Keys) {
-    [IO.File]::WriteAllBytes((Join-Path $site $name), [Convert]::FromBase64String($files[$name]))
+    $gz = New-Object IO.Compression.GZipStream((New-Object IO.MemoryStream(,[Convert]::FromBase64String($files[$name]))), [IO.Compression.CompressionMode]::Decompress)
+    $out = [IO.File]::Create((Join-Path $site $name)); $gz.CopyTo($out); $out.Close(); $gz.Close()
 }
 
 Write-Host '3/4 把 IIS 默认站点指向官网目录...'
@@ -68,7 +70,7 @@ def main():
     out = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "dist" / "deploy-website.ps1"
     entries = []
     for name in FILES:
-        data = base64.b64encode((HERE / name).read_bytes()).decode("ascii")
+        data = base64.b64encode(gzip.compress((HERE / name).read_bytes(), 9, mtime=0)).decode("ascii")
         entries.append(f"    '{name}' = '{data}'")
     script = TEMPLATE.replace("__SITE_DIR__", SITE_DIR).replace("__FILES__", "\n".join(entries))
     out.parent.mkdir(parents=True, exist_ok=True)
