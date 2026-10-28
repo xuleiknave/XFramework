@@ -1,8 +1,10 @@
 using System;
+using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Starline.Server.Data.CrudSave;
+using Newtonsoft.Json.Linq;
 using Starline.Server.Game;
 using Unity.UOS.Func.Stateless.Core.Attributes;
 using Unity.UOS.Func.Stateless.Core.Context;
@@ -18,13 +20,90 @@ namespace Starline.Cloud
     public class StarlineService
     {
         private static readonly SemaphoreSlim OpenLock = new SemaphoreSlim(1, 1);
+        private static readonly DateTime StartedAt = DateTime.UtcNow;
         private static GameServer _server;
+        private static CrudSaveStore _store;
 
         [CloudFunc]
         public async Task<string> Call(string request)
         {
             GameServer server = await Server();
             return await server.HandleJson(request, PassportUserId);
+        }
+
+        /// <summary>
+        /// Self-check after a deployment (server/README.md): call it from the console's "调试函数" with an
+        /// empty body. Changes nothing; reports the server version, which environment variables are set
+        /// (never their values), whether the database answers and whether Passport tokens can be checked.
+        /// </summary>
+        [CloudFunc]
+        public async Task<string> Status()
+        {
+            var items = new JArray();
+            bool allOk = true;
+            void Item(string name, bool ok, long ms, string detail)
+            {
+                allOk &= ok;
+                items.Add(new JObject { ["name"] = name, ["ok"] = ok, ["ms"] = ms, ["detail"] = detail });
+            }
+
+            bool devLogin = DevLoginAllowed();
+            Item("服务端版本", true, 0, GameServer.Version);
+            Item("开发者登录", true, 0, devLogin ? "接受（只该出现在开发用的 UOS 应用上）" : "不接受");
+            Item("环境变量", true, 0, string.Join("，",
+                Describe("STARLINE_DEV_LOGIN"), Describe("STARLINE_DB_ID"), Describe("STARLINE_DB_PASSWORD"),
+                Describe("UOS_APP_ID"), Describe("UOS_APP_SERVICE_SECRET")));
+
+            var watch = Stopwatch.StartNew();
+            try
+            {
+                await Server();
+                long openMs = watch.ElapsedMilliseconds;
+                watch.Restart();
+                await _store.FindIdentity("status:check");
+                Item("数据库", true, watch.ElapsedMilliseconds, "连接和建索引 " + openMs + " ms（只在这个实例第一次调用时发生），读一次 " + watch.ElapsedMilliseconds + " ms");
+            }
+            catch (Exception e)
+            {
+                Item("数据库", false, watch.ElapsedMilliseconds, e.GetBaseException().Message);
+            }
+
+            bool canValidate = typeof(FuncContext).GetMethod("ValidateToken", Type.EmptyTypes) != null
+                && typeof(FuncContext).GetMethod("GetUserId", Type.EmptyTypes) != null;
+            Item("Passport 令牌校验", canValidate, 0, canValidate
+                ? "FuncContext.ValidateToken / GetUserId 可用"
+                : "SDK 里没有 FuncContext.ValidateToken / GetUserId，UOS 账号登录会失败，请升级 Func Stateless SDK");
+
+            var report = new JObject
+            {
+                ["allOk"] = allOk,
+                ["serverTime"] = DateTime.UtcNow.ToString("o"),
+                ["instanceStartedAt"] = StartedAt.ToString("o"),
+                ["items"] = items,
+            };
+            return report.ToString();
+        }
+
+        private static string Describe(string variable) =>
+            variable + (string.IsNullOrEmpty(Environment.GetEnvironmentVariable(variable)) ? " 未设置" : " 已设置");
+
+        /// <summary>
+        /// The developer login is for the development UOS app (STARLINE_DEV_LOGIN=1) and for the Func
+        /// Stateless panel's local mode, where this code runs inside the Tuanjie editor. On UOS the
+        /// function runs on Tencent Cloud SCF (TENCENTCLOUD_RUNENV=SCF, the variable UOS's CRUD SDK
+        /// checks too), so the editor rule can never open the developer login on the real server.
+        /// </summary>
+        private static bool DevLoginAllowed()
+        {
+            if (Environment.GetEnvironmentVariable("STARLINE_DEV_LOGIN") == "1")
+            {
+                return true;
+            }
+#if UNITY_EDITOR
+            return Environment.GetEnvironmentVariable("TENCENTCLOUD_RUNENV") == null;
+#else
+            return false;
+#endif
         }
 
         /// <summary>One server per function instance: the database connection is reused by warm calls.</summary>
@@ -44,8 +123,8 @@ namespace Starline.Cloud
                         Environment.GetEnvironmentVariable("STARLINE_DB_ID") ?? "",
                         Environment.GetEnvironmentVariable("STARLINE_DB_PASSWORD") ?? "");
                     await store.EnsureIndexes();
-                    var options = new ServerOptions { AllowDevLogin = Environment.GetEnvironmentVariable("STARLINE_DEV_LOGIN") == "1" };
-                    _server = new GameServer(store, options);
+                    _store = store;
+                    _server = new GameServer(store, new ServerOptions { AllowDevLogin = DevLoginAllowed() });
                 }
                 return _server;
             }

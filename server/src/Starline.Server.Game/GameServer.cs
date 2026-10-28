@@ -15,6 +15,9 @@ namespace Starline.Server.Game
     /// </summary>
     public sealed class GameServer
     {
+        /// <summary>Shown by the Status cloud function; bump it with each deployment that changes behavior.</summary>
+        public const string Version = "S1 · 2026-10-28";
+
         /// <summary>Conditional writes retried this often before answering <see cref="ServerErrors.Conflict"/>.</summary>
         private const int WriteAttempts = 3;
         /// <summary>Play time a report may add beyond the time that really passed (clock and network slack).</summary>

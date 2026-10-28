@@ -148,7 +148,7 @@ server/
 
 - C# 云函数用团结编辑器里的 Func Stateless 插件上传（`usf-cli` 只支持 JS）：`tools/uos/sync_cloud_service.py` 把 `server/src` 的源码复制到工程的 `Assets/Scripts/CloudService/`，步骤见 server/README.md；配置表以后按 `data/<data_hash>/` 一起打进函数包。
 - 每天由一个定时云函数把 CRUD 里的数据导出成 JSON 存档备份，防误删，也方便以后迁出 UOS 或换到 MySQL。
-- 开发和正式环境分开两个 UOS 应用。UOS 的试用额度不能用于正式商用。
+- 开发和正式环境分开两个 UOS 应用。UOS 的试用额度不能用于正式商用。两边代码相同，只差环境变量（开发应用设 `STARLINE_DEV_LOGIN=1` 接受开发者登录）；每次上传后调一次自检云函数 `StarlineService.Status`，看版本、数据库和 Passport 校验是否正常（server/README.md“部署到 UOS”）。
 
 ---
 
