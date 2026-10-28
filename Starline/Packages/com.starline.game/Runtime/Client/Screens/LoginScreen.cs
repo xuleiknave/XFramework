@@ -17,6 +17,9 @@ namespace Starline.Client
         private readonly Button _cancel;
         private readonly TextField _devAccount;
         private readonly Label _status;
+        private readonly VisualElement _card;
+        private readonly VisualElement _spinner;
+        private readonly IVisualElementScheduledItem _spin;
         private readonly ILoginProvider _autoLogin;
 
         /// <summary>Bumped by every login and by "cancel": a failure from an older login is not shown.</summary>
@@ -30,6 +33,14 @@ namespace Starline.Client
         public LoginScreen(GameApp app, bool autoLogin, string message = null) : base(app, "Login")
         {
             _status = Find<Label>("status");
+            _card = Find<VisualElement>("card");
+            _spinner = Find<VisualElement>("spinner");
+            float angle = 0f;
+            _spin = _spinner.schedule.Execute(() =>
+            {
+                angle = (angle + 8f) % 360f;
+                _spinner.style.rotate = new Rotate(new Angle(angle));
+            }).Every(16);
             _uos = Button("login-uos", () => SignIn(AccountService.Find(LoginMethods.Uos)));
             _dev = Button("login-dev", () => SignIn(AccountService.Find(LoginMethods.Dev)));
             _cancel = Button("cancel", Cancel);
@@ -161,6 +172,16 @@ namespace Starline.Client
             _dev.SetEnabled(!busy);
             _devAccount.SetEnabled(!busy);
             Show(_cancel, busy);
+            Show(_spinner, busy);
+            _card.EnableInClassList("login-card--busy", busy);
+            if (busy)
+            {
+                _spin.Resume();
+            }
+            else
+            {
+                _spin.Pause();
+            }
         }
 
         private void SetStatus(string text, bool bad)

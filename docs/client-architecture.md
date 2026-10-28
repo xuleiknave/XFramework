@@ -149,7 +149,7 @@ Battle 结果弹窗 ──回放本场──▶ Battle（回放，录像只在�
 
 ### 登录
 
-- 启动后先进登录界面（决策 62），没登录时 `GameApp.ShowMainMenu` 也会退回这里。界面上每种登录方式一个按钮，登录中按钮锁住，“取消”可以放弃等待（第三方面板被关掉却没有回调时用）；失败时显示原因，再点一次就是重试。
+- 启动后先进登录界面（决策 62），没登录时 `GameApp.ShowMainMenu` 也会退回这里。界面左边沿用主菜单的标题和简介，下面是登录卡片：每种登录方式一个金色大按钮，按钮下面一行是状态（登录中带转圈图标和“取消”，失败时红字显示原因，再点一次就是重试），开发者登录在卡片底部的分隔线下；“设置”“退出”放在右上角。登录中按钮锁住，“取消”可以放弃等待（第三方面板被关掉却没有回调时用）。
 - 登录方式是 `ILoginProvider`（`Runtime/Client/Online/`），由 `AccountService` 统一管理：`Register` 注册、`SignIn` 登录并记住这次的方式（PlayerPrefs `StarlineLastLogin`，下次启动自动用它登录）、`SignOut` 退出并忘掉。登录结果是 `AuthSession`（登录方式、账号 id、显示名、游戏服务器令牌）。
 - `DevLogin`：只在编辑器和开发版注册，填任意账号名，不需要密码，名字记在 PlayerPrefs `StarlineDevAccount`。有游戏服务器时对应服务端的 `dev` 登录，只有设了 `STARLINE_DEV_LOGIN=1` 的开发用 UOS 应用接受。
 - `UosPassportLogin`（`Assets/Scripts/Online/`）：UOS Passport 登录，用 SDK 自带的登录面板 `PassportUI`（`InvokeLoginManually`，点按钮才弹出）。放在 Assets 里是为了不用在 asmdef 里写 SDK 的程序集名；它启动时自己注册到 `AccountService`。整个文件包在 `#if STARLINE_UOS_PASSPORT` 里，没装 SDK 时工程照常编译，登录界面只显示开发者登录。

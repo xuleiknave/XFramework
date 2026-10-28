@@ -367,9 +367,115 @@ Label {
     top: 226px;
 }
 
-/* Login screen: the login methods take the place of the main menu entries. */
+/* Login screen: the brand from the main menu, then a card with one big button per login method,
+   the progress or error right under it, and the developer login below a divider. */
+.login-tagline {
+    margin-bottom: 58px;
+}
+
+.login-card {
+    padding: 53px 58px 48px 58px;
+    border-top-width: 5px;
+    border-top-color: var(--gold-bright);
+}
+
+.login-heading {
+    font-size: 53px;
+    -unity-font-style: bold;
+    color: var(--gold-bright);
+    letter-spacing: 10px;
+    margin: 0;
+}
+
+.login-heading-sub {
+    font-size: 31px;
+    color: var(--muted);
+    margin: 10px 0 43px 0;
+}
+
+.login-main {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 197px;
+    margin: 0;
+    padding: 29px 43px;
+}
+
+.login-main-title {
+    font-size: 53px;
+    -unity-font-style: bold;
+    letter-spacing: 14px;
+    margin: 0;
+}
+
+.login-main-sub {
+    font-size: 29px;
+    color: #4A3A1A;
+    letter-spacing: 2px;
+    margin: 10px 0 0 0;
+}
+
+.login-status-row {
+    align-items: center;
+    min-height: 82px;
+    margin-top: 29px;
+}
+
+/* Turned by LoginScreen while a login runs. */
+.login-spinner {
+    width: 29px;
+    height: 29px;
+    margin: 0 29px 0 10px;
+    flex-shrink: 0;
+    border-width: 5px;
+    border-color: var(--supply);
+    border-top-color: transparent;
+    border-radius: 50%;
+}
+
+.login-status {
+    flex-grow: 1;
+    flex-shrink: 1;
+    font-size: 34px;
+    color: var(--muted);
+    white-space: normal;
+    margin: 0;
+}
+
+.login-status.bad {
+    color: var(--bad);
+}
+
+.login-card--busy .login-status {
+    color: var(--supply);
+}
+
+.login-cancel {
+    flex-shrink: 0;
+    margin: 0 0 0 29px;
+}
+
 .login-dev {
-    margin: 34px 0 0 0;
+    margin-top: 34px;
+}
+
+.login-dev-head {
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.login-dev-line {
+    flex-grow: 1;
+    height: 2px;
+    background-color: var(--border);
+}
+
+.login-dev-title {
+    font-size: 29px;
+    color: var(--muted);
+    letter-spacing: 5px;
+    margin: 0 29px;
 }
 
 .login-dev-row {
@@ -377,20 +483,44 @@ Label {
 }
 
 .login-dev-field {
-    width: 620px;
-    margin: 10px 29px 10px 0;
+    flex-grow: 1;
+    flex-shrink: 1;
+    margin: 0 24px 0 0;
 }
 
-.login-status {
-    font-size: 36px;
-    color: var(--muted);
-    white-space: normal;
-    min-height: 50px;
-    margin: 43px 0 0 0;
+.login-dev .login-dev-field .unity-base-text-field__input,
+.login-dev .login-dev-field .unity-text-field__input {
+    font-size: 38px;
+    letter-spacing: 2px;
+    min-height: 86px;
+    padding: 14px 29px;
+    border-color: var(--border);
 }
 
-.login-status.bad {
-    color: var(--bad);
+.login-dev .login-dev-field:focus .unity-base-text-field__input,
+.login-dev .login-dev-field .unity-base-text-field__input:focus {
+    border-color: var(--gold-bright);
+}
+
+.login-dev-button {
+    flex-shrink: 0;
+    min-height: 86px;
+    margin: 0;
+}
+
+.login-dev-hint {
+    margin: 19px 0 0 0;
+}
+
+/* Settings and quit, top right where the main menu shows the commander. */
+.login-corner {
+    position: absolute;
+    right: 115px;
+    top: 96px;
+}
+
+.login-corner .btn-small {
+    margin: 0 0 0 29px;
 }
 
 /* Logo used by the save-slot screen. */
