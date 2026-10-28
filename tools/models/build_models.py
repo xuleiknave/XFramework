@@ -38,7 +38,7 @@ PALETTE = [
     ("gold", "E8C15A"),
     ("leather", "6B4A32"),
     ("wood", "8A6440"),
-    ("skin", "E0B894"),
+    ("skin", "EDB48E"),
     ("stone", "8C8F96"),
     ("stone_dark", "5C6068"),
     ("iron", "3A3D42"),
@@ -69,6 +69,25 @@ PALETTE = [
     ("ice", "A8DDF2"),
     ("moss", "6E8F3E"),
 ]
+# 阵营配色（决策 64）：同名色块在不同阵营里换成阵营色，色块在贴图里的位置不变。
+# 卡通角色按自己的阵营用一张换过色的色块贴图烘焙专属贴图；导出的 Palette.png（低多边形单位用）不受影响。
+# 饰边金属不换：★2 银、★3 起金是升星规则，各阵营一致。
+FACTION_COLOURS = {
+    # 晨星骑士团：钴蓝 + 象牙白钢 + 亮金（"晨光"）
+    "morningstar": {"cloth_blue": "2F62D6", "royal": "1C3A9E", "white": "F5EEDC", "steel": "DCE1EA",
+                    "steel_dark": "8E9AB2", "gold": "F2C14A", "leather": "7A4E2E"},
+    # 边境游侠会：林绿 + 锈红围巾 + 暖色皮革
+    "rangers": {"cloth_navy": "46632F", "royal": "2F4A22", "cloth_blue": "C0582A", "leather": "8E5C34",
+                "steel": "BDB49C", "white": "E8DCC0", "robe_black": "2E3326", "elf_dark": "3A4A2A"},
+    # 银月法师塔：酒红外袍 + 银白
+    "silvermoon": {"royal": "84203F", "cloth_navy": "561530", "cloth_blue": "A33A5A", "white": "EEEAF4",
+                   "steel": "C9D1DE", "steel_dark": "7D879A"},
+}
+# 只给个别角色换的颜色：老橡的树冠换成影歌精灵的紫色
+UNIT_COLOURS = {
+    "treant_guard": {"leaf": "6B4FB0", "bark": "4E3A48", "wood": "6E5060", "elf_purple": "C08CFF"},
+}
+
 PALETTE_CELLS = 8
 PALETTE_CELL_PX = 32
 GLOW = "glow"
@@ -91,11 +110,13 @@ def hex_rgb(h):
     return tuple(int(h[i:i + 2], 16) / 255.0 for i in (0, 2, 4))
 
 
-def build_palette_image():
+def build_palette_image(overrides=None):
+    """色块贴图；overrides 是 {色块名: 颜色}，用来做阵营配色（位置不变，只换颜色）。"""
     size = PALETTE_CELLS * PALETTE_CELL_PX
     image = bpy.data.images.new("Palette", size, size, alpha=False)
     pixels = [0.0] * (size * size * 4)
     colours = dict(PALETTE)
+    colours.update(overrides or {})
     names = [n for n, _ in PALETTE]
     for y in range(size):
         row = (size - 1 - y) // PALETTE_CELL_PX  # Blender 像素从下往上
@@ -2887,6 +2908,10 @@ CARTOON_FACTIONS = [
                "sentinel"], ELF_GLOW),
 ]
 LARGE_UNITS = {"spirit_knight", "siege_golem"}  # 2×2 卡通角色
+# 卡通角色 → 阵营（阵营配色用），样品角色各归各的阵营
+FACTION_OF = {u: name for name, group, _ in CARTOON_FACTIONS for u in group}
+FACTION_OF.update({"shield_guard": "morningstar", "shadow_assassin": "rangers", "storm_mage": "silvermoon",
+                   "necromancer": "undead", "treant_guard": "elves"})
 SMOOTH_UNITS = set(SAMPLE_UNITS) | {u for _, group, _ in CARTOON_FACTIONS for u in group}
 
 
@@ -3509,6 +3534,18 @@ def main():
     palette.file_format = "PNG"
     palette.save()
 
+    unit_palettes = {}  # 换过阵营色的色块贴图，按配色缓存
+
+    def palette_of(unit_id):
+        overrides = dict(FACTION_COLOURS.get(FACTION_OF.get(unit_id), {}))
+        overrides.update(UNIT_COLOURS.get(unit_id, {}))
+        if not overrides:
+            return palette
+        key = tuple(sorted(overrides.items()))
+        if key not in unit_palettes:
+            unit_palettes[key] = build_palette_image(overrides)
+        return unit_palettes[key]
+
     built = {}
     outlines = {}
     unit_of = {}
@@ -3522,7 +3559,7 @@ def main():
         prop = unit_id in SMOOTH_PROPS
         for star in (STAR_TIERS if cartoon else (1,)):
             mid = model_id(unit_id, star)
-            hull, glow = make_materials(palette)
+            hull, glow = make_materials(palette_of(unit_id) if cartoon else palette)
             b = Builder()
             if cartoon:
                 b.draw_base = False  # 战斗里不要底座；底座单独导出，展示界面再加
