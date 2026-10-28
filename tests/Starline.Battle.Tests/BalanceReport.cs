@@ -220,10 +220,10 @@ namespace Starline.Battle.Tests
             md.AppendLine();
             md.AppendLine("## 模拟方法");
             md.AppendLine();
-            md.AppendLine("- 每方用同一套魔网：源晶塔在后排中间，三颗法力水晶立在第 2 条纵线的 1、4、7 号交叉点，前四排全部接入魔网。");
+            md.AppendLine("- 每方用同一套星络：观星台在后排中间，三颗星石立在第 2 条纵线的 1、4、7 号交叉点，前四排全部接入星络。");
             md.AppendLine("- 角色按职业摆放：重装和轻装从前排往后放，飞骑和对空从第二排开始，远程从第四排开始；每排从中间往两边放。双方阵型镜像。");
             md.AppendLine("- 每组对战用 " + seeds + " 个随机种子，每个种子双方各站一次左边（内核里“我方”和“敌方”的结算顺序不同，见第 6 节），共 " + (2 * seeds) + " 场。\n- **胜率**：胜 1、平 0.5、负 0。**优势分** = 50% + （己方剩余耐久比例 − 对方剩余耐久比例）÷ 2，耐久 = 作战角色的生命 + 护盾：险胜略高于 50%，无损全胜是 100%。内核是确定性的，随机只来自 ±10% 的伤害浮动，势均力敌的对战胜率经常直接是 0% 或 100%，所以找平衡点和比较地形时用优势分。\n- 不使用指挥官技能，不算羁绊（还没实现）。");
-            md.AppendLine("- 骸骨要塞是 Boss，不参加对战；影歌精灵还没有做出数值的角色。");
+            md.AppendLine("- 墨城是 Boss，不参加对战；青丘灵族还没有做出数值的角色。");
             md.AppendLine();
 
             SideBias(md, combat);
@@ -253,11 +253,11 @@ namespace Starline.Battle.Tests
         {
             switch (f)
             {
-                case Faction.Morningstar: return "晨星骑士团";
-                case Faction.Rangers: return "边境游侠会";
-                case Faction.Silvermoon: return "银月法师塔";
-                case Faction.Undead: return "亡灵";
-                case Faction.Elves: return "影歌精灵";
+                case Faction.Morningstar: return "玄武营";
+                case Faction.Rangers: return "白虎游骑";
+                case Faction.Silvermoon: return "朱雀司天监";
+                case Faction.Undead: return "墨蚀者";
+                case Faction.Elves: return "青丘灵族";
                 default: return "—";
             }
         }
@@ -282,16 +282,16 @@ namespace Starline.Battle.Tests
         {
             md.AppendLine("## 1. 角色固有属性（units.json）");
             md.AppendLine();
-            md.AppendLine("距离换算成格（1 格 = 2 单位）。有效生命 = 生命 + 护盾；每秒伤害不含克制倍率；法力为“—”表示不消耗法力。");
+            md.AppendLine("距离换算成格（1 格 = 2 单位）。有效生命 = 生命 + 护盾；每秒伤害不含克制倍率；灵力为“—”表示不消耗灵力。");
             md.AppendLine();
-            md.AppendLine("| 角色 | id | 阵营 | 职业 | 尺寸 | 指挥点 | 生命 | 护盾 | 护盾恢复/秒 | 伤害 | 攻击间隔 | 每秒伤害 | 射程（格） | 移速（格/秒） | 法力 | 回复 1 点（秒） | 离网（秒） | 索敌偏好 |");
+            md.AppendLine("| 角色 | id | 阵营 | 职业 | 尺寸 | 指挥点 | 生命 | 护盾 | 护盾恢复/秒 | 伤害 | 攻击间隔 | 每秒伤害 | 射程（格） | 移速（格/秒） | 灵力 | 回复 1 点（秒） | 离网（秒） | 索敌偏好 |");
             md.AppendLine("|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|");
             foreach (UnitDef d in UnitCatalog.All)
             {
                 var prefers = new List<string>();
                 foreach (UnitRole r in d.PreferredTargets)
                 {
-                    prefers.Add(r == UnitRole.Structure ? "魔网节点" : RoleName(r));
+                    prefers.Add(r == UnitRole.Structure ? "星络节点" : RoleName(r));
                 }
                 string size = d.Size == 0 ? "交叉点" : d.Size == 2 ? "2×2" : "1 格";
                 md.AppendLine("| " + Fixtures.Text(d.Name) + " | `" + d.Id + "` | " + FactionName(d.Faction) + " | " + RoleName(d.Role) + " | " + size
@@ -420,28 +420,28 @@ namespace Starline.Battle.Tests
                 {
                     tiles.Add(Fixtures.Text(e.Tile.Name) + " " + e.Min + "~" + e.Max);
                 }
-                string network = (t.LinkRangeBonus != 0 ? "；魔网连线 +" + t.LinkRangeBonus + " 格" : "") + (t.CoverageBonus != 0 ? "；覆盖 +" + t.CoverageBonus + " 格" : "");
+                string network = (t.LinkRangeBonus != 0 ? "；星络连线 +" + t.LinkRangeBonus + " 格" : "") + (t.CoverageBonus != 0 ? "；覆盖 +" + t.CoverageBonus + " 格" : "");
                 md.AppendLine("| " + Fixtures.Text(t.Name) + " | `" + t.Id + "` | " + EffectList(t.Effects) + network + " | " + string.Join("、", tiles) + " |");
             }
             md.AppendLine();
             md.AppendLine("**地块**（飞骑和建筑不受影响）");
             md.AppendLine();
-            md.AppendLine("| 地块 | id | 效果 | 魔网 | 谁不受影响 | 能否布阵 |");
+            md.AppendLine("| 地块 | id | 效果 | 星络 | 谁不受影响 | 能否布阵 |");
             md.AppendLine("|---|---|---|---|---|---|");
             foreach (TileDef t in TerrainCatalog.Tiles)
             {
                 var network = new List<string>();
                 if (t.RelayLinkBonus > 0)
                 {
-                    network.Add("角上的法力水晶连线 +" + t.RelayLinkBonus + " 格");
+                    network.Add("角上的星石连线 +" + t.RelayLinkBonus + " 格");
                 }
                 if (t.RelayCoverageBonus > 0)
                 {
-                    network.Add("角上的法力水晶覆盖 +" + t.RelayCoverageBonus + " 格");
+                    network.Add("角上的星石覆盖 +" + t.RelayCoverageBonus + " 格");
                 }
                 if (t.NoNetwork)
                 {
-                    network.Add("站在上面断魔网，角上不能放法力水晶");
+                    network.Add("站在上面断星络，角上不能放星石");
                 }
                 var exempt = new List<string>();
                 foreach (Faction f in t.ExemptFactions)
@@ -503,7 +503,7 @@ namespace Starline.Battle.Tests
         {
             md.AppendLine("## 7. 模拟：性价比（加进混编队伍的边际价值）");
             md.AppendLine();
-            md.AppendLine("双方都以标准混编（1 重甲骑士 + 1 游侠 + 1 奥术法师 + 2 弩手 + 2 狮鹫骑士，" + Budget + " 指挥点）为底。B 方再加 1 游侠 + 1 弩手 + 1 狮鹫骑士（" + BundleCost + " 指挥点）；");
+            md.AppendLine("双方都以标准混编（1 玄甲将 + 1 游侠 + 1 星术士 + 2 连弩手 + 2 鹤骑，" + Budget + " 指挥点）为底。B 方再加 1 游侠 + 1 连弩手 + 1 鹤骑（" + BundleCost + " 指挥点）；");
             md.AppendLine("A 方改加 k 名某角色，用优势分找到打平的 k（可以是小数），换算成“等价指挥点” = " + BundleCost + " ÷ k。它回答的是“在正常的混编阵容里，这名角色值几个指挥点”。");
             md.AppendLine("“同价替换”一列是 A 方加同样 " + BundleCost + " 指挥点的这种角色时的胜率 / 优势分。");
             md.AppendLine();
@@ -532,8 +532,8 @@ namespace Starline.Battle.Tests
                     + " | " + same + " | " + (capped ? "> " + F(k, "0") : F(k, "0.00")) + " | " + (capped ? "< " + F(BundleCost / k, "0.0") : F(value, "0.0")) + " | " + deviation + " |");
             }
             md.AppendLine();
-            md.AppendLine("偏差 = 等价指挥点 ÷ 现在的指挥点 − 1，超过 ±25% 标出。亡灵现在没有指挥点（只当敌人用），招募亡灵后可以按“等价指挥点”定价。");
-            md.AppendLine("注意这是加在“标准混编”上的边际价值：底子里已经有 2 名弩手，所以再加对空的价值偏低、加怨灵和狮鹫的价值也偏低（对面同样有弩手）。");
+            md.AppendLine("偏差 = 等价指挥点 ÷ 现在的指挥点 − 1，超过 ±25% 标出。墨蚀者现在没有指挥点（只当敌人用），招募墨蚀者后可以按“等价指挥点”定价。");
+            md.AppendLine("注意这是加在“标准混编”上的边际价值：底子里已经有 2 名连弩手，所以再加对空的价值偏低、加墨魂和鹤骑的价值也偏低（对面同样有连弩手）。");
             md.AppendLine();
             return result;
         }
@@ -590,7 +590,7 @@ namespace Starline.Battle.Tests
         {
             md.AppendLine("## 8. 模拟：同等指挥点的单一角色对战（克制）");
             md.AppendLine();
-            md.AppendLine("双方各花 " + Budget + " 指挥点只带一种角色（亡灵按第 7 节的等价指挥点），表里是行方的胜率。没有地形。");
+            md.AppendLine("双方各花 " + Budget + " 指挥点只带一种角色（墨蚀者按第 7 节的等价指挥点），表里是行方的胜率。没有地形。");
             md.AppendLine();
             var header = new StringBuilder("| 行 \\ 列 |");
             var line = new StringBuilder("|---|");
@@ -758,18 +758,18 @@ namespace Starline.Battle.Tests
         {
             md.AppendLine("## 10. 模拟：战场环境对各阵营的影响");
             md.AppendLine();
-            md.AppendLine("我方四种 " + Budget + " 指挥点的阵容各对一支亡灵混编；亡灵的人数取没有地形时最接近 50% 的那一档。然后只加环境效果（不放地块），看我方优势分的变化（百分点）。"
+            md.AppendLine("我方四种 " + Budget + " 指挥点的阵容各对一支墨蚀者混编；墨蚀者的人数取没有地形时最接近 50% 的那一档。然后只加环境效果（不放地块），看我方优势分的变化（百分点）。"
                 + "设计文档 5.5 的标准：环境把同一场战斗的胜率改变超过 " + F(TerrainFlag * 100, "0") + " 个百分点就削弱，超过的标 ⚠。这里每格 " + (4 * _seeds) + " 场。");
             md.AppendLine();
             var armies = new List<(string name, Formation f)>
             {
                 ("标准混编", Reference()),
-                ("骑士团为主：2 重甲骑士 + 4 狮鹫骑士", Squad(("battleship", 2, 1), ("strike_craft", 4, 1))),
-                ("游侠会为主：3 游侠 + 6 弩手", Squad(("frigate", 3, 1), ("pd_ship", 6, 1))),
-                ("法师塔为主：4 奥术法师 + 1 游侠 + 2 弩手", Squad(("missile_ship", 4, 1), ("frigate", 1, 1), ("pd_ship", 2, 1))),
+                ("玄武营为主：2 玄甲将 + 4 鹤骑", Squad(("battleship", 2, 1), ("strike_craft", 4, 1))),
+                ("白虎游骑为主：3 游侠 + 6 连弩手", Squad(("frigate", 3, 1), ("pd_ship", 6, 1))),
+                ("司天监为主：4 星术士 + 1 游侠 + 2 连弩手", Squad(("missile_ship", 4, 1), ("frigate", 1, 1), ("pd_ship", 2, 1))),
             };
             var terrains = new List<TerrainDef>(TerrainCatalog.Terrains);
-            var header = new StringBuilder("| 我方阵容 | 亡灵阵容 | 无地形 |");
+            var header = new StringBuilder("| 我方阵容 | 墨蚀者阵容 | 无地形 |");
             var line = new StringBuilder("|---|---|---|");
             foreach (TerrainDef t in terrains)
             {
@@ -840,7 +840,7 @@ namespace Starline.Battle.Tests
         {
             md.AppendLine("## 11. 模拟：地块的价值");
             md.AppendLine();
-            md.AppendLine("同种角色镜像对战，一方的半场（源晶塔所在格除外）铺满某种地块，另一方是平地；表里是铺地块一方的优势分（双方轮流铺），50% 表示没有影响。敌人走进这一方半场时也会踩到地块。只测会改变战斗属性、能布阵的地块。");
+            md.AppendLine("同种角色镜像对战，一方的半场（观星台所在格除外）铺满某种地块，另一方是平地；表里是铺地块一方的优势分（双方轮流铺），50% 表示没有影响。敌人走进这一方半场时也会踩到地块。只测会改变战斗属性、能布阵的地块。");
             md.AppendLine();
             var tiles = new List<TileDef>();
             foreach (TileDef t in TerrainCatalog.Tiles)
@@ -871,7 +871,7 @@ namespace Starline.Battle.Tests
                 md.AppendLine(row.ToString());
             }
             md.AppendLine();
-            md.AppendLine("飞骑不吃地块；骨堆只对亡灵生效；流沙对边境游侠会、沼泽对影歌精灵无效。");
+            md.AppendLine("飞骑不吃地块；墨泥只对墨蚀者生效；流沙对白虎游骑、沼泽对青丘灵族无效。");
             md.AppendLine();
         }
     }

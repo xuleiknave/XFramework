@@ -1,96 +1,88 @@
 key,zh-Hans,en,note
-unit.supply_ship.name,源晶塔,Source Spire,
-unit.supply_ship.description,远征军随行的法力源头。前沿中点是源口，魔网连线从这里出发。,"The expedition's travelling mana source. The middle of its front edge is the wellhead, where Mana Web links begin.",
-unit.relay.name,法力水晶,Mana Crystal,
-unit.relay.description,魔网节点。覆盖周围 2 格，同一条格线上 3 格内的节点自动连线。,A Mana Web node. Covers 2 tiles around it and links to nodes within 3 tiles on the same grid line.,
-unit.battleship.name,重甲骑士,Heavy Knight,
-unit.battleship.description,骑着战马的重甲骑士，顶在前排吸收伤害，专克轻装单位。,An armoured knight on a warhorse who holds the front line and soaks up damage. Strong against light units.,
+unit.supply_ship.name,观星台,,
+unit.supply_ship.description,远征军随行的灵力源头。前沿中点是台口，星络连线从这里出发。,,
+unit.relay.name,星石,,
+unit.relay.description,星络节点。覆盖周围 2 格，同一条格线上 3 格内的节点自动连线。,,
+unit.battleship.name,玄甲将,,
+unit.battleship.description,骑着战马的玄甲将，顶在前排吸收伤害，专克轻装单位。,,
 unit.frigate.name,游侠,Ranger,
 unit.frigate.description,身手敏捷的游侠，突进去切掉敌方远程单位。,A nimble ranger who dashes in to cut down enemy ranged units.,
-unit.pd_ship.name,弩手,Arbalist,
-unit.pd_ship.description,密集的弩箭火网，专门射落狮鹫和怨灵。,"A dense hail of crossbow bolts, built to shoot down griffins and wraiths.",
-unit.missile_ship.name,奥术法师,Arcane Mage,
-unit.missile_ship.description,超远射程的奥术轰击，自身法力有限，必须待在魔网覆盖内。,"Arcane bombardment from extreme range. Her own mana is limited, so she must stay inside Mana Web coverage.",
-unit.strike_craft.name,狮鹫骑士,Griffin Knight,
-unit.strike_craft.description,骑狮鹫的空中骑士，可以离网 10 秒绕后，优先攻击魔网节点和远程单位。,"A knight of the skies on griffin-back. Can leave the web for 10 seconds to flank, and goes for Mana Web nodes and ranged units first.",
-unit.hive.name,亡灵祭坛,Undead Altar,
-unit.hive_node.name,骨碑,Bone Obelisk,
-unit.ripper.name,食尸鬼,Ghoul,
-unit.crawler.name,憎恶,Abomination,
-unit.locust.name,怨灵,Wraith,
-unit.acid_turret.name,毒雾骨塔,Miasma Bone Tower,
-unit.brood_mother.name,缝合巨怪,Stitched Colossus,
-unit.wreck_fortress.name,骸骨要塞,Ossuary Fortress,
-skill.OrbitalStrike.name,陨星术,Meteor,
+unit.pd_ship.name,连弩手,,
+unit.pd_ship.description,密集的连弩火网，专门射落鹤骑和墨魂。,,
+unit.missile_ship.name,星术士,,
+unit.missile_ship.description,超远射程的星矢轰击，自身灵力有限，必须待在星络覆盖内。,,
+unit.strike_craft.name,鹤骑,,
+unit.strike_craft.description,骑白鹤的空中骑手，可以离网 10 秒绕后，优先攻击星络节点和远程单位。,,
+unit.hive.name,墨祭坛,,
+unit.hive_node.name,墨碑,,
+unit.ripper.name,蚀爪,,
+unit.crawler.name,墨傀,,
+unit.locust.name,墨魂,,
+unit.acid_turret.name,墨雾塔,,
+unit.brood_mother.name,墨聚巨灵,,
+unit.wreck_fortress.name,墨城,,
+skill.OrbitalStrike.name,星落,,
 skill.OrbitalStrike.description,选择落点，1 秒后对范围内敌人造成大量伤害,"Choose a point. After 1 second, enemies in the area take heavy damage.",
-skill.EmergencyShield.name,守护结界,Warding Barrier,
+skill.EmergencyShield.name,玄武盾,,
 skill.EmergencyShield.description,全体恢复一半护盾,Restores half of every ally's shield.,
-encounter.patrol.name,食尸鬼巡逻队,Ghoul Patrol,
-encounter.patrol.briefing,灯塔城外的第一颗法力水晶被一小队食尸鬼占着。把它们赶走。,A small band of ghouls holds the first Mana Crystal outside Lighthaven. Drive them off.,
-encounter.locust_raid.name,怨灵袭扰,Wraith Raid,
-encounter.locust_raid.briefing,怨灵专门撕咬魔网连线。看好你的法力水晶。,Wraiths go straight for Mana Web links. Keep an eye on your Mana Crystals.,
-encounter.turret_line.name,骨塔阵地,Bone Tower Line,
-encounter.turret_line.briefing,亡灵在碎裂的水晶上垒起了毒雾骨塔。它的法力靠后方的骨碑补充。,The undead have raised Miasma Bone Towers on shattered crystals. Bone Obelisks in the rear keep them fed with mana.,
-encounter.crawler_wall.name,憎恶之墙,Wall of Abominations,
-encounter.crawler_wall.briefing,一排憎恶堵住了道路。它们皮糙肉厚，怕奥术法师和狮鹫骑士。,"A row of abominations blocks the road. They're thick-skinned, but they fear Arcane Mages and Griffin Knights.",
-encounter.hive_outpost.name,墓园前哨,Graveyard Outpost,
-encounter.hive_outpost.briefing,要塞外围的墓园，三座骨碑连着骨塔。,"A graveyard on the fortress outskirts, where three Bone Obelisks feed the bone towers.",
-encounter.evolved_pack.name,饱食尸群,Gorged Horde,
-encounter.evolved_pack.briefing,这群亡灵吸饱了水晶里的法力，比普通个体强得多（★2）。,These undead have glutted themselves on crystal mana and are far stronger than usual (★2).,
-encounter.brood_patrol.name,精英战：缝合巨怪巡游,Elite: Colossus on the Prowl,
-encounter.brood_patrol.briefing,一头缝合巨怪带着护卫在水晶间游荡。它每第 4 次攻击是一记重击。,A Stitched Colossus roams between the crystals with an escort. Every 4th attack is a crushing blow.,
+encounter.patrol.name,蚀爪巡逻队,,
+encounter.patrol.briefing,望星城外的第一颗星石被一小队蚀爪占着。把它们赶走。,,
+encounter.locust_raid.name,墨魂袭扰,,
+encounter.locust_raid.briefing,墨魂专门撕咬星络连线。看好你的星石。,,
+encounter.turret_line.name,墨雾塔阵地,,
+encounter.turret_line.briefing,墨蚀者在碎裂的星石上垒起了墨雾塔。它的灵力靠后方的墨碑补充。,,
+encounter.crawler_wall.name,墨傀之墙,,
+encounter.crawler_wall.briefing,一排墨傀堵住了道路。它们又厚又沉，怕星术士和鹤骑。,,
+encounter.hive_outpost.name,墨城前哨,,
+encounter.hive_outpost.briefing,墨城外围的前哨，三座墨碑连着墨雾塔。,,
+encounter.evolved_pack.name,饱食墨群,,
+encounter.evolved_pack.briefing,这群墨蚀者吸饱了星石里的灵力，比普通个体强得多（★2）。,,
+encounter.brood_patrol.name,精英战：墨聚巨灵巡游,,
+encounter.brood_patrol.briefing,一头墨聚巨灵带着护卫在星石间游荡。它每第 4 次攻击是一记重击。,,
 encounter.wreck_ambush.name,精英战：古战场伏击,Elite: Ambush on the Old Battlefield,
-encounter.wreck_ambush.briefing,古战场的坟堆里埋伏着一队亡灵，后方有缝合巨怪压阵。,"Undead lie in wait among the barrows of an old battlefield, with a Stitched Colossus holding the rear.",
-encounter.wreck_fortress.name,Boss：骸骨要塞,Boss: Ossuary Fortress,
-encounter.wreck_fortress.briefing,亡灵用断线日倒下的守军尸骨和碎水晶垒成了一座要塞。要塞不会移动，但骨炮覆盖我方前两排，每第 3 次攻击是一轮重炮齐射。,"The undead built this fortress from shattered crystals and the bones of the defenders who fell on Severance Day. It cannot move, but its bone cannons cover our first two rows, and every 3rd attack is a full barrage.",
-act.act1.title,第一幕 · 边境行省,Act I · The Border Provinces,
+encounter.wreck_ambush.briefing,古战场的断墙后埋伏着一队墨蚀者，后方有墨聚巨灵压阵。,,
+encounter.wreck_fortress.name,Boss：墨城,,
+encounter.wreck_fortress.briefing,墨蚀者占了一座陷落的城池，用碎星石和墨泥把它改成了堡垒。墨城不会移动，但墨炮覆盖我方前两排，每第 3 次攻击是一轮重炮齐射。,,
+act.act1.title,第一幕 · 边州,,
 act.act1.intro_title,启程,Setting Out,
-act.act1.intro,"雷恩爵士：断线日之后，灯塔城的源晶是星线最末端还亮着的光。从这里往外，每一颗水晶都被亡灵吸干了。
+act.act1.intro,"雷震：断线日之后，望星城的观星台是星线最末端还亮着的光。从这里往外，每一颗星石都被墨蚀者吸干了。
 
-指挥官，晨星远征军现在只有三个人。但每夺回一颗水晶，就能把一座城邦重新连回星线，也能招募那里的勇士。
+持线人，远征军现在只有三个人。但每夺回一颗星石，就能把一座城池重新连回星线，也能招募那里的勇士。
 
-骸骨要塞在这片行省的尽头。拿下它，边境行省的星线就通了。","Sir Rayne: Since Severance Day, Lighthaven's source crystal has been the last light still burning at the far end of the Starline. Beyond it, every crystal has been drained by the undead.
+墨城在边州的尽头。拿下它，边州的星线就通了。",,
+act.act1.victory_title,边州 · 通关,,
+act.act1.victory,"阿织：墨城的墨色散了。边州的星线……重新亮了起来。
 
-Commander, the Morning Star Expedition is only three strong. But each crystal we take back reconnects a city-state to the Starline, and lets us recruit its champions.
+雷震：干得漂亮，持线人。三座边城已经连回望星城。下一站是中原。
 
-The Ossuary Fortress stands at the far edge of this province. Take it, and the Starline runs through the Border Provinces again.",
-act.act1.victory_title,边境行省 · 通关,The Border Provinces · Cleared,
-act.act1.victory,"诺娃：骸骨要塞的死气散了。边境行省的星线……重新亮了起来。
-
-雷恩爵士：干得漂亮，指挥官。三座边境城邦已经连回灯塔城。下一站是王国腹地。
-
-（第二幕“王国腹地”正在开发中）","Nova: The death-mist over the Ossuary Fortress is gone. The Starline across the Border Provinces... it's shining again.
-
-Sir Rayne: Well done, Commander. Three border city-states are linked to Lighthaven once more. Next stop: the Kingdom's Heartland.
-
-(Act II, ""The Heartland"", is in development)",
+（第二幕“中原”正在开发中）",,
 act.act1.defeat_title,远征失败,Expedition Failed,
-act.act1.defeat,雷恩爵士：远征军撤回灯塔城。星线还在那里，亡灵也还在那里。我们还会回去的。,"Sir Rayne: The expedition falls back to Lighthaven. The Starline is still out there, and so are the undead. We'll be back.",
-reward.relay,法力水晶 +1,Mana Crystal +1,
+act.act1.defeat,雷震：远征军撤回望星城。星线还在那里，墨蚀者也还在那里。我们还会回去的。,,
+reward.relay,星石 +1,,
 reward.unit,{0} {1},{0} {1},{0} 角色名，{1} 星级（★）
 run.battle_lost,战斗失败，远征军耐久 −{0},Battle lost. Expedition Durability −{0},
-run.gain_relay,获得 法力水晶（共 {0} 个）,Gained a Mana Crystal ({0} total),
+run.gain_relay,获得 星石（共 {0} 个）,,
 run.repaired,远征军休整完毕，耐久 {0} / {1},The expedition has rested. Durability {0} / {1},
 run.gain_unit,获得 {0} {1},Gained {0} {1},{0} 角色名，{1} 星级
 run.merged,3 名合成 → {0} {1},3 merged → {0} {1},{0} 角色名，{1} 合成后的星级
 run.auto_deployed,{0} 已自动上阵，可在布阵时调整,{0} was deployed automatically. You can rearrange before battle.,
 run.reserve,{0} 进入后备（指挥点不够或没有空位）,{0} went to the reserve (not enough Command Points or no free space),
 formation.bad_position,{0} 的位置无效或与其他单位重叠,{0} is in an invalid position or overlaps another unit,
-formation.one_source,需要且只能有 1 个魔网源头,Exactly 1 Mana Web source is required,
+formation.one_source,需要且只能有 1 个星络源头,,
 formation.no_combatant,至少需要上阵 1 名作战角色,Deploy at least 1 fighting hero,
 formation.over_command,指挥点超出上限（{0} / {1}）,Command Points over the cap ({0} / {1}),
 forecast.no_defeat,推演中没有出现败局，可以直接开战。,No defeats in the forecast. You're clear to fight.,
 forecast.unit_lost,{0} 被击败,{0} was defeated,
-forecast.unit_dry,{0} 法力耗尽停手,{0} ran out of mana and stopped,
-forecast.relay_lost,魔网节点被摧毁,A Mana Web node was destroyed,
-forecast.unsupplied,角色长时间断开魔网,Heroes were cut off from the Mana Web for too long,
+forecast.unit_dry,{0} 灵力耗尽停手,,
+forecast.relay_lost,星络节点被摧毁,,
+forecast.unsupplied,角色长时间断开星络,,
 forecast.reason_share,{0}（{1}% 的败局）,{0} ({1}% of defeats),{0} 败因，{1} 百分比
-forecast.advice_dry,让 {0} 待在魔网覆盖范围内，或者在它附近加一个法力水晶。,"Keep {0} inside Mana Web coverage, or add a Mana Crystal near them.",
-forecast.advice_relay_lost,在法力水晶附近放一名弩手，挡住来切魔网连线的怨灵。,Put an Arbalist near your Mana Crystals to stop wraiths cutting the links.,
+forecast.advice_dry,让 {0} 待在星络覆盖范围内，或者在它附近加一个星石。,,
+forecast.advice_relay_lost,在星石附近放一名连弩手，挡住来切星络连线的墨魂。,,
 forecast.advice_unsupplied,检查红框的“未接入”角色，把它们移进绿色覆盖区。,"Check the heroes outlined in red as ""Unlinked"" and move them into the green coverage area.",
-forecast.advice_artillery,把 {0} 往后放，前面用重甲骑士或游侠挡住突进的敌人。,"Move {0} further back, and screen them with Heavy Knights or Rangers against divers.",
+forecast.advice_artillery,把 {0} 往后放，前面用玄甲将或游侠挡住突进的敌人。,,
 forecast.advice_craft,{0} 怕点防御，避开敌方点防御单位所在的一翼。,{0} is vulnerable to anti-air. Stay away from the flank with enemy anti-air units.,
-forecast.advice_heavy,敌方骨塔和怨灵克制重装单位，先用狮鹫骑士或游侠解决它们。,Enemy bone towers and wraiths counter heavy units. Take them out first with Griffin Knights or Rangers.,
+forecast.advice_heavy,敌方墨雾塔和墨魂克制重装单位，先用鹤骑或游侠解决它们。,,
 forecast.advice_point_defense,{0} 很脆，放在第二排，让前排替它挡伤害。,{0} is fragile. Put them in the second row and let the front line take the hits.,
 forecast.advice_default,前排太薄，考虑多放一个耐打的单位。,Your front line is too thin. Consider adding one more sturdy unit.,
 tile.high_ground.name,高地,,地块名
@@ -101,41 +93,41 @@ tile.brush.name,灌木,,地块名
 tile.brush.description,低矮的灌木丛，挡住一部分箭矢和法术。受到的远程伤害 −20%。,,地块说明（布阵时显示）
 tile.brush.effect1,受到远程伤害 −20%,,地块第 1 条效果的简短说明
 tile.shallows.name,浅水,,地块名
-tile.shallows.description,没过脚踝的水。移速 −30%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。,,地块说明（布阵时显示）
+tile.shallows.description,没过脚踝的水。移速 −30%。立在水边交叉点上的星石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
 tile.shallows.effect1,移速 −30%,,地块第 1 条效果的简短说明
 tile.deep_water.name,深水,,地块名
-tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的法力水晶连线距离 +1 格（水面导魔）。,,地块说明（布阵时显示）
+tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的星石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
 tile.deep_water.effect1,移速 −60%,,地块第 1 条效果的简短说明
 tile.quicksand.name,流沙,,地块名
-tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的边境游侠会不受影响。,,地块说明（布阵时显示）
+tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的白虎游骑不受影响。,,地块说明（布阵时显示）
 tile.quicksand.effect1,移速 −40%,,地块第 1 条效果的简短说明
 tile.marsh.name,沼泽,,地块名
-tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；影歌精灵不受影响。,,地块说明（布阵时显示）
+tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；青丘灵族不受影响。,,地块说明（布阵时显示）
 tile.marsh.effect1,移速 −30%,,地块第 1 条效果的简短说明
 tile.marsh.effect2,攻速 −10%,,地块第 2 条效果的简短说明
 tile.ice.name,冰面,,地块名
 tile.ice.description,光滑的冰面。移速 +25%，但站在上面不回复护盾。,,地块说明（布阵时显示）
 tile.ice.effect1,移速 +25%,,地块第 1 条效果的简短说明
 tile.ice.effect2,不回复护盾,,地块第 2 条效果的简短说明
-tile.bone_pile.name,骨堆,,地块名
-tile.bone_pile.description,守军的遗骨堆成的小丘。亡灵站在上面每秒回复 2% 生命。,,地块说明（布阵时显示）
-tile.bone_pile.effect1,亡灵每秒回复 2% 生命,,地块第 1 条效果的简短说明
-tile.mana_spring.name,法力泉,,地块名
-tile.mana_spring.description,地脉涌出的法力泉。放在它角上交叉点的法力水晶覆盖 +1 格。,,地块说明（布阵时显示）
+tile.bone_pile.name,墨泥,,地块名
+tile.bone_pile.description,永夜留下的墨泥。墨蚀者站在上面每秒回复 2% 生命。,,地块说明（布阵时显示）
+tile.bone_pile.effect1,墨蚀者每秒回复 2% 生命,,地块第 1 条效果的简短说明
+tile.mana_spring.name,灵泉,,地块名
+tile.mana_spring.description,地脉涌出的灵泉。放在它角上交叉点的星石覆盖 +1 格。,,地块说明（布阵时显示）
 tile.drained.name,枯竭区,,地块名
-tile.drained.description,法力被吸干的土地。站在上面不算接入魔网，角上的交叉点不能放法力水晶；亡灵不受影响。,,地块说明（布阵时显示）
+tile.drained.description,灵力被吸干的土地。站在上面不算接入星络，角上的交叉点不能放星石；墨蚀者不受影响。,,地块说明（布阵时显示）
 terrain.plains.name,城郊草原,,战场环境名
-terrain.plains.description,灯塔城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
-terrain.forest.name,古木森林,,战场环境名
-terrain.forest.description,游侠会守了多年的林子。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
-terrain.forest.effect1,边境游侠会、影歌精灵移速 +15%,,战场环境第 1 条效果的简短说明
+terrain.plains.description,望星城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
+terrain.forest.name,古木山林,,战场环境名
+terrain.forest.description,白虎游骑守了多年的山林。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
+terrain.forest.effect1,白虎游骑、青丘灵族移速 +15%,,战场环境第 1 条效果的简短说明
 terrain.forest.effect2,远程射程 −1 格（树冠遮挡）,,战场环境第 2 条效果的简短说明
 terrain.forest.effect3,重装移速 −10%,,战场环境第 3 条效果的简短说明
 terrain.desert.name,灰沙荒漠,,战场环境名
-terrain.desert.description,永夜吸干了城邦的法力，田野化成了灰沙。,,战场环境说明（布阵时显示）
-terrain.desert.effect1,地面部队移速 −10%（边境游侠会不受影响）,,战场环境第 1 条效果的简短说明
-terrain.desert.effect2,法力枯竭：接入魔网时法力恢复 −40%（亡灵不受影响）,,战场环境第 2 条效果的简短说明
+terrain.desert.description,永夜吸干了城池的灵力，田野化成了灰沙。,,战场环境说明（布阵时显示）
+terrain.desert.effect1,地面部队移速 −10%（白虎游骑不受影响）,,战场环境第 1 条效果的简短说明
+terrain.desert.effect2,灵力枯竭：接入星络时灵力恢复 −40%（墨蚀者不受影响）,,战场环境第 2 条效果的简短说明
 terrain.lake.name,湖心枢纽,,战场环境名
-terrain.lake.description,建在湖心的水晶枢纽，夜色里只有水晶在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
+terrain.lake.description,建在湖心的星石枢纽，夜色里只有星石在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
 terrain.lake.effect1,夜战：远程射程 −1 格,,战场环境第 1 条效果的简短说明
-terrain.lake.effect2,背水守护：晨星骑士团护盾回复 +30%,,战场环境第 2 条效果的简短说明
+terrain.lake.effect2,背水守护：玄武营护盾回复 +30%,,战场环境第 2 条效果的简短说明

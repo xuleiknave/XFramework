@@ -1,138 +1,124 @@
 key,zh-Hans,en,note
-story.act.1.title,第一幕 · 边境行省,Act I · The Border Provinces,
-story.act.1.question,亡灵到底是什么？,"What are the undead, really?",这一幕要回答的问题，章节选择界面的副标题
-story.act.2.title,第二幕 · 王国腹地,Act II · The Heartland,
+story.act.1.title,第一幕 · 边州,,
+story.act.1.question,墨蚀者到底是什么？,,这一幕要回答的问题，章节选择界面的副标题
+story.act.2.title,第二幕 · 中原,,
 story.act.2.question,谁打开了初源，为什么？,"Who opened the Prime, and why?",
 story.act.3.title,第三幕 · 永夜之地,Act III · The Land of Endless Night,
-story.act.3.question,诺娃是谁，要付出什么？,"Who is Nova, and what will it cost?",
-story.chapter.1.title,第 1 章 · 灯塔城,Chapter 1 · Lighthaven,
-story.chapter.1.summary,第一次出城，点亮最近的水晶。,Ride out for the first time and light the nearest crystal.,章节选择界面的一句话简介
-story.chapter.1.hook,点亮的水晶里传出亡灵的低语：“让我们回家。”,"From the newly lit crystal comes an undead whisper: ""Let us go home.""",章末钩子，最后一关结束对话的最后一句
-story.chapter.1.boss,食尸鬼头目,Ghoul Chieftain,章末 Boss
-story.chapter.2.title,第 2 章 · 游侠的森林,Chapter 2 · The Rangers' Forest,
-story.chapter.2.summary,游侠会在林子里独自抵抗亡灵，答应与远征军合作。,"The Frontier Rangers hold out alone in the woods, and agree to join the expedition.",
-story.chapter.2.hook,缝合巨怪莫格倒下时，喊出了自己生前的名字。,"As the Stitched Colossus Mog falls, it cries out the names it bore in life.",莫格由多人缝成，英文用复数
-story.chapter.2.boss,缝合巨怪莫格,"Mog, the Stitched Colossus",
-story.chapter.3.title,第 3 章 · 骸骨要塞,Chapter 3 · The Ossuary Fortress,
-story.chapter.3.summary,攻下亡灵用守军尸骨垒起的要塞；林大师在废墟里唤醒了第一个亡灵灰爪。,"Storm the fortress the undead built from the bones of its defenders. In the ruins, Master Lin awakens the first undead: Greyclaw.",
-story.chapter.3.hook,要塞核心里刻着银月法师塔的法印：亡灵背后有法师。,Carved into the fortress core is the seal of the Silver Moon Tower. A mage stands behind the undead.,
-story.chapter.3.boss,骸骨要塞,The Ossuary Fortress,
-story.chapter.4.title,第 4 章 · 银月法师塔,Chapter 4 · The Silver Moon Tower,
-story.chapter.4.summary,解法师塔之围，救出赛琳和阿尔德大法师。,Break the siege of the Tower and rescue Celine and Archmage Alder.,
-story.chapter.4.hook,唤醒的女妖赛薇唱起一首古老的织网者之歌，诺娃跟着哼了出来。,"The awakened banshee Sevi sings an ancient song of the Weavers, and Nova hums along.",
-story.chapter.4.boss,女妖赛薇,Sevi the Banshee,
-story.chapter.5.title,第 5 章 · 饥饿的城邦,Chapter 5 · The Hungering City,
-story.chapter.5.summary,亡灵吞食水晶，越来越强；吸魔者卡斯原来是被困的城邦法师。玛塔在怨灵群里找到了妹妹。,"The undead grow stronger as they devour crystals, and the manaleech Kass turns out to be the city's trapped mage. Among the wraiths, Marta finds her sister.",
-story.chapter.5.hook,诺娃的光第一次明显变暗。她说没事，林大师不信。,"For the first time, Nova's light visibly dims. She says she's fine. Master Lin doesn't believe her.",
-story.chapter.5.boss,吸魔者群,Manaleech Swarm,
-story.chapter.6.title,第 6 章 · 雷恩的最后一夜,Chapter 6 · Rayne's Last Night,
-story.chapter.6.summary,噬魔巨龙袭击水晶枢纽，雷恩爵士为守住水晶牺牲。阿尔德说出了莫德雷德的真相。,"The Manaeater Wyrm strikes the crystal nexus, and Sir Rayne falls holding it. Alder reveals the truth about Mordred.",
-story.chapter.6.hook,莫德雷德笔记的最后一页写着：“最后一位织网者，在灯塔城。”,"The last page of Mordred's notes reads: ""The last Weaver is in Lighthaven.""",
-story.chapter.6.boss,噬魔巨龙,The Manaeater Wyrm,
-story.chapter.7.title,第 7 章 · 迷雾森林,Chapter 7 · The Misty Forest,
-story.chapter.7.summary,精灵以为人类又来抢水晶，双方交战；托恩和老橡的旧交让战斗停了下来。,"The elves believe humans have come to steal crystals again, and battle breaks out, until an old friendship between Thorne and Old Oak brings it to a halt.",
-story.chapter.7.hook,维拉见到诺娃，单膝跪下，叫出了她的名字。,"Vera sees Nova, kneels on one knee, and speaks her name.",
-story.chapter.7.boss,老橡,Old Oak,
+story.act.3.question,阿织是谁，要付出什么？,,
+story.chapter.1.title,第 1 章 · 望星城,,
+story.chapter.1.summary,第一次出城，点亮最近的星石。,,章节选择界面的一句话简介
+story.chapter.1.hook,点亮的星石里传出墨蚀者的低语：“让我们回家。”,,章末钩子，最后一关结束对话的最后一句
+story.chapter.1.boss,蚀爪头目,,章末 Boss
+story.chapter.2.title,第 2 章 · 白虎岭,,
+story.chapter.2.summary,白虎游骑在山岭里独自抵抗墨蚀者，答应与远征军合作。,,
+story.chapter.2.hook,墨聚巨灵莫大倒下时，喊出了自己生前的名字。,,莫大由许多人聚成，英文用复数
+story.chapter.2.boss,墨聚巨灵莫大,,
+story.chapter.3.title,第 3 章 · 墨城,,
+story.chapter.3.summary,攻下墨蚀者占据的墨城；林大师在废墟里唤醒了第一个墨蚀者灰爪。,,
+story.chapter.3.hook,墨城核心里刻着朱雀司天监的星印：墨蚀者背后有术士。,,
+story.chapter.3.boss,墨城,,
+story.chapter.4.title,第 4 章 · 朱雀台,,
+story.chapter.4.summary,解朱雀台之围，救出朱弦和闻道少监。,,
+story.chapter.4.hook,唤醒的墨歌姬薛薇唱起一首古老的织网者之歌，阿织跟着哼了出来。,,
+story.chapter.4.boss,墨歌姬薛薇,,
+story.chapter.5.title,第 5 章 · 饥城,,
+story.chapter.5.summary,墨蚀者吞食星石，越来越强；噬灵者柯思原来是被困的守城术士。孟婉在墨魂群里找到了妹妹。,,
+story.chapter.5.hook,阿织的光第一次明显变暗。她说没事，林大师不信。,,
+story.chapter.5.boss,噬灵者群,,
+story.chapter.6.title,第 6 章 · 雷震的最后一夜,,
+story.chapter.6.summary,噬星蛟袭击星石枢纽，雷震老将军为守住星石牺牲。闻道说出了沈寂的真相。,,
+story.chapter.6.hook,沈寂手稿的最后一页写着：“最后一位织网者，在望星城。”,,
+story.chapter.6.boss,噬星蛟,,
+story.chapter.7.title,第 7 章 · 青丘雾林,,
+story.chapter.7.summary,青丘以为人又来抢星石，双方交战；阿图和老槐的旧交让战斗停了下来。,,
+story.chapter.7.hook,涂山薇见到阿织，单膝跪下，叫出了她的名字。,,
+story.chapter.7.boss,老槐,,
 story.chapter.8.title,第 8 章 · 初源之路,Chapter 8 · The Road to the Prime,
-story.chapter.8.summary,人类和精灵重签织网者盟约，击败血族骑士瓦伦。,"Humans and elves sign the Weavers' Pact again, and defeat the Blood Knight Valen.",
-story.chapter.8.hook,诺娃对指挥官说：“到了初源，就让我留下吧。”,"Nova tells the Commander: ""When we reach the Prime, let me stay.""",
-story.chapter.8.boss,血族骑士瓦伦,Valen the Blood Knight,
-story.chapter.9.title,第 9 章 · 初源水晶,Chapter 9 · The Prime Crystal,
-story.chapter.9.summary,决战巫妖王莫德雷德，再直面永夜本身。五根线齐了，重织星线。,"Face Mordred the Lich King, then the Endless Night itself. With all five threads gathered, reweave the Starline.",
-story.chapter.9.boss,巫妖王 → 永夜之心,The Lich King → Heart of the Endless Night,两段式 Boss
+story.chapter.8.summary,人与青丘重立织网者之约，击败墨骑万仞。,,
+story.chapter.8.hook,阿织对持线人说：“到了初源，就让我留下吧。”,,
+story.chapter.8.boss,墨骑万仞,,
+story.chapter.9.title,第 9 章 · 初源星石,,
+story.chapter.9.summary,决战永夜之主沈寂，再直面永夜本身。五根线齐了，重织星线。,,
+story.chapter.9.boss,永夜之主 → 永夜之心,,两段式 Boss
 story.thread.guardian.name,守护之线,Thread of Guardianship,
-story.thread.guardian.obtain,第 1 章，晨星骑士团在点亮的第一颗水晶前宣誓。,Chapter 1: the Order of the Morning Star swears its oath before the first crystal lit.,星图线槽的说明
+story.thread.guardian.obtain,第 1 章，玄武营在点亮的第一颗星石前立誓。,,星图线槽的说明
 story.thread.freedom.name,自由之线,Thread of Freedom,
-story.thread.freedom.obtain,第 2 章，边境游侠会答应合作。,Chapter 2: the Frontier Rangers agree to stand with us.,
+story.thread.freedom.obtain,第 2 章，白虎游骑答应合作。,,
 story.thread.redemption.name,救赎之线,Thread of Redemption,
 story.thread.redemption.obtain,第 3 章，被唤醒的灰爪自愿留下。,Chapter 3: the awakened Greyclaw chooses to stay.,
 story.thread.knowledge.name,知识之线,Thread of Knowledge,
-story.thread.knowledge.obtain,第 6 章，阿尔德交出莫德雷德的笔记。,Chapter 6: Alder hands over Mordred's notes.,
+story.thread.knowledge.obtain,第 6 章，闻道交出沈寂的星图手稿。,,
 story.thread.trust.name,信任之线,Thread of Trust,
-story.thread.trust.obtain,第 8 章，人类和精灵重签织网者盟约。,Chapter 8: humans and elves sign the Weavers' Pact again.,
+story.thread.trust.obtain,第 8 章，人与青丘重立织网者之约。,,
 story.thread.empty,尚未找到,Not yet found,空线槽
 story.thread.progress,五根线 {0} / 5,Five Threads {0} / 5,{0} 已拿到的数量
 story.lore.seal.title,星线是一道封印,The Starline Is a Seal,档案馆条目标题
-story.lore.seal.body,"一千年前，大陆深处醒来一股吞食法力的饥饿，人们叫它永夜。人类法师和影歌精灵联手，把流星雨留下的法力水晶立在大地上，用一根根光带连成魔网，把永夜压在大陆尽头。这群人叫织网者，这张网就是星线。
+story.lore.seal.body,"一千年前，大地深处醒来一股吞食灵力的饥饿，人们叫它永夜。天上的织女带着人间的术士和青丘的灵族，把二十八星宿落下的碎星一颗颗立在九州大地上，照着天上星宿的样子连成星络，把永夜压在大地尽头。这群人叫织网者，这张网就是星线。
 
-这张网只用了两根线：人类法师的知识和精灵的信任。它没有把所有人连起来，只靠一名织网者在初源水晶里独自撑着。千年过去，人们忘了星线是封印，只记得它是城邦的灯火、结界和粮田的来源。","A thousand years ago, a hunger that devours mana woke deep within the continent. People called it the Endless Night. Human mages and the Shadowsong Elves joined forces, raised the Mana Crystals left by a meteor shower across the land, and linked them with bands of light into a Mana Web that pinned the Endless Night at the edge of the world. They were called the Weavers, and their web was the Starline.
-
-The web used only two threads: the knowledge of human mages and the trust of the elves. It did not connect everyone, and was held up by a single Weaver alone inside the Prime Crystal. A thousand years later, people had forgotten the Starline was a seal. They remembered only that it lit their cities, powered their wards and fed their fields.",档案馆条目正文
+这张网只用了两根线：人间术士的知识和青丘灵族的信任。它没有把所有人连起来，只靠一名织网者在初源星石里独自撑着。千年过去，人们忘了星线是封印，只记得它是城池的灯火、结界和田地的来源。",,档案馆条目正文
 story.lore.severance.title,断线日,Severance Day,
-story.lore.severance.body,"王国纪元 412 年，银月法师塔的前任塔主莫德雷德打开了初源水晶。星线从源头开始被吸干，失去法力的城邦结界崩塌，死去的人被死气唤起，成为亡灵大军。这一天叫断线日。
+story.lore.severance.body,"星历四百一十二年，朱雀司天监的前任监正沈寂打开了初源星石。星线从源头开始被吸干，失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人成了墨蚀者。这一天叫断线日。
 
-亡灵不是天生的恶魔：它们是陷落城邦的居民和守军，记忆被死气封住，只剩下饥饿。","In the Kingdom's year 412, Mordred, former master of the Silver Moon Tower, opened the Prime Crystal. The Starline was drained from its very source. Without mana, the cities' wards collapsed, and the dead were raised by the death-mist into an undead army. That day is called Severance Day.
+墨蚀者不是天生的妖魔：他们是陷落城池的百姓和守军，记忆被墨色封住，只剩下饥饿。",,第 6 章之前不能写出沈寂的真实动机
+story.lore.lighthaven.title,望星城,,
+story.lore.lighthaven.body,"星线最末端的边城，靠一座观星台撑了下来。观星台的星石里住着一缕星魂，名叫阿织。她能预见战局，却记不起自己是谁。
 
-The undead are not demons born. They are the people and soldiers of the fallen cities, their memories sealed away by the death-mist, leaving only hunger.",第 6 章之前不能写出莫德雷德的真实动机
-story.lore.lighthaven.title,灯塔城,Lighthaven,
-story.lore.lighthaven.body,"星线最末端的边境城市，靠一座源晶塔撑了下来。源晶塔的水晶里住着一缕意识，名叫诺娃。她能预见战局，却记不起自己是谁。
-
-断线日那一夜，源晶塔选中了一个人：只有这个人听得见诺娃的声音。这个人就是你，灯塔城新任的指挥官，持线人。","A border city at the far end of the Starline that survived thanks to a single Source Spire. Within the Spire's crystal lives a presence named Nova. She can foresee the course of battle, but cannot remember who she is.
-
-On the night of Severance Day, the Source Spire chose one person, the only one who can hear Nova's voice. That person is you: Lighthaven's new Commander, the Threadholder.",指挥官不定性别，英文用 you
+断线日那一夜，观星台选中了一个人：只有这个人听得见阿织的声音。这个人就是你，望星城新任的持线人。",,持线人不定性别，英文用 you
 story.lore.threads.title,五根线,The Five Threads,
-story.lore.threads.body,诺娃说，要重织星线，需要五根线：守护、自由、知识、救赎、信任。五个阵营，各出一根。,"Nova says that to reweave the Starline, five threads are needed: Guardianship, Freedom, Knowledge, Redemption and Trust. One from each of the five factions.",
-story.lore.mordred.title,莫德雷德的笔记,Mordred's Notes,第 6 章后解锁
-story.lore.mordred.body,莫德雷德发现封印在衰竭。他不信任任何人，没有告诉学生，也没有去找精灵，而是想独自吞下初源水晶的力量，用自己去撑住封印。结果他成了第一个被永夜吞掉的人，也就是巫妖王。亡灵吞下的法力，一路被送往初源，喂给了永夜。,"Mordred discovered the seal was failing. Trusting no one, he told neither his students nor the elves. Instead he meant to take the power of the Prime Crystal into himself and hold the seal up alone. He became the first to be swallowed by the Endless Night: the Lich King. All the mana the undead devour is carried back to the Prime, to feed the Endless Night.",
+story.lore.threads.body,阿织说，要重织星线，需要五根线：守护、自由、知识、救赎、信任。五方阵营，各出一根。,,
+story.lore.mordred.title,沈寂的手稿,,第 6 章后解锁
+story.lore.mordred.body,沈寂发现封印在衰竭。他不信任任何人，没有告诉学生，也没有去找青丘，而是想独自吞下初源星石的力量，用自己去撑住封印。结果他成了第一个被永夜吞掉的人，也就是永夜之主。墨蚀者吞下的灵力，一路被送往初源，喂给了永夜。,,
 story.lore.nova.title,最后一位织网者,The Last Weaver,第 8 章后解锁
-story.lore.nova.body,"诺娃就是最后一位织网者。断线日那一夜，她从初源退到了星线最末端的这颗水晶里，用剩下的光护住灯塔城。一千年来，她一直用自己撑着残存的星线，所以她的光在一点点变暗。
+story.lore.nova.body,"阿织就是最后一位织网者，织女留在人间的星魂。断线日那一夜，她从初源退到了星线最末端的这颗星石里，用剩下的光护住望星城。一千年来，她一直用自己撑着残存的星线，所以她的光在一点点变暗。
 
-重织星线需要有人把五根线打成一个结。她本打算成为那个结，永远留在初源。","Nova is the last Weaver. On the night of Severance Day, she retreated from the Prime into this crystal at the far end of the Starline, and sheltered Lighthaven with the light she had left. For a thousand years she has held up what remains of the Starline with her own self, and so her light grows dimmer and dimmer.
-
-To reweave the Starline, someone must tie the five threads into a single knot. She meant to become that knot, and stay in the Prime forever.",
-story.faction.knights.intro,灯塔城的守军骑士，由老骑士雷恩爵士带领。,"The knights of Lighthaven's garrison, led by the veteran Sir Rayne.",阵营介绍；阵营名在 Characters.csv
-story.faction.rangers.intro,散落在边境行省的猎人、斥候和雇佣兵。,"Hunters, scouts and sellswords scattered across the Border Provinces.",
-story.faction.mages.intro,王国的法师学院，断线日后半数法师失踪。塔里藏着一个秘密。,"The Kingdom's academy of magic. Half its mages vanished after Severance Day, and the Tower hides a secret.",
-story.faction.undead.intro,被永夜死气唤起的陷落城邦之民。想起自己是谁的，就能选择站在哪一边。,"The people of the fallen cities, raised by the death-mist of the Endless Night. Those who remember who they are can choose their side.",
-story.faction.elves.intro,织网者的另一半，守着星线的真相。,"The other half of the Weavers, keepers of the Starline's truth.",
+重织星线需要有人把五根线打成一个结。她本打算成为那个结，永远留在初源。",,
+story.faction.knights.intro,望星城的守军，由老将军雷震带领。,,阵营介绍；阵营名在 Characters.csv
+story.faction.rangers.intro,散落在边州的猎户、斥候和游侠。,,
+story.faction.mages.intro,观星的术士，掌管星线的学问；断线日后半数术士失踪。监里藏着一个秘密。,,
+story.faction.undead.intro,被永夜墨色侵蚀的陷落城池之民。想起自己是谁的，就能选择站在哪一边。,,
+story.faction.elves.intro,山林里的狐族和花木之灵，织网者的另一半，守着星线的真相。,,
 story.ending.knot.title,打结,The Knot,结局第 2 步标题
-story.ending.knot.nova_stay,诺娃：让我留下吧。总得有人当这个结。,Nova: Let me stay. Someone has to be the knot.,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.gavin,加文：守护之线在这里。这一次，换我们撑着你。,"Gavin: Here is the Thread of Guardianship. This time, we'll hold you up.",草案：story.md 只写了要点，这句是新写的
-story.ending.knot.roland,罗兰：自由之线。没人逼我，是我自己要来的。,Roland: The Thread of Freedom. Nobody made me come. I chose to.,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.celine,赛琳：知识之线。我们已经弄懂了，这个结不该只压在一个人身上。,Celine: The Thread of Knowledge. We understand now. This knot was never meant to rest on one person.,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.nova_stay,阿织：让我留下吧。总得有人当这个结。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.gavin,岳擎：守护之线在这里。这一次，换我们撑着你。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.roland,陆离：自由之线。没人逼我，是我自己要来的。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.celine,朱弦：知识之线。我们已经弄懂了，这个结不该只压在一个人身上。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.greyclaw,灰爪：救赎之线。我跑回来了，这次不会再松手。,Greyclaw: The Thread of Redemption. I made it back. This time I won't let go.,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.vera,维拉：信任之线。一千年前你信了我们，现在轮到我们信你。,Vera: The Thread of Trust. A thousand years ago you trusted us. Now it's our turn to trust you.,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.nova_last,诺娃：星线不断，我们就不散。,"Nova: As long as the Starline holds, we will never be apart.",诺娃的最后一句，宣传语的变体
+story.ending.knot.vera,涂山薇：信任之线。一千年前你信了我们，现在轮到我们信你。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.nova_last,阿织：星线不断，我们就不散。,,阿织的最后一句，宣传语的变体
 story.ending.epilogue.title,后来,Afterwards,结局第 3 步标题
-story.ending.epilogue.knights,晨星骑士团重建了城墙上的功勋碑。第一行刻的是雷恩爵士的名字，第二行空着，留给下一个守住水晶的人。,"The Order of the Morning Star rebuilt the honour roll on the city wall. The first line bears Sir Rayne's name. The second is left blank, for whoever holds the crystal next.",草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.rangers,边境游侠会又散回了林子里。只是现在，每座营地的篝火旁都多留了一个位子，等走远的人回来。,"The Frontier Rangers scattered back into the woods. But now, every campfire keeps one extra seat, for whoever wandered far to come home.",草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.mages,银月法师塔打开了藏书馆的大门。门口挂着一块新牌子：“谁都可以进来。”,"The Silver Moon Tower threw open its library doors. A new sign hangs at the entrance: ""Anyone may enter.""",草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.undead,被唤醒的亡灵回到了各自的城邦。有的人认出了他们，有的人没有，但城门都开着。,"The awakened undead returned to their own cities. Some were recognised and some were not, but every gate stood open.",草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.elves,影歌精灵在灯塔城外种下了一片小树林。人类的孩子和精灵的孩子在里面一起长大，谁也不记得那里曾经是战场。,"The Shadowsong Elves planted a small grove outside Lighthaven. Human and elven children grow up in it together, and none of them remember it was ever a battlefield.",草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.rayne_farewell,雷恩爵士：两个孩子，都长大了。水晶没有熄，我可以放心了。,Sir Rayne: Both of you have grown up. The crystal never went out. I can rest easy now.,草案：story.md 只写了要点，这句是新写的；招募了雷恩英灵才有的告别戏
+story.ending.epilogue.knights,玄武营重建了城墙上的功勋碑。第一行刻的是雷震老将军的名字，第二行空着，留给下一个守住星石的人。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.rangers,白虎游骑又散回了山林里。只是现在，每座营地的篝火旁都多留了一个位子，等走远的人回来。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.mages,朱雀司天监打开了藏书阁的大门。门口挂着一块新匾：“谁都可以进来。”,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.undead,被唤醒的墨蚀者回到了各自的城池。有的人认出了他们，有的人没有，但城门都开着。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.elves,青丘灵族在望星城外种下了一片小树林。人的孩子和青丘的孩子在里面一起长大，谁也不记得那里曾经是战场。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.rayne_farewell,雷震：两个孩子，都长大了。星石没有熄，我可以放心了。,,草案：story.md 只写了要点，这句是新写的；招募了雷震英灵才有的告别戏
 story.ending.epilogue.hero_unlocked,★5 角色的个人结局,Personal endings of ★5 heroes,尾声里个人结局一栏的标题；个人结局正文是 Characters.csv 的 bio.<id>.5
 story.recap.title,星线编年,Chronicle of the Starline,结局第 4 步标题，档案馆里也用
 story.recap.playtime,历时 {0} 小时 {1} 分,Journey time {0}h {1}m,
 story.recap.battles,战斗 {0} 场,{0} battles fought,
-story.recap.crystals,点亮水晶 {0} 颗,{0} crystals lit,
+story.recap.crystals,点亮星石 {0} 颗,,
 story.recap.heroes,招募角色 {0} / {1},Heroes recruited {0} / {1},
-story.recap.awakened,唤醒亡灵 {0} 名,{0} undead awakened,
+story.recap.awakened,唤醒墨蚀者 {0} 名,,
 story.recap.bond,最常用的羁绊：{0},Favourite bond: {0},{0} 羁绊名
 story.recap.veteran.title,你的老兵,Your Veteran,
 story.recap.veteran.body,{0} · 上阵 {1} 次,{0} · deployed {1} times,{0} 角色名，下面接这名角色的告别语
 story.recap.hardest.title,最难的一夜,The Hardest Night,
 story.recap.hardest.body,{0} · 倒下 {1} 次，第 {2} 次终于打赢,"{0} · fell {1} times, won on attempt {2}",{0} 关卡名，下面接打赢那一场的阵容
-story.recap.forecasts,诺娃替你看过 {0} 次战局,Nova foresaw {0} battles for you,战前推演次数
-story.letter.title,诺娃的信,Nova's Letter,结局第 5 步标题
-story.letter.opening,"指挥官：
+story.recap.forecasts,阿织替你看过 {0} 次战局,,战前推演次数
+story.letter.title,阿织的信,,结局第 5 步标题
+story.letter.opening,"持线人：
 
-一千年来，我一直在等一个听得见我的人。后来你来了。","Commander,
-
-For a thousand years I waited for someone who could hear me. Then you came.",草案：story.md 只写了要点，这句是新写的
+一千年来，我一直在等一个听得见我的人。后来你来了。",,草案：story.md 只写了要点，这句是新写的
 story.letter.hardest,你在{0}前倒下了 {1} 次，第 {2} 次，是{3}替你挡住了那一击。我都看见了。,"You fell before {0} {1} times. On attempt {2}, {3} took the blow for you. I saw it all.",草案：story.md 只写了要点，这句是新写的；{0} 关卡名，{1} 失败次数，{2} 打赢那次是第几次，{3} 那场承伤最多的角色
 story.letter.veteran,{0}一直站在你身边，一共 {1} 场。替我谢谢他们。,{0} stood by your side through {1} battles. Thank them for me.,草案：story.md 只写了要点，这句是新写的；{0} 上阵最多的角色
 story.letter.forecasts,你让我替你看了 {0} 次战局。其实每一次，我都希望自己看错。,"You asked me to look ahead {0} times. Every time, I secretly hoped I was wrong.",草案：story.md 只写了要点，这句是新写的
-story.letter.closing,"现在我在每一颗水晶里。你点亮哪一颗，我就在哪里。
+story.letter.closing,"现在我在每一颗星石里。你点亮哪一颗，我就在哪里。
 
 星线不断，我们就不散。
 
-—— 诺娃","Now I'm in every crystal. Whichever one you light, I'll be there.
-
-As long as the Starline holds, we will never be apart.
-
-— Nova",草案：story.md 只写了要点，这句是新写的
+—— 阿织",,草案：story.md 只写了要点，这句是新写的
 story.letter.photo,最后一张布阵图,The Last Formation,信后的合影标题
 story.letter.share,截图分享,Take a Screenshot,
-story.ending.stinger,维拉：永夜不是这片大陆生出来的。它和水晶一样，是随那场流星雨落下来的。,"Vera: The Endless Night wasn't born of this land. Like the crystals, it fell with that meteor shower.",片尾彩蛋，给续作留悬念
+story.ending.stinger,涂山薇：永夜不是这片大地生出来的。它和星石一样，是随那场星雨从天上落下来的。,,片尾彩蛋，给续作留悬念
 story.ending.skip,跳过,Skip,
 story.ending.replay_hint,可以在档案馆重看结局和星线编年。,You can watch the ending and the Chronicle again in the Archive.,
