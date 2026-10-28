@@ -118,6 +118,8 @@
                     <ui:Label name="device" class="small settings-device" picking-mode="Ignore" />
                 </ui:VisualElement>
             </ui:VisualElement>
+            <ui:VisualElement class="star-node star-node--tl" picking-mode="Ignore" />
+            <ui:VisualElement class="star-node star-node--br" picking-mode="Ignore" />
         </ui:VisualElement>
 
         <ui:VisualElement class="row settings-corner" picking-mode="Ignore">

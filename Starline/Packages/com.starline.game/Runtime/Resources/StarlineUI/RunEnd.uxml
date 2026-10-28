@@ -8,6 +8,8 @@
                 <ui:Button name="again" text="#run_end.again" class="btn btn-primary" />
                 <ui:Button name="menu" text="#run_end.menu" class="btn btn-secondary" />
             </ui:VisualElement>
+            <ui:VisualElement class="star-node star-node--tl" picking-mode="Ignore" />
+            <ui:VisualElement class="star-node star-node--br" picking-mode="Ignore" />
         </ui:VisualElement>
     </ui:VisualElement>
 </ui:UXML>

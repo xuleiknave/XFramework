@@ -5,5 +5,7 @@
 | 资源 | 文件 | 来源 | 许可证 |
 |---|---|---|---|
 | Noto Sans SC Regular（思源黑体简体中文的 Google 版） | `Runtime/Resources/StarlineUIFont.ttf` | Google Fonts（通过 npm 包 `@expo-google-fonts/noto-sans-sc` 0.4.4 获取，字体版本 2.004） | SIL Open Font License 1.1，见 `Licenses/NotoSansSC-OFL.txt` |
+| Noto Serif SC Bold（思源宋体简体中文的 Google 版），裁剪到语言表用到的字，改名为 Starline Title | `Runtime/Resources/StarlineTitleFont.ttf` | Google Fonts（字体版本 2.003），用 `tools/fonts/subset_title_font.py` 裁剪 | SIL Open Font License 1.1，见 `Licenses/NotoSerifSC-OFL.txt` |
+| Cinzel Bold（标志字体） | `Runtime/Resources/StarlineLogoFont.ttf` | Google Fonts（字体版本 2.000），未修改 | SIL Open Font License 1.1，见 `Licenses/Cinzel-OFL.txt` |
 
 OFL 允许免费用于商业游戏并随游戏分发；不允许单独出售字体文件本身。如果修改字体（例如裁剪字符集），修改后的字体不能再使用 “Noto” 或 “Source” 这两个保留名称。

@@ -102,6 +102,8 @@ namespace Starline.Client
                 row.Add(Button(buttons[i].text, buttons[i].action, i == 0 ? "btn-primary" : "btn-secondary"));
             }
             dialog.Add(row);
+            dialog.Add(Box("star-node", "star-node--tl"));
+            dialog.Add(Box("star-node", "star-node--br"));
             return backdrop;
         }
 

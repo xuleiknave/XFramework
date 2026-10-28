@@ -2,23 +2,28 @@
  * Starline UI theme. Every screen uses these classes; layouts are designed for 3840 x 2160 (4K)
  * and scaled to the screen height (see Ui.ConfigurePanel); in portrait, 2160 x 3840 scaled to
  * the width, with the overrides in the "Portrait" section.
- * Style "星夜金边" (docs/art-direction.md): night-blue panels with thin gold borders, gold titles,
- * gold primary buttons, and the mana teal for selection and progress.
+ * Style "星图" (docs/art-direction.md, decision 64): the screens read like a star chart. Deep indigo
+ * night, panels outlined in faint starlight with a glowing mana node on two corners (.star-node),
+ * starlight-ivory primary buttons, pill-shaped secondary buttons, serif titles, and the mana teal
+ * for every line, node, selection and progress bar: the "star lines" of the Mana Web.
  */
 
 :root, .starline {
-    --bg: #0A1020;
-    --bg-dim: rgba(5, 8, 16, 0.75);
-    --panel: rgba(17, 26, 46, 0.94);
-    --panel-solid: #111A2E;
-    --panel-raised: #18233B;
-    --border: #26314A;
-    --gold: #B8954F;
-    --gold-bright: #E8C77A;
-    --gold-button: #D9B46A;
-    --gold-ink: #1A1408;
-    --text: #EDE6D6;
-    --muted: #9AA5B8;
+    --bg: #0B0C22;
+    --bg-dim: rgba(6, 7, 20, 0.78);
+    --panel: rgba(14, 15, 42, 0.92);
+    --panel-solid: #0E0F2A;
+    --panel-raised: #181A40;
+    --border: #2C2F5C;
+    --line: rgba(236, 227, 200, 0.32);
+    --gold: #BFAE7E;
+    --gold-bright: #F3E2AE;
+    --gold-button: #EBD9A4;
+    --gold-ink: #17142E;
+    --text: #ECE6D6;
+    --muted: #9A9CC4;
+    --dim: #5E6188;
+    --pressed: #0A0B20;
     --primary: #5AB8FF;
     --primary-dark: #13243A;
     --good: #6FD08C;
@@ -26,7 +31,7 @@
     --bad: #FF6B6B;
     --enemy: #FF8F4A;
     --elite: #E8C15A;
-    --supply: #6FD0B4;
+    --supply: #6CF0DA;
 }
 
 /* ---- Layout -------------------------------------------------------------- */
@@ -87,8 +92,8 @@
 .panel {
     background-color: var(--panel);
     border-width: 2px;
-    border-color: var(--gold);
-    border-radius: 5px;
+    border-color: var(--line);
+    border-radius: 3px;
     padding: 34px 38px;
 }
 
@@ -141,6 +146,27 @@ Label {
     margin: 10px 0;
 }
 
+/* Title faces: the Cinzel logo and serif titles (Noto Serif SC cut to the characters in the language
+   tables and config, see tools/fonts/subset_title_font.py). Only for text from those tables: names
+   that players type keep the body font, which has every character. */
+.menu-logo,
+.logo,
+.settings-logo {
+    -unity-font-definition: resource("StarlineLogoFont");
+}
+
+.h1,
+.h2,
+.menu-title,
+.menu-item-title,
+.menu-place-title,
+.login-heading,
+.login-main-title,
+.settings-page-title,
+.slot-new {
+    -unity-font-definition: resource("StarlineTitleFont");
+}
+
 .muted { color: var(--muted); }
 .good { color: var(--good); }
 .warn { color: var(--warn); }
@@ -165,11 +191,11 @@ Label {
 
 .btn:hover {
     border-color: var(--gold-bright);
-    background-color: #202D48;
+    background-color: #1F2250;
 }
 
 .btn:active {
-    background-color: #0E1628;
+    background-color: var(--pressed);
 }
 
 .btn:disabled {
@@ -178,25 +204,27 @@ Label {
 
 .btn-primary {
     background-color: var(--gold-button);
-    border-color: #F3DDA0;
+    border-color: #FFF4D2;
     color: var(--gold-ink);
     -unity-font-style: bold;
     letter-spacing: 5px;
 }
 
 .btn-primary:hover {
-    background-color: var(--gold-bright);
-    border-color: #FFF0C8;
+    background-color: #FFF0C8;
+    border-color: var(--supply);
 }
 
 .btn-primary:active {
-    background-color: #B8954F;
+    background-color: #D4C08A;
 }
 
+/* Secondary buttons are pills, so they never read as panels. */
 .btn-secondary {
     background-color: transparent;
     border-color: var(--gold);
     color: var(--gold-bright);
+    border-radius: 41px;
 }
 
 .btn-large {
@@ -206,12 +234,13 @@ Label {
 
 .btn-small {
     min-height: 72px;
-    padding: 5px 24px;
+    padding: 5px 34px;
+    border-radius: 36px;
     margin: 0 0 0 14px;
 }
 
 .btn-toggled {
-    background-color: #0E1628;
+    background-color: var(--pressed);
     border-color: var(--gold-bright);
     color: var(--gold-bright);
 }
@@ -249,10 +278,9 @@ Label {
 }
 
 .menu-logo {
-    font-size: 130px;
-    -unity-font-style: bold;
+    font-size: 134px;
     color: var(--gold-bright);
-    letter-spacing: 24px;
+    letter-spacing: 29px;
     margin: 0;
 }
 
@@ -295,12 +323,12 @@ Label {
 
 .menu-item:hover,
 .menu-item--on {
-    border-color: var(--gold-bright);
-    background-color: rgba(232, 199, 122, 0.12);
+    border-color: var(--supply);
+    background-color: rgba(108, 240, 218, 0.08);
 }
 
 .menu-item:active {
-    background-color: rgba(232, 199, 122, 0.2);
+    background-color: rgba(108, 240, 218, 0.16);
 }
 
 .menu-item-title {
@@ -328,7 +356,7 @@ Label {
 }
 
 .menu-item:disabled .menu-item-title {
-    color: #5D6678;
+    color: var(--dim);
 }
 
 .menu-small {
@@ -343,7 +371,7 @@ Label {
     position: absolute;
     left: 230px;
     bottom: 77px;
-    color: #5D6678;
+    color: var(--dim);
 }
 
 .menu-place {
@@ -375,8 +403,6 @@ Label {
 
 .login-card {
     padding: 53px 58px 48px 58px;
-    border-top-width: 5px;
-    border-top-color: var(--gold-bright);
 }
 
 .login-heading {
@@ -411,7 +437,7 @@ Label {
 
 .login-main-sub {
     font-size: 29px;
-    color: #4A3A1A;
+    color: #5A4C2A;
     letter-spacing: 2px;
     margin: 10px 0 0 0;
 }
@@ -555,7 +581,7 @@ Label {
     padding: 24px 43px;
     background-color: var(--panel);
     border-width: 2px;
-    border-color: rgba(184, 149, 79, 0.6);
+    border-color: var(--line);
     border-radius: 5px;
     font-size: 34px;
     color: var(--gold-bright);
@@ -566,7 +592,7 @@ Label {
 .slots {
     align-items: center;
     justify-content: center;
-    background-color: rgba(10, 16, 32, 0.72);
+    background-color: rgba(11, 12, 34, 0.74);
 }
 
 .slots-head {
@@ -602,12 +628,37 @@ Label {
     opacity: 0.7;
 }
 
+/* A star on the chart: the end of a star line. */
 .diamond {
-    width: 17px;
-    height: 17px;
+    width: 19px;
+    height: 19px;
     margin: 0 29px;
-    background-color: var(--gold-bright);
-    rotate: 45deg;
+    background-color: var(--bg);
+    border-width: 4px;
+    border-color: var(--supply);
+    border-radius: 50%;
+}
+
+/* Glowing mana nodes on two corners of a panel: the panel is a star on the chart. Put them as the
+   panel's last children so they draw over its border. */
+.star-node {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background-color: var(--bg);
+    border-width: 4px;
+    border-color: var(--supply);
+    border-radius: 50%;
+}
+
+.star-node--tl {
+    left: -12px;
+    top: -12px;
+}
+
+.star-node--br {
+    right: -12px;
+    bottom: -12px;
 }
 
 .eyebrow {
@@ -638,8 +689,8 @@ Label {
 }
 
 .slot-card--empty {
-    background-color: rgba(10, 16, 32, 0.7);
-    border-color: rgba(184, 149, 79, 0.55);
+    background-color: rgba(11, 12, 34, 0.7);
+    border-color: var(--line);
     align-items: center;
     justify-content: center;
 }
@@ -921,7 +972,7 @@ Label {
     width: 62px;
     height: 29px;
     margin-right: 10px;
-    background-color: #202838;
+    background-color: #1E2046;
     border-radius: 5px;
 }
 
@@ -1132,7 +1183,7 @@ Label {
 /* Design: art canvas boards "设置 · 画质" and "设置 · 语言" (1600 x 900, x2.4 here). */
 
 .settings {
-    background-color: rgba(10, 16, 32, 0.72);
+    background-color: rgba(11, 12, 34, 0.74);
 }
 
 .settings-column {
@@ -1224,7 +1275,7 @@ Label {
 }
 
 .settings-chip--on {
-    background-color: #0E1628;
+    background-color: var(--pressed);
     border-color: var(--gold-bright);
     color: var(--gold-bright);
     -unity-font-style: bold;
@@ -1267,7 +1318,7 @@ Label {
 }
 
 .settings-device {
-    color: #5D6678;
+    color: var(--dim);
     margin: 0;
 }
 
@@ -1286,7 +1337,7 @@ Label {
 }
 
 .settings-language--on {
-    background-color: #0E1628;
+    background-color: var(--pressed);
     border-color: var(--gold-bright);
 }
 
@@ -1323,4 +1374,20 @@ Label {
     right: 230px;
     bottom: 96px;
     align-items: center;
+}
+
+/* The title fonts are already bold; without this the bold style would thicken them a second time. */
+.menu-logo,
+.logo,
+.settings-logo,
+.h1,
+.h2,
+.menu-title,
+.menu-item-title,
+.menu-place-title,
+.login-heading,
+.login-main-title,
+.settings-page-title,
+.slot-new {
+    -unity-font-style: normal;
 }

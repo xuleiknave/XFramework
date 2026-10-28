@@ -39,6 +39,8 @@
                     </ui:VisualElement>
                     <ui:Label text="#login.dev_hint" class="small muted login-dev-hint" picking-mode="Ignore" />
                 </ui:VisualElement>
+                <ui:VisualElement class="star-node star-node--tl" picking-mode="Ignore" />
+                <ui:VisualElement class="star-node star-node--br" picking-mode="Ignore" />
             </ui:VisualElement>
         </ui:VisualElement>
 
