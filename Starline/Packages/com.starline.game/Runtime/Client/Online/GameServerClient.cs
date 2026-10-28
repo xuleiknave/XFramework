@@ -28,6 +28,9 @@ namespace Starline.Client
 
         public string Code { get; }
 
+        /// <summary>The server's answer when it refused the call (some refusals carry data, e.g. <see cref="ServerErrors.LinkChoice"/>).</summary>
+        public ServerResponse Response { get; set; }
+
         /// <summary>The account must sign in again (another device, expired or unknown session).</summary>
         public bool NeedsLogin => Code == ServerErrors.Unauthorized || Code == ServerErrors.SessionReplaced || Code == ServerErrors.SessionExpired;
 
@@ -60,6 +63,12 @@ namespace Starline.Client
                     return Loc.Ui("server.error.slot_empty");
                 case ServerErrors.Conflict:
                     return Loc.Ui("server.error.conflict");
+                case ServerErrors.LinkInvalid:
+                    return Loc.Ui("server.error.link_invalid");
+                case ServerErrors.LinkSelf:
+                    return Loc.Ui("server.error.link_self");
+                case ServerErrors.LinkLimited:
+                    return Loc.Ui("server.error.link_limited");
                 default:
                     return Loc.Ui("server.error.server_error", Code);
             }
@@ -139,7 +148,7 @@ namespace Starline.Client
                 }
                 if (!ServerErrors.IsOk(response.code))
                 {
-                    var error = new ServerCallException(response.code);
+                    var error = new ServerCallException(response.code) { Response = response };
                     if (request.op != ServerOps.Login && error.NeedsLogin)
                     {
                         SessionLost?.Invoke(error);

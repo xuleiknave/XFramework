@@ -243,7 +243,7 @@ CRUD Save 是文档存储，没有多表事务和行锁。按“一次操作尽�
 | `replayVotes` | `{public_id}:{账号 id}` | 点了赞没有、举报原因和处理状态 | `replay_like`、`replay_report` |
 | `gameVersions` | data_hash | 内核版本、状态、发布时间 | `game_data_version` |
 
-S1 已实现的部分（`Starline.Server.Data.CrudSave`）：`accounts`（文档键是账号 id，含当前会话）、`identities`（键 `uos:<Passport 玩家 id>` 或 `dev:<账号名>`）、`saves`（键 `<账号 id>:<存档位>`，现在只有下面 `commander` 里的字段）、`saves_deleted`（删除的存档，键后面加删除时间）、`idempotency`（键 `<账号 id>/<key>`，存修改请求的返回）。S1 的修改请求只碰一份文档，幂等记录先单独放一个集合；S2 开始做跨文档的战斗结算时，改成下面写的存档内 `recentRequests`。
+S1 已实现的部分（`Starline.Server.Data.CrudSave`）：`accounts`（文档键是账号 id，含当前会话、绑定码输错次数，被绑定合并掉的账号记 `mergedInto`）、`identities`（键 `uos:<Passport 玩家 id>`、`wx:<微信 openid>` 或 `dev:<账号名>`，值是账号 id；按账号查的索引用于绑定时搬身份）、`link_codes`（绑定码：键是 6 位数字，存账号 id 和过期时间）、`saves`（键 `<账号 id>:<存档位>`，现在只有下面 `commander` 里的字段）、`saves_deleted`（删除的存档，键后面加删除时间）、`idempotency`（键 `<账号 id>/<key>`，存修改请求的返回）。S1 的修改请求只碰一份文档，幂等记录先单独放一个集合；S2 开始做跨文档的战斗结算时，改成下面写的存档内 `recentRequests`。
 
 ### 存档文档
 

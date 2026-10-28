@@ -28,6 +28,9 @@ namespace Starline.Client
             Button("logout", App.LogOut);
             Button("saves", App.ShowSaveSlots);
             Button("settings", App.ShowSettings);
+            // Linking the mini game and the app needs the game server; builds without one keep local saves.
+            Button("link", () => AccountLinkDialog.Show(App)).style.display =
+                GameServerClient.IsAvailable ? DisplayStyle.Flex : DisplayStyle.None;
             Button("quit", App.Quit);
             Find<Label>("version").text = Loc.Ui("menu.version", Application.version);
         }

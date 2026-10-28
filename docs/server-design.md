@@ -158,12 +158,16 @@ server/
 
 ### 登录与账号
 
+登录方式（决策 70）：微信小游戏用微信登录（不用点按钮），安卓 App 用 Passport 手机号验证码登录（App 接微信登录要企业资质）；两边靠绑定码共用一个账号。一个账号可以挂多个登录身份（`identities` 集合），所以以后加 TapTap 登录也只是多一种身份。
+
 令牌由云函数自己签发（里面带会话 id），不直接用 Passport 的令牌：这样“一个账号只能在一台电脑上登录”和踢下线都由我们控制，以后不用 Passport 也不影响客户端。Passport 只负责“这个人是谁”：客户端把 Passport 令牌放进 `FuncContext`（请求头 `X-UOS-Token`），登录时云函数用 `FuncContext.ValidateToken` 校验。S1 只发一个会话令牌，7 天不用才过期，不分访问令牌和刷新令牌（决策 63）；下表的 `refresh` 暂不需要。
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
 | POST | `/v1/auth/steam` | 云函数校验 Steam 票据 → 用 Passport 外部 ID 登录换出玩家 id → 签发访问令牌（15 分钟）和刷新令牌（30 天）；第一次登录自动建账号；**作废这个账号的其他会话** |
-| POST | `/v1/auth/wechat` | 微信小游戏：Passport 微信登录，之后同上 |
+| POST | `/v1/auth/wechat` | 微信小游戏：客户端 `wx.login` 拿一次性 code，云函数调微信 code2Session 换 openid（身份 `wx:<openid>`），之后同上。已实现（`auth.login`，`method` = `wechat`，决策 70） |
+| POST | `/v1/link/code` | 生成 6 位绑定码（5 分钟、只能用一次）。已实现（`link.create`） |
+| POST | `/v1/link/redeem` | 在另一台设备输入绑定码：这台设备的登录身份挂到绑定码所属的账号上，两边从此是同一个账号、同一份存档；两边都有存档时先返回 `link_choice` 和两边的存档，玩家选 `keep`（`mine` / `linked`）后再执行，没保留的一边移进已删除的存档。同一账号每 10 分钟最多输错 5 次。已实现（`link.redeem`） |
 | POST | `/v1/auth/refresh` | 用刷新令牌换新的一对令牌 |
 | POST | `/v1/auth/logout` | 作废当前会话 |
 | GET | `/v1/me` | 账号信息、已购内容、设置、存档列表 |

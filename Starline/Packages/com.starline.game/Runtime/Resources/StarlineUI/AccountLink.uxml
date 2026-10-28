@@ -1,0 +1,46 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement class="modal-backdrop">
+        <ui:VisualElement class="panel dialog link-dialog">
+            <ui:Label text="#link.title" class="h2" />
+            <ui:Label text="#link.body" class="body dialog-body" />
+
+            <ui:VisualElement name="start" class="link-section">
+                <ui:Label text="#link.give_title" class="small muted" />
+                <ui:VisualElement class="row link-row">
+                    <ui:Label name="code" text="#link.no_code" class="link-code" />
+                    <ui:Button name="create" text="#link.create" class="btn btn-secondary" />
+                </ui:VisualElement>
+                <ui:Label name="code-hint" class="small muted" />
+
+                <ui:Label text="#link.enter_title" class="small muted link-enter-title" />
+                <ui:VisualElement class="row link-row">
+                    <ui:TextField name="input" max-length="6" class="name-field link-field" />
+                    <ui:Button name="redeem" text="#link.redeem" class="btn btn-primary" />
+                </ui:VisualElement>
+                <ui:Label text="#link.enter_hint" class="small muted" />
+            </ui:VisualElement>
+
+            <ui:VisualElement name="choice" class="link-section">
+                <ui:Label text="#link.choice_body" class="body" />
+                <ui:VisualElement class="row link-choices">
+                    <ui:VisualElement class="link-side grow">
+                        <ui:Label text="#link.mine" class="small muted" />
+                        <ui:Label name="mine-saves" class="body" />
+                        <ui:Button name="keep-mine" text="#link.keep_mine" class="btn btn-secondary" />
+                    </ui:VisualElement>
+                    <ui:VisualElement class="link-side grow">
+                        <ui:Label text="#link.linked" class="small muted" />
+                        <ui:Label name="linked-saves" class="body" />
+                        <ui:Button name="keep-linked" text="#link.keep_linked" class="btn btn-secondary" />
+                    </ui:VisualElement>
+                </ui:VisualElement>
+                <ui:Label text="#link.choice_hint" class="small muted" />
+            </ui:VisualElement>
+
+            <ui:Label name="error" class="small bad name-error" />
+            <ui:VisualElement class="row dialog-buttons">
+                <ui:Button name="close" text="#common.close" class="btn btn-secondary grow" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

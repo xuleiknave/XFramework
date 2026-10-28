@@ -70,8 +70,9 @@ namespace Starline.Client
             var request = new ServerRequest
             {
                 op = ServerOps.Login,
-                method = provided.Method == LoginMethods.Dev ? ServerOps.LoginMethodDev : ServerOps.LoginMethodUos,
+                method = ServerMethod(provided.Method),
                 devAccount = provided.Method == LoginMethods.Dev ? provided.AccountId : null,
+                code = provided.Credential,
             };
             ServerResponse response;
             try
@@ -86,6 +87,30 @@ namespace Starline.Client
             GameServerClient.Session = response.session;
             string name = string.IsNullOrEmpty(response.displayName) ? provided.DisplayName : response.displayName;
             return new AuthSession(provided.Method, response.accountId, name, response.session);
+        }
+
+        private static string ServerMethod(string method)
+        {
+            switch (method)
+            {
+                case LoginMethods.Dev:
+                    return ServerOps.LoginMethodDev;
+                case LoginMethods.Wechat:
+                    return ServerOps.LoginMethodWechat;
+                default:
+                    return ServerOps.LoginMethodUos;
+            }
+        }
+
+        /// <summary>
+        /// After a link code moved this login to another account (link.redeem): the answer's session and
+        /// account replace the current ones; the login method stays the same.
+        /// </summary>
+        public static void Relinked(ServerResponse response)
+        {
+            GameServerClient.Session = response.session;
+            string name = string.IsNullOrEmpty(response.displayName) ? Session?.DisplayName : response.displayName;
+            Session = new AuthSession(Session?.Method, response.accountId, name, response.session);
         }
 
         /// <summary>Signs out; the next launch shows the login screen without logging in automatically.</summary>

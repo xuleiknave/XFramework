@@ -8,6 +8,8 @@ namespace Starline.Client
     {
         /// <summary>UOS Passport (the account service of Tuanjie's online services).</summary>
         public const string Uos = "uos";
+        /// <summary>WeChat mini game: signs in by itself with wx.login, no button to press.</summary>
+        public const string Wechat = "wechat";
         /// <summary>Developer login without a password, only in the editor and development builds.</summary>
         public const string Dev = "dev";
     }

@@ -23,11 +23,13 @@ server/
 
 | op | 用途 |
 |---|---|
-| `auth.login` | 登录：`method` 是 `uos`（云函数校验 Passport 令牌）或 `dev`（开发者登录）；返回账号 id 和会话令牌，**同一账号的旧会话随之失效** |
+| `auth.login` | 登录：`method` 是 `uos`（云函数校验 Passport 令牌，App 用）、`wechat`（`code` 是小游戏 `wx.login` 拿到的一次性 code，服务端调微信 code2Session 换 openid）或 `dev`（开发者登录）；返回账号 id 和会话令牌，**同一账号的旧会话随之失效** |
 | `auth.logout` | 退出登录 |
 | `saves.list` | 账号的全部存档位 |
 | `saves.create` | 在空存档位新建指挥官（名字 1~8 个字） |
 | `saves.delete` | 删除存档（移到 `saves_deleted`，留着给客服恢复） |
+| `link.create` | 生成 6 位绑定码，5 分钟内有效、只能用一次 |
+| `link.redeem` | 输入另一台设备的绑定码（`code`），这台设备的登录身份挂到那个账号上，小游戏和 App 从此共用一个账号。两边都有存档时返回 `link_choice`，带上两边的存档（`saves`、`linkedSaves`），客户端让玩家选，再带 `keep` = `mine` 或 `linked` 重发；没保留的一边移进 `saves_deleted`。成功时返回新会话（另一台设备随之要重新登录）。同一账号 10 分钟内最多输错 5 次 |
 | `saves.report` | 上报游戏时长和远征次数的增量：时长按实际经过的时间封顶，远征一次最多记 5 场。远征改到服务端推进（S4）以前，这几个数只用于显示，不发奖励 |
 
 修改类的请求（create、delete、report）都带客户端生成的 `key`，网络断了用同一个 key 重发，服务端只执行一次。
@@ -125,6 +127,7 @@ Multiverse 要求服务器进程启动后报告“就绪”（`sdk.ready()`）�
 |---|---|---|
 | 云函数环境变量 `STARLINE_DEV_LOGIN` | `1`（接受开发者登录） | **不设** |
 | 云函数环境变量 `STARLINE_DB_ID`、`STARLINE_DB_PASSWORD` | 应用里只有一个 MongoDB、并且授权 UOS 保存数据库密码时不用设；否则填后台显示的数据库 id 和密码 | 同左 |
+| 云函数环境变量 `STARLINE_WX_APPID`、`STARLINE_WX_SECRET` | 小游戏的 AppID 和 AppSecret（微信公众平台“开发管理 → 开发设置”），没设时微信登录失败 | 同左（正式小游戏的） |
 | 云函数超时 | 建议 10 秒（默认 3 秒，实例第一次调用要连数据库） | 同左 |
 | 数据库“临时公网访问” | 在编辑器本地模式下调试时打开，调完关掉 | **一直关着**（部署在 UOS 上的云函数走内网） |
 | Passport 登录渠道 | 手机号就够 | 按上线计划配置 |
@@ -187,6 +190,9 @@ S0 的验证云函数（[probe/README.md](probe/README.md)）检查内核能不�
 | 位置 | 是什么 | 怎么确认 |
 |---|---|---|
 | `StarlineService.PassportUserId` | 用 `FuncContext.ValidateToken()` 校验 Passport 令牌、`FuncContext.GetUserId()` 取玩家 id。NuGet 上的 SDK（0.1.0）还没有这两个方法，文档也没写返回类型，所以代码在运行时查找它们 | `Status` 的“Passport 令牌校验”；UOS 登录后能进主菜单就是通过了 |
+| `WechatLogin.OpenId` | 微信 code2Session 接口（`https://api.weixin.qq.com/sns/jscode2session`）。云函数要能访问外网，小游戏还要在微信后台把云函数的调用域名加进“request 合法域名” | `Status` 的“微信登录”显示已配置；小游戏真机打开能进主菜单 |
+| `WechatMiniGameLogin` | 客户端 `WX.Login`（团结小游戏 SDK，命名空间 `WeChatWASM`），宏 `STARLINE_WECHAT` | 编译不过时把报错发给我 |
+| 小游戏里调云函数 | Func Stateless SDK 在小游戏（WebGL）里能不能用，UOS 文档没写；不能用时改走云函数的 HTTP 访问地址（客户端 `HttpGameServer` 现成） | 小游戏真机调一次 `Status` |
 | `UosGameServer.Call` | 调用前用 `AuthTokenManager.GetAccessToken()`（命名空间按 `Unity.UOS.Auth` 写的）取 Passport 令牌，放进 `FuncContext.SetToken`，SDK 把它作为请求头 `X-UOS-Token` 发给云函数 | 编译不过时把报错发给我；可能 SDK 本来就会自动带上令牌 |
 | 远程模式 | 插件在远程模式下只保留云函数类里带 `[CloudFunc]` 的方法，客户端照样 `new StarlineService().Call(...)`；复制过去的其他服务端文件远程模式下怎么处理，文档没写 | 远程调用能进游戏、打包能通过就是没问题 |
 | 客户端包里的服务端代码 | 本地模式需要服务端代码和 MongoDB 驱动编进编辑器；文档没说远程模式打包时会不会去掉 | 打一个包看大小和 `Managed` 目录里有没有 MongoDB.Driver.dll；有的话告诉我，我把它们限制成只在编辑器里编译 |

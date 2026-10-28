@@ -32,6 +32,7 @@
                 <ui:Button name="saves" text="#menu.saves" class="btn btn-secondary btn-small" />
                 <ui:Button name="archive" text="#menu.archive" class="btn btn-secondary btn-small" />
                 <ui:Button name="settings" text="#menu.settings" class="btn btn-secondary btn-small" />
+                <ui:Button name="link" text="#menu.link" class="btn btn-secondary btn-small" />
                 <ui:Button name="logout" text="#menu.logout" class="btn btn-secondary btn-small" />
                 <ui:Button name="quit" text="#menu.quit" class="btn btn-secondary btn-small" />
             </ui:VisualElement>
