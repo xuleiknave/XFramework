@@ -17,3 +17,4 @@ Starline/*.csproj
 Starline/*.sln
 Starline/*.slnx
 __pycache__/
+website/dist/
