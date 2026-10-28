@@ -90,6 +90,10 @@ python3 tools/uos/package_server.py
 
 数据库连接字符串、密码写在启动命令里会显示在后台，能设环境变量的话优先用环境变量。
 
+### Multiverse 就绪上报
+
+Multiverse 要求服务器进程启动后报告“就绪”（`sdk.ready()`），否则启动配置测试会失败：“Game server is not ready, please check if your game package has called sdk.ready()”。程序发现 `AGONES_SDK_*` 环境变量（Multiverse 在容器里放了 Agones SDK 边车）时会自动做这件事，不需要另加参数：端口打开后先 `POST /ready`，之后每 2 秒 `POST /health`。用的是边车的 REST 接口（`AGONES_SDK_HTTP_PORT`，默认 9358），连不上再改走 gRPC（`AGONES_SDK_GRPC_PORT`，默认 9357）。没有用 UOS 的 `UOS.Multiverse.SDK` 包，因为它带着 Grpc.Core 的本机库。成功时日志里有一行“Multiverse：已报告就绪”，失败时会写出两个端口各自的错误。REST 这条路在本机用模拟的边车测过，gRPC 那条和真正的 Multiverse 还没验证。
+
 用内存库时只能开 **1 台**服务器（每台各有一份数据）；用 MongoDB 时可以开多台，会话和存档都在库里。
 
 ### 确认部署成功

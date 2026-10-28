@@ -68,6 +68,16 @@ namespace Starline.Server.Host
                 listener.Stop();
             });
 
+            if (MultiverseSdk.Present)
+            {
+                // Under UOS Multiverse: report Ready once the port is open, then keep sending Health.
+                _ = new MultiverseSdk(Log).Run(stopping.Token);
+            }
+            else
+            {
+                Log("没有 AGONES_SDK_* 环境变量，不在 Multiverse 里，不报告就绪");
+            }
+
             while (!stopping.IsCancellationRequested)
             {
                 HttpListenerContext context;
