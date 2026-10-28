@@ -31,7 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `tools/models/build_models.py`：用 Blender 脚本生成部队模型，输出到 `Runtime/Resources/StarlineModels`（见 `docs/art-direction.md`）
 - `tools/music/compose.py`：程序化生成背景音乐，输出到 `Runtime/Resources/StarlineMusic`，选曲表 `music.json`（见 `docs/music.md`）
 - `src/Starline.Battle/`：用 .NET 编译同一份内核源码
-- `server/src/`：服务端，托管在 UOS 的 C# 云函数（见 `server/README.md`、`docs/server-design.md`、`docs/server-database.md`）。`Starline.Server.Game` 是规则（不依赖 UOS），`Starline.Server.Data` 数据层接口和内存实现，`Starline.Server.Data.CrudSave` 第一阶段数据库（CRUD Save / MongoDB），`Starline.Server.Uos` 云函数入口 `StarlineService`。客户端和服务端共用的消息格式在内核的 `Runtime/Battle/Online/`。现在做到 S1（登录、存档位）。部署要在团结编辑器里用 Func Stateless 插件上传，`tools/uos/sync_cloud_service.py` 先把源码复制到 `Starline/Assets/Scripts/CloudService/`（生成的目录，不提交）
+- `server/src/`：服务端，托管在 UOS 的 C# 云函数（见 `server/README.md`、`docs/server-design.md`、`docs/server-database.md`）。`Starline.Server.Game` 是规则（不依赖 UOS），`Starline.Server.Data` 数据层接口和内存实现，`Starline.Server.Data.CrudSave` 第一阶段数据库（CRUD Save / MongoDB），`Starline.Server.Host` 常驻 HTTP 进程（UOS 服务器程序镜像，现在用这个，`python3 tools/uos/package_server.py` 打 zip），`Starline.Server.Uos` 云函数入口 `StarlineService`。客户端和服务端共用的消息格式在内核的 `Runtime/Battle/Online/`。现在做到 S1（登录、存档位）。部署要在团结编辑器里用 Func Stateless 插件上传，`tools/uos/sync_cloud_service.py` 先把源码复制到 `Starline/Assets/Scripts/CloudService/`（生成的目录，不提交）
 - `server/db/schema.sql`：服务端第二阶段（UOS CRUD Storage / MySQL）的建表语句
 - `server/probe/`：UOS 验证云函数（S0）：在 UOS 上检查内核重跑、数据库条件写、Steam API、冷启动；`dotnet run --project server/probe/Starline.Probe.Local` 在本机跑
 - `tests/Starline.Battle.Tests/`：无依赖的测试程序，包含自动玩家平衡模拟

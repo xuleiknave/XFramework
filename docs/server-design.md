@@ -114,7 +114,7 @@ POST /v1/battles/{battle_id}/finish  结束：带帧号的指令、客户端算�
 
 | 职责 | UOS 服务 | 说明 |
 |---|---|---|
-| 所有接口（登录、存档、战斗结算、养成、远征、录像榜） | Func Stateless（C# 云函数）：一个云函数类 `StarlineService`，只有一个 `Call`，请求里的 `op` 区分接口（决策 63） | 战斗重跑单场几毫秒，按 GB·秒计费；上限 100 QPS，个人项目起步够用 |
+| 所有接口（登录、存档、战斗结算、养成、远征、录像榜） | 现在部署成服务器程序镜像（Func Stateful，常驻 HTTP 进程 `starline-server`，`POST /call`，决策 64）；也可以部署成 Func Stateless 云函数 `StarlineService.Call`（决策 63）。两种都是同一个 `ServerRequest`，请求里的 `op` 区分接口 | 战斗重跑单场几毫秒，按 GB·秒计费；上限 100 QPS，个人项目起步够用 |
 | 数据库 | CRUD Save → CRUD Storage（托管 MySQL） | 两个阶段见 [server-database.md](server-database.md) 第 0 节；只有云函数能读写 |
 | 账号 | Passport：微信小游戏直接登录；Steam、iOS 走“外部 ID 登录”，由云函数先校验 Steam 票据再映射 | 计费口径待确认，太贵就由云函数自己处理登录（replay-server.md 第 12 节） |
 | 配置表、客户端资源 | CDN | 配置表 JSON 跟云函数一起打包，客户端的随包发 |

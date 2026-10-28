@@ -1,6 +1,6 @@
 # 星线服务端（UOS）
 
-服务端全部托管在 UOS（决策 50、57、63）：业务代码是一个 C# 云函数类 `StarlineService`（Func Stateless），数据放在 CRUD Save（MongoDB），账号用 Passport。设计见 [server-design.md](../docs/server-design.md)，数据结构见 [server-database.md](../docs/server-database.md)。
+服务端全部托管在 UOS（决策 50、57、63、64）：同一套规则可以部署成 UOS 的**服务器程序镜像**（常驻的 HTTP 进程 `starline-server`，现在用这个），也可以部署成 C# **云函数**（`StarlineService`）。数据放在 MongoDB，账号用 Passport。设计见 [server-design.md](../docs/server-design.md)，数据结构见 [server-database.md](../docs/server-database.md)。
 
 现在做到 **S1**：登录（UOS Passport、开发者登录）、一个账号同时只能在一台设备上登录、存档位的列出 / 新建 / 删除、上报游戏时长和远征次数。战斗结算（S2）、养成（S4）、录像榜（S5）还没写。
 
@@ -13,6 +13,7 @@ server/
     Starline.Server.Data/         数据层接口 IServerStore + 内存实现（测试用）
     Starline.Server.Data.CrudSave/ CRUD Save（MongoDB）实现
     Starline.Server.Uos/          云函数入口 StarlineService：Call 把请求交给 GameServer，Status 是部署后的自检
+    Starline.Server.Host/         常驻进程入口 starline-server：HTTP 服务（POST /call、GET /status），部署成 UOS 的服务器程序镜像
   tests/Starline.Server.Tests/    规则测试
   probe/                          S0 验证云函数（部署前先跑它，见 probe/README.md）
   db/schema.sql                   第二阶段（CRUD Storage / MySQL）的表
@@ -42,13 +43,73 @@ dotnet run --project server/tests/Starline.Server.Tests -- --mongo mongodb://127
 
 云端开发环境里两种都跑过（MongoDB 7.0）。
 
-## 部署到 UOS
+## 两种部署方式
 
-UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UOS 文档“开发指南(C#)”），代码放在工程的 `Assets/Scripts/CloudService/`，所有函数代码都要在这一个目录里。服务端代码平时放在 `server/src`，部署前用脚本复制过去。
+规则和数据层只有一份，外面有两个入口，按 UOS 后台选的产品用其中一个：
+
+| | 服务器程序镜像（Func Stateful，**现在用这个**） | 云函数（Func Stateless） |
+|---|---|---|
+| 入口 | `Starline.Server.Host`，打包成 zip 上传 | `Starline.Server.Uos`，在团结编辑器里用插件上传 |
+| 客户端怎么连 | HTTP：`StarlineData/server.json` 里填服务器地址 | 插件生成的调用代码，要定义 `STARLINE_UOS_FUNC` |
+| UOS 账号登录 | **还不能用**：UOS 文档没写常驻服务器怎么校验 Passport 令牌（云函数里有 `FuncContext.ValidateToken`）。现在只能用开发者登录 | 能用（API 未实测） |
+| 数据库 | MongoDB 连接字符串，或 UOS CRUD（要开公网访问） | UOS CRUD，走内网 |
+
+## 部署成服务器程序镜像
+
+### 打包
+
+```
+python3 tools/uos/package_server.py
+```
+
+生成 `dist/starline-server-<版本>.zip`（约 7 MB，`dist/` 不提交）。做法和 UOS 文档里的 C# 示例一样：`dotnet publish -c Release -r linux-x64 --no-self-contained`，把发布目录里的全部文件放在 zip 根目录。程序目标是 .NET 8，允许前滚到新的大版本，在 `mcr.microsoft.com/dotnet/runtime:9.0` 里实测能跑（运行时 9.0.22，内存库和 MongoDB 7.0 都试过）。
+
+### 在 UOS 后台制作镜像
+
+| 字段 | 填什么 |
+|---|---|
+| 镜像标签 | 小写字母、数字、`.`、`-`，比如 `s1-2026-10-28` |
+| 添加服务器程序 | 选 **上传**，传上面的 zip。URL 方式要先把 zip 放到一个公开地址，Docker 方式要自己维护镜像仓库，都比上传麻烦 |
+| 需要增加执行权限的文件 | `starline-server` |
+| 入口程序启动命令 | `./starline-server` 加下面的参数 |
+| 端口 | `8899`（程序默认监听的端口，和 UOS 示例一致；要改就加 `--port`） |
+
+### 启动参数
+
+参数也可以写成环境变量（括号里），两个都有时参数优先。
+
+| 参数 | 作用 |
+|---|---|
+| `--memory`（`STARLINE_STORE=memory`） | 数据只放内存，重启就清空。**第一次部署先用它**，确认程序能跑、客户端能连上，不涉及数据库 |
+| `--mongo <连接字符串>`（`STARLINE_MONGO`） | 用这个 MongoDB，比如 `mongodb://用户:密码@地址:端口` |
+| `--db-name <库名>`（`STARLINE_DB_NAME`） | 默认 `starline` |
+| 都不给 | 用 UOS CRUD 的 MongoDB：需要环境变量 `UOS_APP_ID`、`UOS_APP_SERVICE_SECRET`（UOS 后台的应用 ID 和服务密钥）；多个库时加 `--db-id`，没授权保存密码时加 `--db-password`。常驻服务器不在云函数的内网里，CRUD SDK 走的是公网地址，要在数据库页面打开“临时公网访问” |
+| `--dev-login`（`STARLINE_DEV_LOGIN=1`） | 接受开发者登录。**只在开发用的应用上加** |
+
+开发用的应用第一次可以这样启动：`./starline-server --memory --dev-login`。
+
+数据库连接字符串、密码写在启动命令里会显示在后台，能设环境变量的话优先用环境变量。
+
+用内存库时只能开 **1 台**服务器（每台各有一份数据）；用 MongoDB 时可以开多台，会话和存档都在库里。
+
+### 确认部署成功
+
+1. 后台显示服务器运行后，记下它的 IP 和端口，浏览器打开 `http://IP:端口/status`，应该看到 `allOk: true`、版本号、`runtime` 是 9.0.x。
+2. 把 `Starline/Packages/com.starline.game/Runtime/Resources/StarlineData/server.json` 的 `url` 改成 `http://IP:端口`（或者启动参数 `-server http://IP:端口` 临时覆盖），在编辑器里点 Play，用开发者登录进游戏，新建指挥官、删掉，再重新登录确认存档还在。客户端会走 HTTP，不需要装 Func Stateless SDK。
+3. 现在是明文 HTTP：工程设置里已经把“Allow downloads over HTTP”设成只在开发版允许（`insecureHttpOption: 1`）。正式发布前要换成 HTTPS（域名、证书和备案），不然正式包连不上。
+
+### 还要解决的
+
+- **UOS 账号登录**：服务器要能校验 Passport 令牌才能确认玩家身份。需要知道 UOS 给常驻服务器的校验方式（JWT 公钥或校验接口），可以在 UOS 后台或问 UOS 客服：“自建 / Func Stateful 服务器怎么校验 Passport 的 access token 并拿到 userId”。知道以后我在 `Starline.Server.Host` 里接上，客户端把令牌放进请求头 `X-UOS-Token`。
+- **固定地址**：客户端填的是服务器的 IP。服务器换了 IP 要改 `server.json` 重新发包，正式上线前要有固定域名。
+
+## 部署成云函数
+
+这一节是 Func Stateless（云函数）的做法，现在没用它；留着以备 UOS 账号登录需要 `FuncContext.ValidateToken` 时切回来。UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UOS 文档“开发指南(C#)”），代码放在工程的 `Assets/Scripts/CloudService/`，所有函数代码都要在这一个目录里。服务端代码平时放在 `server/src`，部署前用脚本复制过去。
 
 > 云端开发环境里没有团结编辑器，也装不了 UOS 的编辑器插件，所以下面的步骤是按 UOS 文档写的，**没有实际跑过**。哪一步和后台或插件对不上，把截图或报错发给我。
 
-### 两个环境
+#### 两个环境
 
 开发和正式各建一个 UOS 应用（试用额度不能商用）。两边的代码一样，只有下面这些设置不同：
 
@@ -63,7 +124,7 @@ UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UO
 
 `UOS_APP_ID`、`UOS_APP_SERVICE_SECRET` 由 UOS 提供：云函数里 CRUD SDK 先读这两个环境变量，读不到再用 UOS Launcher 里关联的应用（本地模式就是这种情况）。应用 ID 和密钥都不要写进代码或提交到仓库。
 
-### 准备（每个应用做一次）
+#### 准备（每个应用做一次）
 
 1. 在 UOS 后台给应用开通：
    - **Func Stateless**，Runtime 选 **Dotnet**
@@ -73,7 +134,7 @@ UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UO
 3. 菜单 `UOS > Func Stateless > Import NuGetForUnity` 导入 NuGetForUnity，然后在 `NuGet > Preferences` 里把 **Packages Config Path** 设成 `Assets/Scripts/CloudService`，**Packages Install Path** 设成 `Assets/Scripts/CloudService/Packages`（UOS 文档要求第三方库装在云函数目录下）。
 4. `Project Settings > Player > Other Settings > Scripting Define Symbols` 加上 `STARLINE_UOS_FUNC` 和 `STARLINE_UOS_PASSPORT`，点 Apply。
 
-### 每次部署
+#### 每次部署
 
 1. 复制服务端代码：
 
@@ -104,7 +165,7 @@ UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UO
 
 S0 的验证云函数（[probe/README.md](probe/README.md)）检查内核能不能在云函数里逐位一致地重跑战斗，S2（战斗结算）之前必须跑；S1 只用到数据库和 Passport，上面的 `Status` 已经覆盖。
 
-### 上线前检查（正式应用）
+#### 上线前检查（正式应用）
 
 - [ ] 正式应用的云函数**没有** `STARLINE_DEV_LOGIN`，`Status` 显示“开发者登录：不接受”
 - [ ] 数据库“临时公网访问”是关着的
@@ -113,7 +174,7 @@ S0 的验证云函数（[probe/README.md](probe/README.md)）检查内核能不�
 - [ ] 打包前切到了远程模式
 - [ ] 每天备份（server-design.md 第 6.3 节，定时云函数还没写）在玩家进来前补上
 
-### 还没验证的地方
+#### 还没验证的地方
 
 | 位置 | 是什么 | 怎么确认 |
 |---|---|---|
