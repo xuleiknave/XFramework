@@ -1,5 +1,6 @@
 using System;
 using System.Security.Cryptography;
+using System.Threading.Tasks;
 
 namespace Starline.Server.Game
 {
@@ -10,6 +11,12 @@ namespace Starline.Server.Game
         /// app: the cloud function turns it on with the environment variable STARLINE_DEV_LOGIN=1.
         /// </summary>
         public bool AllowDevLogin;
+
+        /// <summary>
+        /// Exchanges a wx.login code for the player's openid (null when WeChat refuses it). Null when the
+        /// server has no WeChat mini game configured; WeChat logins then fail. See <see cref="WechatLogin"/>.
+        /// </summary>
+        public Func<string, Task<string>> WechatOpenId;
 
         /// <summary>A session unused for this long must sign in again (the Passport SDK does that without asking the player).</summary>
         public long SessionIdleMs = 7L * 24 * 3600 * 1000;

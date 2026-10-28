@@ -20,6 +20,7 @@ namespace Starline.Server.Data.CrudSave
         private readonly IMongoCollection<BsonDocument> _saves;
         private readonly IMongoCollection<BsonDocument> _deletedSaves;
         private readonly IMongoCollection<BsonDocument> _idempotency;
+        private readonly IMongoCollection<BsonDocument> _links;
 
         public CrudSaveStore(IMongoClient client, string databaseName = DatabaseName)
         {
@@ -29,6 +30,7 @@ namespace Starline.Server.Data.CrudSave
             _saves = db.GetCollection<BsonDocument>("saves");
             _deletedSaves = db.GetCollection<BsonDocument>("saves_deleted");
             _idempotency = db.GetCollection<BsonDocument>("idempotency");
+            _links = db.GetCollection<BsonDocument>("link_codes");
         }
 
         /// <summary>Connects through the UOS CRUD SDK; with no id it picks the app's only database.</summary>
@@ -44,9 +46,10 @@ namespace Starline.Server.Data.CrudSave
         }
 
         /// <summary>Indexes the queries need; safe to call more than once.</summary>
-        public Task EnsureIndexes()
+        public async Task EnsureIndexes()
         {
-            return _saves.Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(Builders<BsonDocument>.IndexKeys.Ascending("account").Ascending("slot")));
+            await _saves.Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(Builders<BsonDocument>.IndexKeys.Ascending("account").Ascending("slot")));
+            await _identities.Indexes.CreateOneAsync(new CreateIndexModel<BsonDocument>(Builders<BsonDocument>.IndexKeys.Ascending("account")));
         }
 
         private static FilterDefinition<BsonDocument> ById(string id) => Builders<BsonDocument>.Filter.Eq("_id", id);
@@ -80,6 +83,9 @@ namespace Starline.Server.Data.CrudSave
             { "lastLoginAt", a.LastLoginAt },
             { "sessionSecret", a.SessionSecret ?? "" },
             { "sessionExpiresAt", a.SessionExpiresAt },
+            { "linkFailures", a.LinkFailures },
+            { "linkFailuresSince", a.LinkFailuresSince },
+            { "mergedInto", a.MergedInto ?? "" },
         };
 
         private static AccountRecord ToAccount(BsonDocument d) => new AccountRecord
@@ -92,7 +98,12 @@ namespace Starline.Server.Data.CrudSave
             LastLoginAt = d.GetValue("lastLoginAt", 0L).ToInt64(),
             SessionSecret = d.GetValue("sessionSecret", "").AsString,
             SessionExpiresAt = d.GetValue("sessionExpiresAt", 0L).ToInt64(),
+            LinkFailures = d.GetValue("linkFailures", 0).ToInt32(),
+            LinkFailuresSince = d.GetValue("linkFailuresSince", 0L).ToInt64(),
+            MergedInto = NullIfEmpty(d.GetValue("mergedInto", "").AsString),
         };
+
+        private static string NullIfEmpty(string s) => string.IsNullOrEmpty(s) ? null : s;
 
         public async Task<AccountRecord> GetAccount(string id)
         {
@@ -116,6 +127,43 @@ namespace Starline.Server.Data.CrudSave
 
         public Task<bool> InsertIdentity(string identity, string accountId) =>
             TryInsert(_identities, new BsonDocument { { "_id", identity }, { "account", accountId } });
+
+        public async Task<List<string>> ListIdentities(string accountId)
+        {
+            List<BsonDocument> docs = await _identities.Find(Builders<BsonDocument>.Filter.Eq("account", accountId)).ToListAsync();
+            return docs.Select(d => d["_id"].AsString).OrderBy(id => id, System.StringComparer.Ordinal).ToList();
+        }
+
+        public async Task<bool> MoveIdentity(string identity, string fromAccount, string toAccount)
+        {
+            UpdateResult result = await _identities.UpdateOneAsync(
+                ById(identity) & Builders<BsonDocument>.Filter.Eq("account", fromAccount),
+                Builders<BsonDocument>.Update.Set("account", toAccount));
+            return result.MatchedCount == 1;
+        }
+
+        // ------------------------------------------------------------------
+        // Link codes
+
+        public Task<bool> InsertLinkCode(LinkCodeRecord link) =>
+            TryInsert(_links, new BsonDocument { { "_id", link.Code }, { "account", link.AccountId }, { "expiresAt", link.ExpiresAt } });
+
+        public async Task<LinkCodeRecord> GetLinkCode(string code)
+        {
+            BsonDocument doc = await _links.Find(ById(code)).FirstOrDefaultAsync();
+            return doc == null ? null : new LinkCodeRecord
+            {
+                Code = doc["_id"].AsString,
+                AccountId = doc["account"].AsString,
+                ExpiresAt = doc["expiresAt"].ToInt64(),
+            };
+        }
+
+        public async Task<bool> DeleteLinkCode(string code)
+        {
+            DeleteResult result = await _links.DeleteOneAsync(ById(code));
+            return result.DeletedCount == 1;
+        }
 
         // ------------------------------------------------------------------
         // Saves

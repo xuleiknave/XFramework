@@ -52,6 +52,7 @@ namespace Starline.Cloud
             Item("开发者登录", true, 0, devLogin ? "接受（只该出现在开发用的 UOS 应用上）" : "不接受");
             Item("环境变量", true, 0, string.Join("，",
                 Describe("STARLINE_DEV_LOGIN"), Describe("STARLINE_DB_ID"), Describe("STARLINE_DB_PASSWORD"),
+                Describe("STARLINE_WX_APPID"), Describe("STARLINE_WX_SECRET"),
                 Describe("UOS_APP_ID"), Describe("UOS_APP_SERVICE_SECRET")));
 
             var watch = Stopwatch.StartNew();
@@ -73,6 +74,11 @@ namespace Starline.Cloud
             Item("Passport 令牌校验", canValidate, 0, canValidate
                 ? "FuncContext.ValidateToken / GetUserId 可用"
                 : "SDK 里没有 FuncContext.ValidateToken / GetUserId，UOS 账号登录会失败，请升级 Func Stateless SDK");
+
+            bool wechat = WechatLogin.FromEnvironment() != null;
+            Item("微信登录", true, 0, wechat
+                ? "已配置（STARLINE_WX_APPID、STARLINE_WX_SECRET）"
+                : "没配置：小游戏的微信登录会失败。在云函数环境变量里填小游戏的 AppID 和 AppSecret");
 
             var report = new JObject
             {
@@ -124,7 +130,11 @@ namespace Starline.Cloud
                         Environment.GetEnvironmentVariable("STARLINE_DB_PASSWORD") ?? "");
                     await store.EnsureIndexes();
                     _store = store;
-                    _server = new GameServer(store, new ServerOptions { AllowDevLogin = DevLoginAllowed() });
+                    _server = new GameServer(store, new ServerOptions
+                    {
+                        AllowDevLogin = DevLoginAllowed(),
+                        WechatOpenId = WechatLogin.FromEnvironment(Console.WriteLine) is WechatLogin wechat ? wechat.OpenId : null,
+                    });
                 }
                 return _server;
             }

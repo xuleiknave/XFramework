@@ -47,7 +47,11 @@ namespace Starline.Server.Host
                 Console.Error.WriteLine("连接数据库失败：" + e.GetBaseException().Message);
                 return 1;
             }
-            var server = new GameServer(store, new ServerOptions { AllowDevLogin = options.DevLogin });
+            var server = new GameServer(store, new ServerOptions
+            {
+                AllowDevLogin = options.DevLogin,
+                WechatOpenId = WechatLogin.FromEnvironment(Log) is WechatLogin wechat ? wechat.OpenId : null,
+            });
 
             var listener = new HttpListener();
             listener.Prefixes.Add("http://+:" + options.Port + "/");
@@ -212,6 +216,7 @@ namespace Starline.Server.Host
                 ["runtime"] = Environment.Version.ToString(),
                 ["port"] = options.Port,
                 ["devLogin"] = options.DevLogin,
+                ["wechatLogin"] = WechatLogin.FromEnvironment() != null,
                 ["uosLogin"] = false,
                 ["database"] = new JObject { ["ok"] = dbOk, ["ms"] = watch.ElapsedMilliseconds, ["detail"] = dbDetail },
             };

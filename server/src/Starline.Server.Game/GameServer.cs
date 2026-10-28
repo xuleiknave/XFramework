@@ -16,7 +16,7 @@ namespace Starline.Server.Game
     public sealed class GameServer
     {
         /// <summary>Shown by the Status cloud function; bump it with each deployment that changes behavior.</summary>
-        public const string Version = "S1 · 2026-10-28.2";
+        public const string Version = "S1 · 2026-10-28.3";
 
         /// <summary>Conditional writes retried this often before answering <see cref="ServerErrors.Conflict"/>.</summary>
         private const int WriteAttempts = 3;
@@ -122,6 +122,10 @@ namespace Starline.Server.Game
                     return DeleteSave(account, request.slot);
                 case ServerOps.ReportPlay:
                     return ReportPlay(account, request);
+                case ServerOps.CreateLinkCode:
+                    return CreateLinkCode(account);
+                case ServerOps.RedeemLinkCode:
+                    return RedeemLinkCode(account, request);
                 default:
                     throw new ServerException(ServerErrors.BadRequest, "unknown op " + request.op);
             }
@@ -145,6 +149,18 @@ namespace Starline.Server.Game
                     identity = "uos:" + userId;
                     displayName = "";
                     break;
+                case ServerOps.LoginMethodWechat:
+                    string code = (request.code ?? "").Trim();
+                    string openId = code.Length == 0 || code.Length > 128 || _options.WechatOpenId == null
+                        ? null
+                        : await _options.WechatOpenId(code);
+                    if (string.IsNullOrEmpty(openId))
+                    {
+                        throw new ServerException(ServerErrors.LoginFailed);
+                    }
+                    identity = "wx:" + openId;
+                    displayName = "";
+                    break;
                 case ServerOps.LoginMethodDev:
                     if (!_options.AllowDevLogin)
                     {
@@ -163,6 +179,12 @@ namespace Starline.Server.Game
             }
 
             AccountRecord account = await FindOrCreateAccount(identity, displayName);
+            return await StartSession(account, displayName);
+        }
+
+        /// <summary>A new session on the account, answered like a login.</summary>
+        private async Task<ServerResponse> StartSession(AccountRecord account, string displayName)
+        {
             for (int attempt = 0; attempt < WriteAttempts; attempt++)
             {
                 long expected = account.Revision;
@@ -275,6 +297,171 @@ namespace Starline.Server.Game
                 diff |= a[i] ^ b[i];
             }
             return diff == 0;
+        }
+
+        // ------------------------------------------------------------------
+        // Link codes: one account for the mini game and the app (server-design.md section 1)
+
+        private async Task<ServerResponse> CreateLinkCode(AccountRecord account)
+        {
+            for (int attempt = 0; attempt < 10; attempt++)
+            {
+                string code = RandomDigits(ServerLimits.LinkCodeLength);
+                LinkCodeRecord existing = await _store.GetLinkCode(code);
+                if (existing != null && existing.ExpiresAt < Now)
+                {
+                    await _store.DeleteLinkCode(code);
+                }
+                var link = new LinkCodeRecord { Code = code, AccountId = account.Id, ExpiresAt = Now + ServerLimits.LinkCodeLifetimeMs };
+                if (await _store.InsertLinkCode(link))
+                {
+                    ServerResponse response = Ok();
+                    response.linkCode = code;
+                    response.linkExpiresAt = link.ExpiresAt;
+                    return response;
+                }
+            }
+            throw new ServerException(ServerErrors.Conflict);
+        }
+
+        private string RandomDigits(int count)
+        {
+            string hex = _options.RandomHex(8);
+            ulong value = Convert.ToUInt64(hex, 16);
+            ulong modulo = 1;
+            for (int i = 0; i < count; i++)
+            {
+                modulo *= 10;
+            }
+            return (value % modulo).ToString().PadLeft(count, '0');
+        }
+
+        /// <summary>
+        /// Moves the caller's logins onto the code's account, keeping one side's saves (the other side's go to
+        /// the deleted saves, kept for recovery), and answers with the caller's new session on that account.
+        /// Every step can run again: a retry after a failure in the middle finishes the move.
+        /// </summary>
+        private async Task<ServerResponse> RedeemLinkCode(AccountRecord me, ServerRequest request)
+        {
+            if (me.LinkFailures >= ServerLimits.MaxLinkFailures && Now - me.LinkFailuresSince < ServerLimits.LinkFailureWindowMs)
+            {
+                throw new ServerException(ServerErrors.LinkLimited);
+            }
+            string code = (request.code ?? "").Trim();
+            LinkCodeRecord link = code.Length == ServerLimits.LinkCodeLength && code.All(c => c >= '0' && c <= '9')
+                ? await _store.GetLinkCode(code)
+                : null;
+            AccountRecord target = link == null || link.ExpiresAt < Now ? null : await _store.GetAccount(link.AccountId);
+            if (target == null || target.MergedInto != null)
+            {
+                await CountLinkFailure(me);
+                throw new ServerException(ServerErrors.LinkInvalid);
+            }
+            if (target.Id == me.Id)
+            {
+                throw new ServerException(ServerErrors.LinkSelf);
+            }
+
+            List<SaveRecord> mine = await _store.ListSaves(me.Id);
+            List<SaveRecord> theirs = await _store.ListSaves(target.Id);
+            bool keepMine;
+            if (mine.Count == 0 || theirs.Count == 0)
+            {
+                keepMine = mine.Count > 0;
+            }
+            else if (request.keep == ServerOps.KeepMine || request.keep == ServerOps.KeepLinked)
+            {
+                keepMine = request.keep == ServerOps.KeepMine;
+            }
+            else
+            {
+                ServerResponse choice = Error(ServerErrors.LinkChoice);
+                choice.saves = mine.Select(ToInfo).ToArray();
+                choice.linkedSaves = theirs.Select(ToInfo).ToArray();
+                return choice;
+            }
+
+            if (keepMine)
+            {
+                foreach (SaveRecord save in theirs)
+                {
+                    await ArchiveSlot(target.Id, save.Slot);
+                }
+                foreach (SaveRecord save in mine)
+                {
+                    SaveRecord moved = save.Clone();
+                    moved.AccountId = target.Id;
+                    moved.Revision = 1;
+                    // A retry after the copy but before the archive finds the copy already there.
+                    await _store.InsertSave(moved);
+                    await ArchiveSlot(me.Id, save.Slot);
+                }
+            }
+            else
+            {
+                foreach (SaveRecord save in mine)
+                {
+                    await ArchiveSlot(me.Id, save.Slot);
+                }
+            }
+            foreach (string identity in await _store.ListIdentities(me.Id))
+            {
+                await _store.MoveIdentity(identity, me.Id, target.Id);
+            }
+            await RetireAccount(me, target.Id);
+            await _store.DeleteLinkCode(code);
+            return await StartSession(target, "");
+        }
+
+        private async Task CountLinkFailure(AccountRecord account)
+        {
+            for (int attempt = 0; attempt < WriteAttempts; attempt++)
+            {
+                long expected = account.Revision;
+                if (Now - account.LinkFailuresSince >= ServerLimits.LinkFailureWindowMs)
+                {
+                    account.LinkFailures = 0;
+                    account.LinkFailuresSince = Now;
+                }
+                account.LinkFailures++;
+                account.Revision = expected + 1;
+                if (await _store.ReplaceAccount(account, expected))
+                {
+                    return;
+                }
+                account = await _store.GetAccount(account.Id);
+            }
+        }
+
+        private async Task RetireAccount(AccountRecord account, string mergedInto)
+        {
+            for (int attempt = 0; attempt < WriteAttempts; attempt++)
+            {
+                long expected = account.Revision;
+                account.SessionSecret = "";
+                account.MergedInto = mergedInto;
+                account.Revision = expected + 1;
+                if (await _store.ReplaceAccount(account, expected))
+                {
+                    return;
+                }
+                account = await _store.GetAccount(account.Id);
+            }
+            throw new ServerException(ServerErrors.Conflict);
+        }
+
+        /// <summary>Moves the save in a slot to the deleted saves; nothing when the slot is already empty.</summary>
+        private async Task ArchiveSlot(string accountId, int slot)
+        {
+            for (int attempt = 0; attempt < WriteAttempts; attempt++)
+            {
+                SaveRecord save = await _store.GetSave(accountId, slot);
+                if (save == null || await _store.ArchiveSave(save, save.Revision, Now))
+                {
+                    return;
+                }
+            }
+            throw new ServerException(ServerErrors.Conflict);
         }
 
         // ------------------------------------------------------------------

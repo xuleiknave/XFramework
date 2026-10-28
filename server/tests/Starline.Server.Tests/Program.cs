@@ -41,6 +41,10 @@ namespace Starline.Server.Tests
                 await Run("存档：游戏时长按实际经过的时间封顶", PlayTimeIsCapped);
                 await Run("存档：条件写冲突时重读重做", ConflictsAreRetried);
                 await Run("消息：JSON 往返、坏请求、没带会话", JsonEntryPoint);
+                await Run("微信登录：同一个 openid 是同一个账号，code 无效或没配置时拒绝", WechatLoginUsesOpenId);
+                await Run("绑定码：小游戏绑到 App 的账号，两边用同一份存档", LinkCodeSharesAccount);
+                await Run("绑定码：两边都有存档时先问保留哪边，另一边进已删除", LinkCodeAsksWhichSavesStay);
+                await Run("绑定码：错码、过期、自己的码、连续猜错被限制", LinkCodeRejectsBadCodes);
             }
             Console.WriteLine();
             Console.WriteLine(_failures == 0 ? "全部通过" : _failures + " 项失败");
@@ -270,6 +274,11 @@ namespace Starline.Server.Tests
             public Task<bool> ArchiveSave(SaveRecord save, long expectedRevision, long deletedAt) => _inner.ArchiveSave(save, expectedRevision, deletedAt);
             public Task<string> GetIdempotent(string accountId, string key) => _inner.GetIdempotent(accountId, key);
             public Task PutIdempotent(string accountId, string key, string response, long createdAt) => _inner.PutIdempotent(accountId, key, response, createdAt);
+            public Task<List<string>> ListIdentities(string accountId) => _inner.ListIdentities(accountId);
+            public Task<bool> MoveIdentity(string identity, string fromAccount, string toAccount) => _inner.MoveIdentity(identity, fromAccount, toAccount);
+            public Task<bool> InsertLinkCode(LinkCodeRecord link) => _inner.InsertLinkCode(link);
+            public Task<LinkCodeRecord> GetLinkCode(string code) => _inner.GetLinkCode(code);
+            public Task<bool> DeleteLinkCode(string code) => _inner.DeleteLinkCode(code);
         }
 
         private static async Task ConflictsAreRetried()
@@ -301,6 +310,121 @@ namespace Starline.Server.Tests
             ServerResponse list = await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = session }, null);
             long okCount = results.Count(x => x.code == ServerErrors.Ok);
             Assert(list.saves[0].playMs == okCount * 1000, "成功的请求都记上了：" + okCount + " 次，" + list.saves[0].playMs + " 毫秒");
+        }
+
+        private static ServerOptions WechatOptions()
+        {
+            ServerOptions options = Options();
+            options.WechatOpenId = code => Task.FromResult(code.StartsWith("good-") ? "openid-" + code.Substring(5) : null);
+            return options;
+        }
+
+        private static async Task<ServerResponse> WechatLogin(GameServer server, string code)
+        {
+            return await server.Handle(new ServerRequest { op = ServerOps.Login, method = ServerOps.LoginMethodWechat, code = code }, null);
+        }
+
+        private static ServerRequest Link(string session, string op, string code = null, string keep = null) =>
+            new ServerRequest { op = op, session = session, key = Guid.NewGuid().ToString(), code = code, keep = keep };
+
+        private static async Task WechatLoginUsesOpenId()
+        {
+            var server = new GameServer(_newStore(), WechatOptions());
+            ServerResponse first = await WechatLogin(server, "good-1");
+            ServerResponse again = await WechatLogin(server, "good-1");
+            Expect(first, ServerErrors.Ok, "微信登录");
+            Assert(first.accountId == again.accountId, "同一个 openid 应是同一个账号");
+            Assert((await WechatLogin(server, "good-2")).accountId != first.accountId, "不同 openid 应是不同账号");
+            Expect(await WechatLogin(server, "bad"), ServerErrors.LoginFailed, "微信拒绝的 code");
+            Expect(await WechatLogin(server, ""), ServerErrors.LoginFailed, "空 code");
+            Expect(await WechatLogin(new GameServer(_newStore(), Options()), "good-1"), ServerErrors.LoginFailed, "没配置小游戏");
+        }
+
+        private static async Task LinkCodeSharesAccount()
+        {
+            IServerStore store = _newStore();
+            var server = new GameServer(store, WechatOptions());
+            string app = await DevLogin(server, "app-player");
+            await server.Handle(Write(app, ServerOps.CreateSave, 1, "手机上的"), null);
+            ServerResponse code = await server.Handle(Link(app, ServerOps.CreateLinkCode), null);
+            Expect(code, ServerErrors.Ok, "生成绑定码");
+            Assert(code.linkCode.Length == ServerLimits.LinkCodeLength && code.linkCode.All(char.IsDigit), "6 位数字：" + code.linkCode);
+            Assert(code.linkExpiresAt == _now + ServerLimits.LinkCodeLifetimeMs, "5 分钟有效");
+
+            ServerResponse mini = await WechatLogin(server, "good-7");
+            ServerResponse linked = await server.Handle(Link(mini.session, ServerOps.RedeemLinkCode, code.linkCode), null);
+            Expect(linked, ServerErrors.Ok, "小游戏输入绑定码");
+            string appAccount = app.Substring(0, app.IndexOf('.'));
+            Assert(linked.accountId == appAccount && linked.session != mini.session, "兑换后是 App 账号的新会话");
+            ServerResponse saves = await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = linked.session }, null);
+            Assert(saves.saves.Length == 1 && saves.saves[0].name == "手机上的", "看到 App 的存档");
+            Expect(await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = mini.session }, null), ServerErrors.Unauthorized, "小游戏原来的账号不能再用");
+            Expect(await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = app }, null), ServerErrors.SessionReplaced, "同一账号同时只在一台设备上");
+            Assert((await WechatLogin(server, "good-7")).accountId == appAccount, "以后微信登录直接进 App 的账号");
+            Assert((await DevLogin(server, "app-player")) != null, "App 照常登录");
+            Expect(await server.Handle(Link((await WechatLogin(server, "good-8")).session, ServerOps.RedeemLinkCode, code.linkCode), null),
+                ServerErrors.LinkInvalid, "绑定码只能用一次");
+        }
+
+        private static async Task LinkCodeAsksWhichSavesStay()
+        {
+            IServerStore store = _newStore();
+            var server = new GameServer(store, WechatOptions());
+            string app = await DevLogin(server, "app-player");
+            await server.Handle(Write(app, ServerOps.CreateSave, 0, "手机上的"), null);
+            await server.Handle(Write(app, ServerOps.CreateSave, 2, "手机二号"), null);
+            string mini = (await WechatLogin(server, "good-9")).session;
+            await server.Handle(Write(mini, ServerOps.CreateSave, 0, "小游戏的"), null);
+            string code = (await server.Handle(Link(app, ServerOps.CreateLinkCode), null)).linkCode;
+
+            ServerResponse ask = await server.Handle(Link(mini, ServerOps.RedeemLinkCode, code), null);
+            Expect(ask, ServerErrors.LinkChoice, "两边都有存档");
+            Assert(ask.saves.Length == 1 && ask.linkedSaves.Length == 2, "列出两边的存档");
+            Expect(await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = mini }, null), ServerErrors.Ok, "问的时候什么都没改");
+
+            ServerResponse linked = await server.Handle(Link(mini, ServerOps.RedeemLinkCode, code, ServerOps.KeepMine), null);
+            Expect(linked, ServerErrors.Ok, "保留小游戏的存档");
+            ServerResponse saves = await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = linked.session }, null);
+            Assert(saves.saves.Length == 1 && saves.saves[0].name == "小游戏的" && saves.saves[0].slot == 0, "只剩小游戏的存档：" + JsonConvert.SerializeObject(saves.saves));
+            if (store is MemoryServerStore memory)
+            {
+                Assert(memory.Archived.Select(s => s.Name).OrderBy(n => n).SequenceEqual(new[] { "小游戏的", "手机上的", "手机二号" }.OrderBy(n => n)),
+                    "App 的两个存档和小游戏原来那份都在已删除里：" + string.Join("，", memory.Archived.Select(s => s.Name)));
+            }
+
+            // Keeping the other side: the mini game's own save is the one archived.
+            server = new GameServer(_newStore(), WechatOptions());
+            app = await DevLogin(server, "app-player");
+            await server.Handle(Write(app, ServerOps.CreateSave, 0, "手机上的"), null);
+            mini = (await WechatLogin(server, "good-9")).session;
+            await server.Handle(Write(mini, ServerOps.CreateSave, 1, "小游戏的"), null);
+            code = (await server.Handle(Link(app, ServerOps.CreateLinkCode), null)).linkCode;
+            linked = await server.Handle(Link(mini, ServerOps.RedeemLinkCode, code, ServerOps.KeepLinked), null);
+            saves = await server.Handle(new ServerRequest { op = ServerOps.ListSaves, session = linked.session }, null);
+            Assert(saves.saves.Length == 1 && saves.saves[0].name == "手机上的", "只剩 App 的存档");
+        }
+
+        private static async Task LinkCodeRejectsBadCodes()
+        {
+            var server = new GameServer(_newStore(), WechatOptions());
+            string app = await DevLogin(server, "app-player");
+            string mini = (await WechatLogin(server, "good-3")).session;
+            string code = (await server.Handle(Link(app, ServerOps.CreateLinkCode), null)).linkCode;
+            Expect(await server.Handle(Link(app, ServerOps.RedeemLinkCode, code), null), ServerErrors.LinkSelf, "自己的码");
+            Expect(await server.Handle(Link(mini, ServerOps.RedeemLinkCode, "12ab56"), null), ServerErrors.LinkInvalid, "不是数字");
+            _now += ServerLimits.LinkCodeLifetimeMs + 1;
+            Expect(await server.Handle(Link(mini, ServerOps.RedeemLinkCode, code), null), ServerErrors.LinkInvalid, "过期的码");
+
+            string fresh = (await server.Handle(Link(app, ServerOps.CreateLinkCode), null)).linkCode;
+            string wrong = fresh == "000000" ? "000001" : "000000";
+            for (int i = 2; i < ServerLimits.MaxLinkFailures; i++)
+            {
+                Expect(await server.Handle(Link(mini, ServerOps.RedeemLinkCode, wrong), null), ServerErrors.LinkInvalid, "第 " + (i + 1) + " 次错码");
+            }
+            Expect(await server.Handle(Link(mini, ServerOps.RedeemLinkCode, fresh), null), ServerErrors.LinkLimited, "猜错太多次后连对的码也不收");
+            _now += ServerLimits.LinkFailureWindowMs;
+            fresh = (await server.Handle(Link(app, ServerOps.CreateLinkCode), null)).linkCode;
+            Expect(await server.Handle(Link(mini, ServerOps.RedeemLinkCode, fresh), null), ServerErrors.Ok, "过一会儿可以再试");
         }
 
         private static async Task JsonEntryPoint()

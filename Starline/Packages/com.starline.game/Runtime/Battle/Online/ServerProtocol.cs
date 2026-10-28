@@ -9,7 +9,7 @@ namespace Starline.Online
     /// </summary>
     public static class ServerOps
     {
-        /// <summary>Signs in (method: <see cref="LoginMethodUos"/> or <see cref="LoginMethodDev"/>); ends the account's other sessions.</summary>
+        /// <summary>Signs in (method: <see cref="LoginMethodUos"/>, <see cref="LoginMethodWechat"/> or <see cref="LoginMethodDev"/>); ends the account's other sessions.</summary>
         public const string Login = "auth.login";
         public const string Logout = "auth.logout";
         /// <summary>All save slots of the account.</summary>
@@ -21,11 +21,31 @@ namespace Starline.Online
         /// <summary>Play time and expedition counts since the last report (slot, playMs, runsStarted, runsWon).</summary>
         public const string ReportPlay = "saves.report";
 
+        /// <summary>
+        /// A one-time link code for this account (linkCode, linkExpiresAt): entered on another device,
+        /// it puts that device's login on this account, so the mini game and the app share saves.
+        /// </summary>
+        public const string CreateLinkCode = "link.create";
+        /// <summary>
+        /// Moves the caller's login onto the account of a link code (code, keep). When both accounts have
+        /// saves the answer is <see cref="ServerErrors.LinkChoice"/> until keep says which saves stay;
+        /// the others go to the deleted saves. Answers like a login: the caller's new session on that account.
+        /// </summary>
+        public const string RedeemLinkCode = "link.redeem";
+
+        /// <summary>UOS Passport: the server checks the Passport token sent along with the call.</summary>
         public const string LoginMethodUos = "uos";
+        /// <summary>WeChat mini game: code is the one-time code from wx.login, which the server exchanges for the openid.</summary>
+        public const string LoginMethodWechat = "wechat";
         public const string LoginMethodDev = "dev";
 
+        /// <summary>Values of <see cref="ServerRequest.keep"/> for <see cref="RedeemLinkCode"/>.</summary>
+        public const string KeepLinked = "linked";
+        public const string KeepMine = "mine";
+
         /// <summary>Ops that change data and therefore need an idempotency key.</summary>
-        public static bool IsWrite(string op) => op == CreateSave || op == DeleteSave || op == ReportPlay;
+        public static bool IsWrite(string op) =>
+            op == CreateSave || op == DeleteSave || op == ReportPlay || op == CreateLinkCode || op == RedeemLinkCode;
     }
 
     /// <summary>Rules the client checks for display and the server enforces.</summary>
@@ -34,6 +54,12 @@ namespace Starline.Online
         public const int SlotCount = 3;
         public const int MaxCommanderName = 8;
         public const int MaxDevAccount = 16;
+        /// <summary>Digits of a link code.</summary>
+        public const int LinkCodeLength = 6;
+        public const long LinkCodeLifetimeMs = 5 * 60 * 1000;
+        /// <summary>Wrong link codes an account may enter per <see cref="LinkFailureWindowMs"/>.</summary>
+        public const int MaxLinkFailures = 5;
+        public const long LinkFailureWindowMs = 10 * 60 * 1000;
     }
 
     /// <summary>Values of <see cref="ServerResponse.code"/>; the client shows UI.csv "server.error.&lt;code&gt;".</summary>
@@ -52,6 +78,17 @@ namespace Starline.Online
         public const string BadSlot = "bad_slot";
         public const string SlotTaken = "slot_taken";
         public const string SlotEmpty = "slot_empty";
+        /// <summary>The link code is wrong, used or expired.</summary>
+        public const string LinkInvalid = "link_invalid";
+        /// <summary>The link code belongs to the caller's own account.</summary>
+        public const string LinkSelf = "link_self";
+        /// <summary>Too many wrong link codes; try again in a few minutes.</summary>
+        public const string LinkLimited = "link_limited";
+        /// <summary>
+        /// Both accounts have saves: the answer lists the caller's saves (saves) and the other account's
+        /// (linkedSaves); send the redeem again with keep = <see cref="ServerOps.KeepLinked"/> or <see cref="ServerOps.KeepMine"/>.
+        /// </summary>
+        public const string LinkChoice = "link_choice";
         /// <summary>Too many concurrent changes to the same data; safe to retry.</summary>
         public const string Conflict = "conflict";
         public const string ServerError = "server_error";
@@ -72,6 +109,12 @@ namespace Starline.Online
         public string method;
         /// <summary>Account name for the developer login (accepted only when the server allows it).</summary>
         public string devAccount;
+        /// <summary>wx.login code (WeChat login), or the link code (link.redeem).</summary>
+        public string code;
+
+        // link.redeem
+        /// <summary><see cref="ServerOps.KeepLinked"/>, <see cref="ServerOps.KeepMine"/>, or empty while not asked.</summary>
+        public string keep;
 
         // saves.*
         public int slot;
@@ -97,6 +140,12 @@ namespace Starline.Online
         // saves.*
         public SaveInfo[] saves;
         public SaveInfo save;
+
+        // link.*
+        public string linkCode;
+        public long linkExpiresAt;
+        /// <summary>With <see cref="ServerErrors.LinkChoice"/>: the saves of the account the code belongs to.</summary>
+        public SaveInfo[] linkedSaves;
     }
 
     /// <summary>One save slot as the server stores it. Times are Unix milliseconds (UTC).</summary>

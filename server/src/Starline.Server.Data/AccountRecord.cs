@@ -16,6 +16,11 @@ namespace Starline.Server.Data
         /// <summary>Secret part of the only valid session; a new login replaces it (one device at a time).</summary>
         public string SessionSecret;
         public long SessionExpiresAt;
+        /// <summary>Wrong link codes entered since <see cref="LinkFailuresSince"/> (guards the 6-digit codes against guessing).</summary>
+        public int LinkFailures;
+        public long LinkFailuresSince;
+        /// <summary>Set when a link code moved this account's logins and saves to another account; the account is no longer used.</summary>
+        public string MergedInto;
 
         public AccountRecord Clone() => (AccountRecord)MemberwiseClone();
     }

@@ -12,6 +12,7 @@ namespace Starline.Server.Data
         private readonly Dictionary<string, string> _identities = new Dictionary<string, string>();
         private readonly Dictionary<string, SaveRecord> _saves = new Dictionary<string, SaveRecord>();
         private readonly Dictionary<string, string> _idempotent = new Dictionary<string, string>();
+        private readonly Dictionary<string, LinkCodeRecord> _links = new Dictionary<string, LinkCodeRecord>();
 
         /// <summary>Deleted saves, for tests.</summary>
         public List<SaveRecord> Archived { get; } = new List<SaveRecord>();
@@ -68,6 +69,56 @@ namespace Starline.Server.Data
                 }
                 _identities[identity] = accountId;
                 return Task.FromResult(true);
+            }
+        }
+
+        public Task<List<string>> ListIdentities(string accountId)
+        {
+            lock (_lock)
+            {
+                return Task.FromResult(_identities.Where(p => p.Value == accountId).Select(p => p.Key).OrderBy(k => k, System.StringComparer.Ordinal).ToList());
+            }
+        }
+
+        public Task<bool> MoveIdentity(string identity, string fromAccount, string toAccount)
+        {
+            lock (_lock)
+            {
+                if (!_identities.TryGetValue(identity, out string current) || current != fromAccount)
+                {
+                    return Task.FromResult(false);
+                }
+                _identities[identity] = toAccount;
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<bool> InsertLinkCode(LinkCodeRecord link)
+        {
+            lock (_lock)
+            {
+                if (_links.ContainsKey(link.Code))
+                {
+                    return Task.FromResult(false);
+                }
+                _links[link.Code] = link.Clone();
+                return Task.FromResult(true);
+            }
+        }
+
+        public Task<LinkCodeRecord> GetLinkCode(string code)
+        {
+            lock (_lock)
+            {
+                return Task.FromResult(_links.TryGetValue(code, out LinkCodeRecord l) ? l.Clone() : null);
+            }
+        }
+
+        public Task<bool> DeleteLinkCode(string code)
+        {
+            lock (_lock)
+            {
+                return Task.FromResult(_links.Remove(code));
             }
         }
 

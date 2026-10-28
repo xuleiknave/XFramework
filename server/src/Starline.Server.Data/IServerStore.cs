@@ -24,6 +24,20 @@ namespace Starline.Server.Data
         /// <summary>Links an identity to an account; false when the identity is already linked.</summary>
         Task<bool> InsertIdentity(string identity, string accountId);
 
+        /// <summary>The identities linked to an account, sorted.</summary>
+        Task<List<string>> ListIdentities(string accountId);
+
+        /// <summary>Links an identity to another account; false when it is no longer linked to <paramref name="fromAccount"/>.</summary>
+        Task<bool> MoveIdentity(string identity, string fromAccount, string toAccount);
+
+        /// <summary>False when the code is taken (expired codes included: the caller deletes those first).</summary>
+        Task<bool> InsertLinkCode(LinkCodeRecord link);
+
+        Task<LinkCodeRecord> GetLinkCode(string code);
+
+        /// <summary>Removes a code; false when it was already gone (so only one redeem can win).</summary>
+        Task<bool> DeleteLinkCode(string code);
+
         Task<SaveRecord> GetSave(string accountId, int slot);
 
         /// <summary>The account's saves, ordered by slot.</summary>
