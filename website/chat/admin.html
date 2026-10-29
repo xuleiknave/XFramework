@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>留言管理 · 星线</title>
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root {
+  --paper: #F3EAD8; --card: #F7F0E2; --ink: #1E2230; --night: #141A2A;
+  --gold: #C9A14A; --gold-hi: #E8C77A; --cinnabar: #C8402F; --azure: #2E6E8E; --muted: #7A6F5E;
+  --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "SimSun", serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.6; }
+header { background: var(--night); color: var(--paper); padding: 12px 16px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+header h1 { font-family: var(--serif); font-size: 18px; letter-spacing: .15em; margin: 0; color: var(--gold-hi); }
+header a { color: var(--paper); opacity: .8; font-size: 14px; }
+header .sp { flex: 1; }
+main { max-width: 960px; margin: 0 auto; padding: 16px; }
+.box { background: var(--card); border: 1px solid rgba(30, 34, 48, .6); padding: 16px; margin-bottom: 16px; }
+h2 { font-family: var(--serif); font-size: 17px; margin: 0 0 10px; letter-spacing: .1em; }
+input[type=text], input[type=password], textarea, select { font: inherit; font-size: 15px; padding: 7px 10px; border: 1px solid rgba(30, 34, 48, .45); background: #fff; color: var(--ink); }
+textarea { width: 100%; min-height: 70px; resize: vertical; }
+button { font: inherit; font-size: 14px; padding: 5px 14px; border: 1px solid var(--ink); background: #fff; color: var(--ink); cursor: pointer; border-radius: 3px; }
+button.primary { background: var(--cinnabar); border-color: var(--cinnabar); color: #fff; }
+button.danger { color: var(--cinnabar); border-color: var(--cinnabar); }
+button:disabled { opacity: .5; cursor: default; }
+.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.tabs button.on { background: var(--ink); color: var(--paper); }
+.toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 8px; }
+.msg { border-top: 1px solid rgba(30, 34, 48, .15); padding: 12px 0; }
+.meta { font-size: 13px; color: var(--muted); display: flex; gap: 10px; flex-wrap: wrap; align-items: baseline; }
+.meta b { color: var(--ink); font-size: 15px; }
+.badge { font-size: 12px; padding: 0 8px; border-radius: 999px; color: #fff; }
+.badge.pending { background: var(--gold); } .badge.public { background: var(--azure); } .badge.hidden { background: var(--muted); }
+.flag { color: var(--cinnabar); }
+.body { white-space: pre-wrap; word-break: break-word; margin: 6px 0; }
+.reply { border-left: 2px solid var(--gold); padding: 4px 10px; background: rgba(201, 161, 74, .12); white-space: pre-wrap; margin: 6px 0; font-size: 14px; }
+.ops { display: flex; gap: 6px; flex-wrap: wrap; }
+.reply-box { margin-top: 8px; }
+.reply-box[hidden] { display: none; }
+.tip { color: var(--muted); font-size: 13px; }
+.err { color: var(--cinnabar); font-size: 14px; min-height: 1.4em; }
+#login { max-width: 360px; margin: 60px auto; }
+#login input { width: 100%; margin-bottom: 10px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+.ban { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid rgba(30, 34, 48, .12); padding: 6px 0; font-size: 14px; }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<header>
+  <h1>星线 · 留言管理</h1>
+  <a href="./" target="_blank">打开留言板</a>
+  <span class="sp"></span>
+  <button id="logout" hidden>退出登录</button>
+</header>
+
+<form class="box" id="login">
+  <h2>后台登录</h2>
+  <input type="password" id="pwd" placeholder="管理密码" autocomplete="current-password">
+  <button class="primary" type="submit">登录</button>
+  <div class="err" id="login-err"></div>
+</form>
+
+<main id="app" hidden>
+  <section class="box">
+    <div class="tabs" id="tabs">
+      <button data-s="pending">待审核 <span data-c="pending"></span></button>
+      <button data-s="public">已公开 <span data-c="public"></span></button>
+      <button data-s="hidden">已隐藏 <span data-c="hidden"></span></button>
+      <button data-s="">全部</button>
+    </div>
+    <div class="toolbar">
+      <input type="text" id="q" placeholder="搜索内容、昵称或 IP">
+      <button id="search">搜索</button>
+      <button id="reload">刷新</button>
+    </div>
+    <div id="list"></div>
+    <button id="more" hidden>更早的</button>
+  </section>
+
+  <div class="grid">
+    <section class="box">
+      <h2>以开发者身份发言</h2>
+      <textarea id="announce" placeholder="会以“开发者”名义出现在留言板最上面"></textarea>
+      <button class="primary" id="announce-send">发布</button>
+      <div class="err" id="announce-err"></div>
+    </section>
+
+    <section class="box">
+      <h2>设置</h2>
+      <p><label><input type="checkbox" id="s-open"> 开放留言</label></p>
+      <p>审核方式：<select id="s-mod">
+        <option value="flagged">只审核命中敏感词或广告的</option>
+        <option value="all">所有留言都先审核</option>
+      </select></p>
+      <p>置顶公告（留空不显示）：<textarea id="s-notice"></textarea></p>
+      <p>追加敏感词（一行一个，命中后进入待审核）：<textarea id="s-words"></textarea></p>
+      <button class="primary" id="s-save">保存设置</button>
+      <div class="err" id="s-err"></div>
+    </section>
+
+    <section class="box">
+      <h2>封禁的 IP</h2>
+      <div id="bans" class="tip">无</div>
+    </section>
+
+    <section class="box">
+      <h2>修改管理密码</h2>
+      <input type="password" id="old-pwd" placeholder="原密码" autocomplete="current-password"><br><br>
+      <input type="password" id="new-pwd" placeholder="新密码（至少 10 位）" autocomplete="new-password"><br><br>
+      <button id="pwd-save">修改</button>
+      <div class="err" id="pwd-err"></div>
+    </section>
+  </div>
+</main>
+
+<script>
+(() => {
+  const API = '/api';
+  const $ = id => document.getElementById(id);
+  let token = '';
+  try { token = sessionStorage.getItem('starline-admin') || ''; } catch (e) {}
+  let status = 'pending', oldest = null;
+
+  const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  const fmt = ms => new Date(ms).toLocaleString('zh-CN', { hour12: false });
+
+  async function api(path, opts = {}) {
+    const res = await fetch(API + path, {
+      method: opts.method || 'GET',
+      headers: Object.assign({ 'Authorization': 'Bearer ' + token }, opts.body ? { 'Content-Type': 'application/json' } : {}),
+      body: opts.body ? JSON.stringify(opts.body) : undefined,
+      cache: 'no-store',
+    });
+    if (res.status === 401 && path !== '/admin/login' && path !== '/admin/password') { showLogin(); throw new Error('登录已过期'); }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || ('请求失败 ' + res.status));
+    return data;
+  }
+
+  function showLogin() {
+    token = ''; try { sessionStorage.removeItem('starline-admin'); } catch (e) {}
+    $('app').hidden = true; $('logout').hidden = true; $('login').hidden = false;
+  }
+  function showApp() {
+    $('app').hidden = false; $('logout').hidden = false; $('login').hidden = true;
+    loadList(false); loadSettings(); loadBans();
+  }
+
+  $('login').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    $('login-err').textContent = '';
+    try {
+      const d = await api('/admin/login', { method: 'POST', body: { password: $('pwd').value } });
+      token = d.token; try { sessionStorage.setItem('starline-admin', token); } catch (e) {}
+      $('pwd').value = '';
+      showApp();
+    } catch (e) { $('login-err').textContent = e.message; }
+  });
+  $('logout').onclick = showLogin;
+
+  function renderMsg(m) {
+    const box = el('div', 'msg');
+    const meta = el('div', 'meta');
+    meta.append(el('b', '', m.name), el('span', 'badge ' + m.status, { pending: '待审核', public: '已公开', hidden: '已隐藏' }[m.status]));
+    meta.append(el('span', '', fmt(m.createdAt)), el('span', '', 'IP ' + m.ip + (m.banned ? '（已封禁）' : '')));
+    if (m.flag) meta.append(el('span', 'flag', m.flag));
+    box.append(meta, el('div', 'body', m.content));
+    if (m.reply) box.append(el('div', 'reply', '回复：' + m.reply));
+
+    const ops = el('div', 'ops');
+    const act = (label, fn, cls) => { const b = el('button', cls || '', label); b.onclick = async () => { b.disabled = true; try { await fn(); } catch (e) { alert(e.message); } b.disabled = false; }; ops.append(b); };
+    if (m.status !== 'public') act('公开', () => api('/admin/messages/' + m.id + '/status', { method: 'POST', body: { status: 'public' } }).then(() => loadList(false)), 'primary');
+    if (m.status !== 'hidden') act('隐藏', () => api('/admin/messages/' + m.id + '/status', { method: 'POST', body: { status: 'hidden' } }).then(() => loadList(false)));
+    const rb = el('div', 'reply-box'); rb.hidden = true;
+    const ta = el('textarea'); ta.value = m.reply || '';
+    const save = el('button', 'primary', '保存回复');
+    save.onclick = async () => { try { await api('/admin/messages/' + m.id + '/reply', { method: 'POST', body: { reply: ta.value } }); loadList(false); } catch (e) { alert(e.message); } };
+    rb.append(ta, save, el('span', 'tip', ' 清空后保存即删除回复'));
+    act(m.reply ? '改回复' : '回复', async () => { rb.hidden = !rb.hidden; if (!rb.hidden) ta.focus(); });
+    if (!m.isDev && !m.banned) act('封 IP 并隐藏其全部留言', async () => {
+      if (!confirm('封禁 ' + m.ip + '，并隐藏这个 IP 的所有留言？')) return;
+      await api('/admin/bans', { method: 'POST', body: { messageId: m.id, hideAll: true, reason: m.content.slice(0, 40) } });
+      loadList(false); loadBans();
+    }, 'danger');
+    act('删除', async () => {
+      if (!confirm('永久删除这条留言？')) return;
+      await api('/admin/messages/' + m.id, { method: 'DELETE' }); loadList(false);
+    }, 'danger');
+    box.append(ops, rb);
+    return box;
+  }
+
+  async function loadList(more) {
+    const qs = new URLSearchParams();
+    if (status) qs.set('status', status);
+    if ($('q').value.trim()) qs.set('q', $('q').value.trim());
+    if (more && oldest) qs.set('before', oldest);
+    const d = await api('/admin/messages?' + qs);
+    if (!more) $('list').textContent = '';
+    d.items.forEach(m => $('list').append(renderMsg(m)));
+    if (!$('list').children.length) $('list').append(el('p', 'tip', '这里没有留言。'));
+    oldest = d.items.length ? d.items[d.items.length - 1].id : oldest;
+    $('more').hidden = d.items.length < 50;
+    document.querySelectorAll('[data-c]').forEach(s => { s.textContent = '(' + (d.counts[s.dataset.c] || 0) + ')'; });
+    document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.s === status));
+  }
+
+  document.querySelectorAll('#tabs button').forEach(b => b.onclick = () => { status = b.dataset.s; loadList(false); });
+  $('search').onclick = () => loadList(false);
+  $('q').addEventListener('keydown', e => { if (e.key === 'Enter') loadList(false); });
+  $('reload').onclick = () => loadList(false);
+  $('more').onclick = () => loadList(true);
+
+  $('announce-send').onclick = async () => {
+    $('announce-err').textContent = '';
+    try { await api('/admin/announce', { method: 'POST', body: { reply: $('announce').value } }); $('announce').value = ''; $('announce-err').textContent = '已发布'; loadList(false); }
+    catch (e) { $('announce-err').textContent = e.message; }
+  };
+
+  async function loadSettings() {
+    const s = await api('/admin/settings');
+    $('s-open').checked = s.open; $('s-mod').value = s.moderation; $('s-notice').value = s.notice; $('s-words').value = s.extraWords;
+  }
+  $('s-save').onclick = async () => {
+    $('s-err').textContent = '';
+    try {
+      await api('/admin/settings', { method: 'POST', body: { open: $('s-open').checked, moderation: $('s-mod').value, notice: $('s-notice').value, extraWords: $('s-words').value } });
+      $('s-err').textContent = '已保存';
+    } catch (e) { $('s-err').textContent = e.message; }
+  };
+
+  async function loadBans() {
+    const list = await api('/admin/bans');
+    const box = $('bans'); box.textContent = '';
+    if (!list.length) { box.textContent = '无'; return; }
+    list.forEach(b => {
+      const row = el('div', 'ban');
+      row.append(el('span', '', b.ip + (b.reason ? '：' + b.reason : '')));
+      const btn = el('button', '', '解封');
+      btn.onclick = async () => { await api('/admin/bans/' + encodeURIComponent(b.ip), { method: 'DELETE' }); loadBans(); loadList(false); };
+      row.append(btn); box.append(row);
+    });
+  }
+
+  $('pwd-save').onclick = async () => {
+    $('pwd-err').textContent = '';
+    try {
+      await api('/admin/password', { method: 'POST', body: { old: $('old-pwd').value, new: $('new-pwd').value } });
+      alert('密码已修改，请用新密码重新登录。'); $('old-pwd').value = $('new-pwd').value = ''; showLogin();
+    } catch (e) { $('pwd-err').textContent = e.message; }
+  };
+
+  if (token) showApp(); else showLogin();
+})();
+</script>
+</body>
+</html>

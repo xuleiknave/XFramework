@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>留言板 · 星线</title>
+<meta name="description" content="给《星线》开发者留言：玩法建议、问题反馈、想看的内容都可以写在这里。">
+<meta name="theme-color" content="#141A2A">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<style>
+:root {
+  --paper: #F3EAD8;
+  --paper-deep: #E8DCC2;
+  --ink: #1E2230;
+  --night: #141A2A;
+  --night-2: #232B40;
+  --gold: #C9A14A;
+  --gold-hi: #E8C77A;
+  --cinnabar: #C8402F;
+  --azure: #2E6E8E;
+  --muted: #7A6F5E;
+  --serif: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif;
+  --sans: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--sans); line-height: 1.75; -webkit-font-smoothing: antialiased; }
+a { color: inherit; }
+h1, h2 { font-family: var(--serif); font-weight: 700; margin: 0; }
+
+.top {
+  background: radial-gradient(ellipse at 50% 0%, var(--night-2) 0%, var(--night) 70%);
+  color: var(--paper); padding: 18px 20px 56px; text-align: center;
+}
+.top nav { display: flex; justify-content: space-between; align-items: center; max-width: 760px; margin: 0 auto 36px; }
+.top nav a { text-decoration: none; opacity: .85; font-size: 15px; }
+.top nav a:hover { opacity: 1; color: var(--gold-hi); }
+.top .brand { font-family: var(--serif); font-size: 20px; letter-spacing: .2em; }
+.top h1 { color: var(--gold-hi); font-size: clamp(30px, 7vw, 44px); letter-spacing: .2em; margin-right: -.2em; }
+.top p { opacity: .78; margin: 10px auto 0; max-width: 520px; font-size: 15px; }
+
+main { max-width: 760px; margin: -32px auto 0; padding: 0 16px 80px; position: relative; }
+.panel { background: #F7F0E2; border: 1px solid var(--ink); padding: 22px clamp(16px, 4vw, 28px); }
+.notice { background: rgba(201, 161, 74, .14); border-left: 3px solid var(--gold); padding: 10px 14px; margin-bottom: 16px; white-space: pre-wrap; font-size: 15px; }
+.notice:empty { display: none; }
+label { display: block; font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+input[type=text], textarea {
+  width: 100%; font: inherit; font-size: 16px; color: var(--ink); background: var(--paper);
+  border: 1px solid rgba(30, 34, 48, .5); padding: 10px 12px; border-radius: 0;
+}
+input[type=text]:focus, textarea:focus { outline: 2px solid var(--gold); outline-offset: -1px; }
+textarea { min-height: 120px; resize: vertical; }
+.row { margin-bottom: 14px; }
+.hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.actions { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.btn {
+  padding: 10px 30px; border-radius: 999px; font-size: 16px; letter-spacing: .15em; font-family: var(--serif);
+  cursor: pointer; border: 0; background: var(--cinnabar); color: var(--paper);
+}
+.btn:hover { background: #d44a38; }
+.btn:disabled { opacity: .55; cursor: default; }
+.count { color: var(--muted); font-size: 13px; margin-left: auto; }
+.status { font-size: 14px; min-height: 1.5em; margin-top: 10px; }
+.status.err { color: var(--cinnabar); }
+.status.ok { color: var(--azure); }
+
+.list-head { display: flex; align-items: baseline; justify-content: space-between; margin: 40px 0 12px; }
+.list-head h2 { font-size: 22px; letter-spacing: .12em; }
+.list-head span { color: var(--muted); font-size: 13px; }
+.msg { border-bottom: 1px solid rgba(30, 34, 48, .15); padding: 16px 2px; }
+.msg .meta { display: flex; gap: 10px; align-items: baseline; font-size: 14px; }
+.msg .name { font-weight: 700; }
+.msg .time { color: var(--muted); font-size: 12px; }
+.msg .body { white-space: pre-wrap; word-break: break-word; margin-top: 4px; }
+.msg.dev { background: rgba(46, 110, 142, .07); padding-left: 12px; padding-right: 12px; border-left: 3px solid var(--azure); }
+.tag { font-size: 12px; color: var(--paper); background: var(--azure); padding: 0 8px; border-radius: 999px; }
+.reply { margin: 10px 0 0 14px; padding: 8px 12px; border-left: 2px solid var(--gold); background: rgba(201, 161, 74, .1); font-size: 15px; }
+.reply .who { font-size: 13px; color: var(--azure); font-weight: 700; }
+.reply .body { margin: 0; }
+.mine { opacity: .7; }
+.mine .time::after { content: " · 审核中，只有你能看到"; color: var(--gold); }
+.empty { color: var(--muted); text-align: center; padding: 40px 0; }
+.more { display: block; margin: 20px auto 0; background: none; border: 1px solid var(--gold); color: var(--ink); padding: 8px 26px; border-radius: 999px; cursor: pointer; font: inherit; }
+.more[hidden] { display: none; }
+footer { text-align: center; color: var(--muted); font-size: 13px; padding: 0 20px 40px; }
+</style>
+</head>
+<body>
+<header class="top">
+  <nav><a class="brand" href="../">星线</a><a href="../">返回官网</a></nav>
+  <h1>留言板</h1>
+  <p>玩法建议、遇到的问题、想看的内容，都可以写给开发者。开发者会在这里回复。</p>
+</header>
+
+<main>
+  <form class="panel" id="form" autocomplete="off">
+    <div class="notice" id="notice"></div>
+    <div class="row">
+      <label for="name">昵称</label>
+      <input type="text" id="name" maxlength="20" required placeholder="怎么称呼你">
+    </div>
+    <div class="row">
+      <label for="content">留言</label>
+      <textarea id="content" maxlength="500" required placeholder="写下你的想法（最多 500 字）"></textarea>
+    </div>
+    <div class="hp" aria-hidden="true"><label for="website">网址</label><input type="text" id="website" tabindex="-1"></div>
+    <div class="actions">
+      <button class="btn" id="send" type="submit">发送</button>
+      <span class="count" id="count">0 / 500</span>
+    </div>
+    <div class="status" id="status" role="status"></div>
+  </form>
+
+  <div class="list-head"><h2>大家的留言</h2><span id="refresh-tip">每 30 秒自动刷新</span></div>
+  <div id="list"><div class="empty">加载中…</div></div>
+  <button class="more" id="more" hidden>更早的留言</button>
+</main>
+<footer>请文明留言。含广告、联系方式或不当内容的留言会先经过审核。</footer>
+
+<script>
+(() => {
+  const API = '/api';
+  const $ = id => document.getElementById(id);
+  const form = $('form'), nameEl = $('name'), contentEl = $('content'), statusEl = $('status');
+  let formToken = '', oldest = null;
+  const mine = [];
+
+  const fmt = ms => {
+    const d = new Date(ms), now = new Date();
+    const p = n => String(n).padStart(2, '0');
+    const hm = p(d.getHours()) + ':' + p(d.getMinutes());
+    if (d.toDateString() === now.toDateString()) return '今天 ' + hm;
+    return (d.getFullYear() === now.getFullYear() ? '' : d.getFullYear() + '-') + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + hm;
+  };
+
+  const el = (tag, cls, text) => {
+    const e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  };
+
+  function render(m, extraCls) {
+    const box = el('div', 'msg' + (m.isDev ? ' dev' : '') + (extraCls ? ' ' + extraCls : ''));
+    const meta = el('div', 'meta');
+    meta.append(m.isDev ? el('span', 'tag', '开发者') : el('span', 'name', m.name));
+    meta.append(el('span', 'time', fmt(m.createdAt)));
+    box.append(meta, el('p', 'body', m.content));
+    if (m.reply) {
+      const r = el('div', 'reply');
+      r.append(el('div', 'who', '开发者回复 · ' + fmt(m.replyAt)), el('p', 'body', m.reply));
+      box.append(r);
+    }
+    return box;
+  }
+
+  async function load(more) {
+    try {
+      const url = API + '/messages' + (more && oldest ? '?before=' + oldest : '');
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error(res.status);
+      const data = await res.json();
+      formToken = data.formToken;
+      $('notice').textContent = data.notice || '';
+      if (!data.open) {
+        $('send').disabled = true;
+        statusEl.textContent = '留言板暂时关闭，可以先看看大家的留言。';
+      }
+      const list = $('list');
+      if (!more) {
+        list.textContent = '';
+        mine.forEach(m => list.append(render(m, 'mine')));
+      }
+      data.items.forEach(m => list.append(render(m)));
+      if (data.items.length) {
+        oldest = data.items[data.items.length - 1].id;
+      }
+      if (!list.children.length) list.append(el('div', 'empty', '还没有留言，来做第一个吧。'));
+      $('more').hidden = data.items.length < 30;
+    } catch (e) {
+      if (!more) $('list').replaceChildren(el('div', 'empty', '留言加载失败，请稍后刷新。'));
+    }
+  }
+
+  contentEl.addEventListener('input', () => { $('count').textContent = contentEl.value.length + ' / 500'; });
+  try { nameEl.value = localStorage.getItem('starline-chat-name') || ''; } catch (e) {}
+
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const name = nameEl.value.trim(), content = contentEl.value.trim();
+    if (!name || content.length < 2) { statusEl.className = 'status err'; statusEl.textContent = '请填写昵称和至少 2 个字的留言。'; return; }
+    $('send').disabled = true;
+    statusEl.className = 'status'; statusEl.textContent = '发送中…';
+    try {
+      const res = await fetch(API + '/messages', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, content, t: formToken, website: $('website').value }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || '发送失败，请稍后再试。');
+      try { localStorage.setItem('starline-chat-name', name); } catch (e) {}
+      contentEl.value = ''; $('count').textContent = '0 / 500';
+      statusEl.className = 'status ok';
+      if (data.status === 'public') {
+        statusEl.textContent = '已发送，谢谢你的留言！';
+      } else {
+        statusEl.textContent = '已收到，审核通过后会公开显示。';
+        mine.unshift({ name, content, createdAt: Date.now() });
+      }
+      await load(false);
+    } catch (e) {
+      statusEl.className = 'status err';
+      statusEl.textContent = e.message;
+    } finally {
+      $('send').disabled = false;
+    }
+  });
+
+  let pagedBack = false;
+  $('more').addEventListener('click', () => { pagedBack = true; load(true); });
+  load(false);
+  // 页面可见且没翻到更早的留言时才自动刷新，避免把正在看的旧留言冲掉
+  setInterval(() => { if (!document.hidden && !pagedBack) load(false); }, 30000);
+})();
+</script>
+</body>
+</html>
