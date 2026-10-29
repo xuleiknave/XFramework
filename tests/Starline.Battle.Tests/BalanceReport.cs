@@ -253,9 +253,9 @@ namespace Starline.Battle.Tests
         {
             switch (f)
             {
-                case Faction.Morningstar: return "玄武营";
-                case Faction.Rangers: return "白虎游骑";
-                case Faction.Silvermoon: return "朱雀司天监";
+                case Faction.Morningstar: return "守星军";
+                case Faction.Rangers: return "逐星骑";
+                case Faction.Silvermoon: return "司星监";
                 case Faction.Undead: return "墨蚀者";
                 case Faction.Elves: return "青丘灵族";
                 default: return "—";
@@ -764,9 +764,9 @@ namespace Starline.Battle.Tests
             var armies = new List<(string name, Formation f)>
             {
                 ("标准混编", Reference()),
-                ("玄武营为主：2 玄甲将 + 4 鹤骑", Squad(("battleship", 2, 1), ("strike_craft", 4, 1))),
-                ("白虎游骑为主：3 游侠 + 6 连弩手", Squad(("frigate", 3, 1), ("pd_ship", 6, 1))),
-                ("司天监为主：4 星术士 + 1 游侠 + 2 连弩手", Squad(("missile_ship", 4, 1), ("frigate", 1, 1), ("pd_ship", 2, 1))),
+                ("守星军为主：2 玄甲将 + 4 鹤骑", Squad(("battleship", 2, 1), ("strike_craft", 4, 1))),
+                ("逐星骑为主：3 游侠 + 6 连弩手", Squad(("frigate", 3, 1), ("pd_ship", 6, 1))),
+                ("司星监为主：4 星术士 + 1 游侠 + 2 连弩手", Squad(("missile_ship", 4, 1), ("frigate", 1, 1), ("pd_ship", 2, 1))),
             };
             var terrains = new List<TerrainDef>(TerrainCatalog.Terrains);
             var header = new StringBuilder("| 我方阵容 | 墨蚀者阵容 | 无地形 |");
@@ -871,7 +871,7 @@ namespace Starline.Battle.Tests
                 md.AppendLine(row.ToString());
             }
             md.AppendLine();
-            md.AppendLine("飞骑不吃地块；墨泥只对墨蚀者生效；流沙对白虎游骑、沼泽对青丘灵族无效。");
+            md.AppendLine("飞骑不吃地块；墨泥只对墨蚀者生效；流沙对逐星骑、沼泽对青丘灵族无效。");
             md.AppendLine();
         }
     }

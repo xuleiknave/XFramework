@@ -23,7 +23,7 @@ unit.brood_mother.name,墨聚巨灵,,
 unit.wreck_fortress.name,墨城,,
 skill.OrbitalStrike.name,星落,,
 skill.OrbitalStrike.description,选择落点，1 秒后对范围内敌人造成大量伤害,"Choose a point. After 1 second, enemies in the area take heavy damage.",
-skill.EmergencyShield.name,玄武盾,,
+skill.EmergencyShield.name,星盾,,
 skill.EmergencyShield.description,全体恢复一半护盾,Restores half of every ally's shield.,
 encounter.patrol.name,蚀爪巡逻队,,
 encounter.patrol.briefing,望星城外的第一颗星石被一小队蚀爪占着。把它们赶走。,,
@@ -99,7 +99,7 @@ tile.deep_water.name,深水,,地块名
 tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的星石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
 tile.deep_water.effect1,移速 −60%,,地块第 1 条效果的简短说明
 tile.quicksand.name,流沙,,地块名
-tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的白虎游骑不受影响。,,地块说明（布阵时显示）
+tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的逐星骑不受影响。,,地块说明（布阵时显示）
 tile.quicksand.effect1,移速 −40%,,地块第 1 条效果的简短说明
 tile.marsh.name,沼泽,,地块名
 tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；青丘灵族不受影响。,,地块说明（布阵时显示）
@@ -119,15 +119,15 @@ tile.drained.description,灵力被吸干的土地。站在上面不算接入星�
 terrain.plains.name,城郊草原,,战场环境名
 terrain.plains.description,望星城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
 terrain.forest.name,古木山林,,战场环境名
-terrain.forest.description,白虎游骑守了多年的山林。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
-terrain.forest.effect1,白虎游骑、青丘灵族移速 +15%,,战场环境第 1 条效果的简短说明
+terrain.forest.description,逐星骑守了多年的山林。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
+terrain.forest.effect1,逐星骑、青丘灵族移速 +15%,,战场环境第 1 条效果的简短说明
 terrain.forest.effect2,远程射程 −1 格（树冠遮挡）,,战场环境第 2 条效果的简短说明
 terrain.forest.effect3,重装移速 −10%,,战场环境第 3 条效果的简短说明
 terrain.desert.name,灰沙荒漠,,战场环境名
 terrain.desert.description,永夜吸干了城池的灵力，田野化成了灰沙。,,战场环境说明（布阵时显示）
-terrain.desert.effect1,地面部队移速 −10%（白虎游骑不受影响）,,战场环境第 1 条效果的简短说明
+terrain.desert.effect1,地面部队移速 −10%（逐星骑不受影响）,,战场环境第 1 条效果的简短说明
 terrain.desert.effect2,灵力枯竭：接入星络时灵力恢复 −40%（墨蚀者不受影响）,,战场环境第 2 条效果的简短说明
 terrain.lake.name,湖心枢纽,,战场环境名
 terrain.lake.description,建在湖心的星石枢纽，夜色里只有星石在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
 terrain.lake.effect1,夜战：远程射程 −1 格,,战场环境第 1 条效果的简短说明
-terrain.lake.effect2,背水守护：玄武营护盾回复 +30%,,战场环境第 2 条效果的简短说明
+terrain.lake.effect2,背水守护：守星军护盾回复 +30%,,战场环境第 2 条效果的简短说明

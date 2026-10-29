@@ -9,16 +9,16 @@ story.chapter.1.title,第 1 章 · 望星城,,
 story.chapter.1.summary,第一次出城，点亮最近的星石。,,章节选择界面的一句话简介
 story.chapter.1.hook,点亮的星石里传出墨蚀者的低语：“让我们回家。”,,章末钩子，最后一关结束对话的最后一句
 story.chapter.1.boss,蚀爪头目,,章末 Boss
-story.chapter.2.title,第 2 章 · 白虎岭,,
-story.chapter.2.summary,白虎游骑在山岭里独自抵抗墨蚀者，答应与远征军合作。,,
+story.chapter.2.title,第 2 章 · 逐星岭,,
+story.chapter.2.summary,逐星骑在山岭里独自抵抗墨蚀者，答应与远征军合作。,,
 story.chapter.2.hook,墨聚巨灵莫大倒下时，喊出了自己生前的名字。,,莫大由许多人聚成，英文用复数
 story.chapter.2.boss,墨聚巨灵莫大,,
 story.chapter.3.title,第 3 章 · 墨城,,
 story.chapter.3.summary,攻下墨蚀者占据的墨城；林大师在废墟里唤醒了第一个墨蚀者灰爪。,,
-story.chapter.3.hook,墨城核心里刻着朱雀司天监的星印：墨蚀者背后有术士。,,
+story.chapter.3.hook,墨城核心里刻着司星监的星印：墨蚀者背后有术士。,,
 story.chapter.3.boss,墨城,,
-story.chapter.4.title,第 4 章 · 朱雀台,,
-story.chapter.4.summary,解朱雀台之围，救出朱弦和闻道少监。,,
+story.chapter.4.title,第 4 章 · 司星台,,
+story.chapter.4.summary,解司星台之围，救出朱弦和闻道少监。,,
 story.chapter.4.hook,唤醒的墨歌姬薛薇唱起一首古老的织网者之歌，阿织跟着哼了出来。,,
 story.chapter.4.boss,墨歌姬薛薇,,
 story.chapter.5.title,第 5 章 · 饥城,,
@@ -41,9 +41,9 @@ story.chapter.9.title,第 9 章 · 初源星石,,
 story.chapter.9.summary,决战永夜之主沈寂，再直面永夜本身。五根线齐了，重织星线。,,
 story.chapter.9.boss,永夜之主 → 永夜之心,,两段式 Boss
 story.thread.guardian.name,守护之线,Thread of Guardianship,
-story.thread.guardian.obtain,第 1 章，玄武营在点亮的第一颗星石前立誓。,,星图线槽的说明
+story.thread.guardian.obtain,第 1 章，守星军在点亮的第一颗星石前立誓。,,星图线槽的说明
 story.thread.freedom.name,自由之线,Thread of Freedom,
-story.thread.freedom.obtain,第 2 章，白虎游骑答应合作。,,
+story.thread.freedom.obtain,第 2 章，逐星骑答应合作。,,
 story.thread.redemption.name,救赎之线,Thread of Redemption,
 story.thread.redemption.obtain,第 3 章，被唤醒的灰爪自愿留下。,Chapter 3: the awakened Greyclaw chooses to stay.,
 story.thread.knowledge.name,知识之线,Thread of Knowledge,
@@ -57,7 +57,7 @@ story.lore.seal.body,"一千年前，大地深处醒来一股吞食灵力的饥�
 
 这张网只用了两根线：人间术士的知识和青丘灵族的信任。它没有把所有人连起来，只靠一名织网者在初源星石里独自撑着。千年过去，人们忘了星线是封印，只记得它是城池的灯火、结界和田地的来源。",,档案馆条目正文
 story.lore.severance.title,断线日,Severance Day,
-story.lore.severance.body,"星历四百一十二年，朱雀司天监的前任监正沈寂打开了初源星石。星线从源头开始被吸干，失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人成了墨蚀者。这一天叫断线日。
+story.lore.severance.body,"星历四百一十二年，司星监的前任监正沈寂打开了初源星石。星线从源头开始被吸干，失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人成了墨蚀者。这一天叫断线日。
 
 墨蚀者不是天生的妖魔：他们是陷落城池的百姓和守军，记忆被墨色封住，只剩下饥饿。",,第 6 章之前不能写出沈寂的真实动机
 story.lore.lighthaven.title,望星城,,
@@ -86,9 +86,9 @@ story.ending.knot.greyclaw,灰爪：救赎之线。我跑回来了，这次不�
 story.ending.knot.vera,涂山薇：信任之线。一千年前你信了我们，现在轮到我们信你。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.nova_last,阿织：星线不断，我们就不散。,,阿织的最后一句，宣传语的变体
 story.ending.epilogue.title,后来,Afterwards,结局第 3 步标题
-story.ending.epilogue.knights,玄武营重建了城墙上的功勋碑。第一行刻的是雷震老将军的名字，第二行空着，留给下一个守住星石的人。,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.rangers,白虎游骑又散回了山林里。只是现在，每座营地的篝火旁都多留了一个位子，等走远的人回来。,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.mages,朱雀司天监打开了藏书阁的大门。门口挂着一块新匾：“谁都可以进来。”,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.knights,守星军重建了城墙上的功勋碑。第一行刻的是雷震老将军的名字，第二行空着，留给下一个守住星石的人。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.rangers,逐星骑又散回了山林里。只是现在，每座营地的篝火旁都多留了一个位子，等走远的人回来。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.mages,司星监打开了藏书阁的大门。门口挂着一块新匾：“谁都可以进来。”,,草案：story.md 只写了要点，这句是新写的
 story.ending.epilogue.undead,被唤醒的墨蚀者回到了各自的城池。有的人认出了他们，有的人没有，但城门都开着。,,草案：story.md 只写了要点，这句是新写的
 story.ending.epilogue.elves,青丘灵族在望星城外种下了一片小树林。人的孩子和青丘的孩子在里面一起长大，谁也不记得那里曾经是战场。,,草案：story.md 只写了要点，这句是新写的
 story.ending.epilogue.rayne_farewell,雷震：两个孩子，都长大了。星石没有熄，我可以放心了。,,草案：story.md 只写了要点，这句是新写的；招募了雷震英灵才有的告别戏
