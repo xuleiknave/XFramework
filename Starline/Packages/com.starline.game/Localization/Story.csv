@@ -1,65 +1,65 @@
 key,zh-Hans,en,note
 story.act.1.title,第一幕 · 边州,,
-story.act.1.question,墨蚀者到底是什么？,,这一幕要回答的问题，章节选择界面的副标题
+story.act.1.question,妖魔到底是什么？,,这一幕要回答的问题，章节选择界面的副标题
 story.act.2.title,第二幕 · 中原,,
 story.act.2.question,谁打开了初源，为什么？,"Who opened the Prime, and why?",
 story.act.3.title,第三幕 · 永夜之地,Act III · The Land of Endless Night,
 story.act.3.question,阿织是谁，要付出什么？,,
 story.chapter.1.title,第 1 章 · 望星城,,
 story.chapter.1.summary,第一次出城，点亮最近的星石。,,章节选择界面的一句话简介
-story.chapter.1.hook,点亮的星石里传出墨蚀者的低语：“让我们回家。”,,章末钩子，最后一关结束对话的最后一句
-story.chapter.1.boss,蚀爪头目,,章末 Boss
-story.chapter.2.title,第 2 章 · 逐星岭,,
-story.chapter.2.summary,逐星骑在山岭里独自抵抗墨蚀者，答应与远征军合作。,,
-story.chapter.2.hook,墨聚巨灵莫大倒下时，喊出了自己生前的名字。,,莫大由许多人聚成，英文用复数
-story.chapter.2.boss,墨聚巨灵莫大,,
-story.chapter.3.title,第 3 章 · 墨城,,
-story.chapter.3.summary,攻下墨蚀者占据的墨城；林大师在废墟里唤醒了第一个墨蚀者灰爪。,,
-story.chapter.3.hook,墨城核心里刻着司星监的星印：墨蚀者背后有术士。,,
-story.chapter.3.boss,墨城,,
-story.chapter.4.title,第 4 章 · 司星台,,
-story.chapter.4.summary,解司星台之围，救出朱弦和闻道少监。,,
+story.chapter.1.hook,点亮的星石里传出妖怪的低语：“让我们回家。”,,章末钩子，最后一关结束对话的最后一句
+story.chapter.1.boss,小妖头目,,章末 Boss
+story.chapter.2.title,第 2 章 · 花果山,,
+story.chapter.2.summary,坠落的奎宿化成狼妖占了水帘洞，流元帅带着猴兵死守，答应与远征军合作。,,
+story.chapter.2.hook,奎木狼倒下时望着天空，说出了自己在天上的星位。,,奎木狼由许多人聚成，英文用复数
+story.chapter.2.boss,奎木狼,,
+story.chapter.3.title,第 3 章 · 黑风岭,,
+story.chapter.3.summary,攻下妖魔占据的黑风妖城；林大师在废墟里唤醒了第一个小妖灰爪。,,
+story.chapter.3.hook,妖城的炉心里刻着兜率宫的丹印：妖魔背后有炼丹的人。,,
+story.chapter.3.boss,黑风妖城,,
+story.chapter.4.title,第 4 章 · 兜率下院,,
+story.chapter.4.summary,解兜率宫人间下院之围，救出朱弦和闻道。,,
 story.chapter.4.hook,唤醒的墨歌姬薛薇唱起一首古老的织网者之歌，阿织跟着哼了出来。,,
 story.chapter.4.boss,墨歌姬薛薇,,
 story.chapter.5.title,第 5 章 · 饥城,,
-story.chapter.5.summary,墨蚀者吞食星石，越来越强；噬灵者柯思原来是被困的守城术士。孟婉在墨魂群里找到了妹妹。,,
+story.chapter.5.summary,妖魔吞食星石，越来越强；黄风怪原来是被困在城里的看石人。孟婉在阴风怪里找到了妹妹。,,
 story.chapter.5.hook,阿织的光第一次明显变暗。她说没事，林大师不信。,,
-story.chapter.5.boss,噬灵者群,,
+story.chapter.5.boss,噬灵妖群,,
 story.chapter.6.title,第 6 章 · 雷震的最后一夜,,
-story.chapter.6.summary,噬星蛟袭击星石枢纽，雷震老将军为守住星石牺牲。闻道说出了沈寂的真相。,,
+story.chapter.6.summary,九头虫袭击星石枢纽，雷震老将军为守住星石牺牲。闻道说出了沈寂的真相。,,
 story.chapter.6.hook,沈寂手稿的最后一页写着：“最后一位织网者，在望星城。”,,
-story.chapter.6.boss,噬星蛟,,
-story.chapter.7.title,第 7 章 · 青丘雾林,,
-story.chapter.7.summary,青丘以为人又来抢星石，双方交战；阿图和老槐的旧交让战斗停了下来。,,
-story.chapter.7.hook,涂山薇见到阿织，单膝跪下，叫出了她的名字。,,
-story.chapter.7.boss,老槐,,
+story.chapter.6.boss,九头虫,,
+story.chapter.7.title,第 7 章 · 东海雾岛,,
+story.chapter.7.summary,龙宫以为人又来抢星石，双方交战；马元帅和龟丞相的旧交让战斗停了下来。,,
+story.chapter.7.hook,敖鸾见到阿织，单膝跪下，叫出了她的名字。,,
+story.chapter.7.boss,龟丞相,,
 story.chapter.8.title,第 8 章 · 初源之路,Chapter 8 · The Road to the Prime,
-story.chapter.8.summary,人与青丘重立织网者之约，击败墨骑万仞。,,
+story.chapter.8.summary,人与龙宫重立织网者之约，击败牛魔王。在初源门口，远征军看见了一根金箍棒和一只石猴。,,
 story.chapter.8.hook,阿织对持线人说：“到了初源，就让我留下吧。”,,
-story.chapter.8.boss,墨骑万仞,,
+story.chapter.8.boss,牛魔王,,
 story.chapter.9.title,第 9 章 · 初源星石,,
 story.chapter.9.summary,决战永夜之主沈寂，再直面永夜本身。五根线齐了，重织星线。,,
 story.chapter.9.boss,永夜之主 → 永夜之心,,两段式 Boss
 story.thread.guardian.name,守护之线,Thread of Guardianship,
-story.thread.guardian.obtain,第 1 章，守星军在点亮的第一颗星石前立誓。,,星图线槽的说明
+story.thread.guardian.obtain,第 1 章，天兵营在点亮的第一颗星石前立誓。,,星图线槽的说明
 story.thread.freedom.name,自由之线,Thread of Freedom,
-story.thread.freedom.obtain,第 2 章，逐星骑答应合作。,,
+story.thread.freedom.obtain,第 2 章，花果山答应合作。,,
 story.thread.redemption.name,救赎之线,Thread of Redemption,
 story.thread.redemption.obtain,第 3 章，被唤醒的灰爪自愿留下。,Chapter 3: the awakened Greyclaw chooses to stay.,
 story.thread.knowledge.name,知识之线,Thread of Knowledge,
 story.thread.knowledge.obtain,第 6 章，闻道交出沈寂的星图手稿。,,
 story.thread.trust.name,信任之线,Thread of Trust,
-story.thread.trust.obtain,第 8 章，人与青丘重立织网者之约。,,
+story.thread.trust.obtain,第 8 章，人与龙宫重立织网者之约。,,
 story.thread.empty,尚未找到,Not yet found,空线槽
 story.thread.progress,五根线 {0} / 5,Five Threads {0} / 5,{0} 已拿到的数量
 story.lore.seal.title,星线是一道封印,The Starline Is a Seal,档案馆条目标题
-story.lore.seal.body,"一千年前，大地深处醒来一股吞食灵力的饥饿，人们叫它永夜。天上的织女带着人间的术士和青丘的灵族，把二十八星宿落下的碎星一颗颗立在九州大地上，照着天上星宿的样子连成星络，把永夜压在大地尽头。这群人叫织网者，这张网就是星线。
+story.lore.seal.body,"一千年前，大地深处醒来一股吞食灵力的饥饿，人们叫它永夜。天上的织女带着兜率宫的炼丹星官和东海的龙族，把二十八宿落下的碎星一颗颗立在人间，照着天上星宿的样子连成星络，把永夜压在大地尽头的初源。这群人叫织网者，这张网就是星线，一头连着人间的星石，一头连着天上的周天星斗。
 
-这张网只用了两根线：人间术士的知识和青丘灵族的信任。它没有把所有人连起来，只靠一名织网者在初源星石里独自撑着。千年过去，人们忘了星线是封印，只记得它是城池的灯火、结界和田地的来源。",,档案馆条目正文
+这张网只用了两根线：兜率宫的知识和龙族的信任。它没有把所有人连起来，只靠一名织网者在初源星石里独自撑着。取经功成以后，人间太平了四百多年，人们忘了星线是封印，只记得它是城池的灯火、结界和田地的来源。",,档案馆条目正文
 story.lore.severance.title,断线日,Severance Day,
-story.lore.severance.body,"星历四百一十二年，司星监的前任监正沈寂打开了初源星石。星线从源头开始被吸干，失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人成了墨蚀者。这一天叫断线日。
+story.lore.severance.body,"取经后第四百一十二年，兜率宫的前任掌炉星官沈寂打开了初源星石。星线从源头开始被吸干：南天门关了，天兵下不来，二十八宿和神仙的坐骑纷纷坠落；失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人、星宿和精怪都成了妖魔。这一天叫断线日。
 
-墨蚀者不是天生的妖魔：他们是陷落城池的百姓和守军，记忆被墨色封住，只剩下饥饿。",,第 6 章之前不能写出沈寂的真实动机
+妖魔不是天生的：他们的记忆被墨色封住，只剩下饥饿。断线日那天，有人看见一道金光从花果山直奔初源，之后大圣就再也没有消息。",,第 6 章之前不能写出沈寂的真实动机
 story.lore.lighthaven.title,望星城,,
 story.lore.lighthaven.body,"星线最末端的边城，靠一座观星台撑了下来。观星台的星石里住着一缕星魂，名叫阿织。她能预见战局，却记不起自己是谁。
 
@@ -67,42 +67,42 @@ story.lore.lighthaven.body,"星线最末端的边城，靠一座观星台撑了�
 story.lore.threads.title,五根线,The Five Threads,
 story.lore.threads.body,阿织说，要重织星线，需要五根线：守护、自由、知识、救赎、信任。五方阵营，各出一根。,,
 story.lore.mordred.title,沈寂的手稿,,第 6 章后解锁
-story.lore.mordred.body,沈寂发现封印在衰竭。他不信任任何人，没有告诉学生，也没有去找青丘，而是想独自吞下初源星石的力量，用自己去撑住封印。结果他成了第一个被永夜吞掉的人，也就是永夜之主。墨蚀者吞下的灵力，一路被送往初源，喂给了永夜。,,
+story.lore.mordred.body,沈寂发现封印在衰竭。他不信任任何人，没有告诉学生，也没有去找龙宫，而是想独自吞下初源星石的力量，用自己去撑住封印。结果他成了第一个被永夜吞掉的人，也就是永夜之主。妖魔吞下的灵力，一路被送往初源，喂给了永夜。,,
 story.lore.nova.title,最后一位织网者,The Last Weaver,第 8 章后解锁
 story.lore.nova.body,"阿织就是最后一位织网者，织女留在人间的星魂。断线日那一夜，她从初源退到了星线最末端的这颗星石里，用剩下的光护住望星城。一千年来，她一直用自己撑着残存的星线，所以她的光在一点点变暗。
 
 重织星线需要有人把五根线打成一个结。她本打算成为那个结，永远留在初源。",,
-story.faction.knights.intro,望星城的守军，由老将军雷震带领。,,阵营介绍；阵营名在 Characters.csv
-story.faction.rangers.intro,散落在边州的猎户、斥候和游侠。,,
-story.faction.mages.intro,观星的术士，掌管星线的学问；断线日后半数术士失踪。监里藏着一个秘密。,,
-story.faction.undead.intro,被永夜墨色侵蚀的陷落城池之民。想起自己是谁的，就能选择站在哪一边。,,
-story.faction.elves.intro,山林里的狐族和花木之灵，织网者的另一半，守着星线的真相。,,
+story.faction.knights.intro,断线日后回不了天上的天兵，和望星城守军合编，由老将军雷震带领。,,阵营介绍；阵营名在 Characters.csv
+story.faction.rangers.intro,大圣不在时守山的猴兵，加上山下收留的猎户和工匠。,,
+story.faction.mages.intro,太上老君的弟子，炼丹炼宝，掌管星线的学问；老君闭关，下院被围，半数弟子失踪。宫里藏着一个秘密。,,
+story.faction.undead.intro,被永夜墨色染成妖的人、坠落的星宿和神仙坐骑。想起自己是谁的，就能选择站在哪一边。,,
+story.faction.elves.intro,东海的龙族、鲛人和水族，织网者的另一半，守着星线的真相。,,
 story.ending.knot.title,打结,The Knot,结局第 2 步标题
 story.ending.knot.nova_stay,阿织：让我留下吧。总得有人当这个结。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.gavin,岳擎：守护之线在这里。这一次，换我们撑着你。,,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.roland,陆离：自由之线。没人逼我，是我自己要来的。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.roland,流元帅：自由之线。没人逼我，是我自己要来的。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.celine,朱弦：知识之线。我们已经弄懂了，这个结不该只压在一个人身上。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.greyclaw,灰爪：救赎之线。我跑回来了，这次不会再松手。,Greyclaw: The Thread of Redemption. I made it back. This time I won't let go.,草案：story.md 只写了要点，这句是新写的
-story.ending.knot.vera,涂山薇：信任之线。一千年前你信了我们，现在轮到我们信你。,,草案：story.md 只写了要点，这句是新写的
+story.ending.knot.vera,敖鸾：信任之线。一千年前你信了我们，现在轮到我们信你。,,草案：story.md 只写了要点，这句是新写的
 story.ending.knot.nova_last,阿织：星线不断，我们就不散。,,阿织的最后一句，宣传语的变体
 story.ending.epilogue.title,后来,Afterwards,结局第 3 步标题
-story.ending.epilogue.knights,守星军重建了城墙上的功勋碑。第一行刻的是雷震老将军的名字，第二行空着，留给下一个守住星石的人。,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.rangers,逐星骑又散回了山林里。只是现在，每座营地的篝火旁都多留了一个位子，等走远的人回来。,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.mages,司星监打开了藏书阁的大门。门口挂着一块新匾：“谁都可以进来。”,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.undead,被唤醒的墨蚀者回到了各自的城池。有的人认出了他们，有的人没有，但城门都开着。,,草案：story.md 只写了要点，这句是新写的
-story.ending.epilogue.elves,青丘灵族在望星城外种下了一片小树林。人的孩子和青丘的孩子在里面一起长大，谁也不记得那里曾经是战场。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.knights,天兵营重建了城墙上的功勋碑。第一行刻的是雷震老将军的名字，第二行空着，留给下一个守住星石的人。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.rangers,花果山的猴子们又散回了山里。只是现在，水帘洞口的篝火旁多留了一个位子，等走远的猴回来。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.mages,兜率宫打开了藏经阁的大门。门口挂着一块新匾：“谁都可以进来。”,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.undead,被唤醒的妖魔回到了各自的家：有的回了城池，有的回了天上的星位。有的人认出了他们，有的人没有，但门都开着。,,草案：story.md 只写了要点，这句是新写的
+story.ending.epilogue.elves,龙宫在望星城外挖了一口海水池，种下了一片珊瑚。人的孩子和龙宫的孩子在池边一起长大，谁也不记得那里曾经是战场。,,草案：story.md 只写了要点，这句是新写的
 story.ending.epilogue.rayne_farewell,雷震：两个孩子，都长大了。星石没有熄，我可以放心了。,,草案：story.md 只写了要点，这句是新写的；招募了雷震英灵才有的告别戏
 story.ending.epilogue.hero_unlocked,★5 角色的个人结局,Personal endings of ★5 heroes,尾声里个人结局一栏的标题；个人结局正文是 Characters.csv 的 bio.<id>.5
-story.recap.title,星线编年,Chronicle of the Starline,结局第 4 步标题，档案馆里也用
+story.recap.title,取线录,,结局第 4 步标题，档案馆里也用
 story.recap.playtime,历时 {0} 小时 {1} 分,Journey time {0}h {1}m,
 story.recap.battles,战斗 {0} 场,{0} battles fought,
 story.recap.crystals,点亮星石 {0} 颗,,
 story.recap.heroes,招募角色 {0} / {1},Heroes recruited {0} / {1},
-story.recap.awakened,唤醒墨蚀者 {0} 名,,
+story.recap.awakened,唤醒妖魔 {0} 名,,
 story.recap.bond,最常用的羁绊：{0},Favourite bond: {0},{0} 羁绊名
 story.recap.veteran.title,你的老兵,Your Veteran,
 story.recap.veteran.body,{0} · 上阵 {1} 次,{0} · deployed {1} times,{0} 角色名，下面接这名角色的告别语
-story.recap.hardest.title,最难的一夜,The Hardest Night,
+story.recap.hardest.title,最难的一难,,
 story.recap.hardest.body,{0} · 倒下 {1} 次，第 {2} 次终于打赢,"{0} · fell {1} times, won on attempt {2}",{0} 关卡名，下面接打赢那一场的阵容
 story.recap.forecasts,阿织替你看过 {0} 次战局,,战前推演次数
 story.letter.title,阿织的信,,结局第 5 步标题
@@ -119,6 +119,8 @@ story.letter.closing,"现在我在每一颗星石里。你点亮哪一颗，我�
 —— 阿织",,草案：story.md 只写了要点，这句是新写的
 story.letter.photo,最后一张布阵图,The Last Formation,信后的合影标题
 story.letter.share,截图分享,Take a Screenshot,
-story.ending.stinger,涂山薇：永夜不是这片大地生出来的。它和星石一样，是随那场星雨从天上落下来的。,,片尾彩蛋，给续作留悬念
+story.ending.stinger,"大圣伸了个懒腰：“俺老孙睡了多久？”他抬头看天：“天上少了好几颗星。”
+
+敖鸾：永夜不是这片大地生出来的。它和星石一样，是随那场星雨从天上落下来的。",,片尾彩蛋，给续作留悬念
 story.ending.skip,跳过,Skip,
-story.ending.replay_hint,可以在档案馆重看结局和星线编年。,You can watch the ending and the Chronicle again in the Archive.,
+story.ending.replay_hint,可以在档案馆重看结局和取线录。,,

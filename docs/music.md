@@ -3,12 +3,14 @@
 星线的配乐方向、曲目清单、客户端选曲规则，以及给 AI 音乐工具的提示词。
 
 > v4.0（决策 68）：题材换成“星宿国潮”，配乐从奇幻管弦乐改成**民乐为主、少量管弦垫底**。下面第 1、3、6 节按新方向重写；仓库里现有的 17 首 `.ogg` 还是 `tools/music/compose.py` 生成的管弦乐版，曲目 id 不变，按第 6 节的提示词重做后替换同名文件即可，不用改代码。
+>
+> v5.0（决策 71）：题材换成“西游后传”，民乐方向不变，只改了几首战斗曲的场景。**不能用、也不能改编 86 版电视剧的《云宫迅音》《敬你一杯》等曲子**，给 AI 工具的提示词里也不要写这些曲名和改编作品名。
 
 ## 1. 风格
 
-**一句话**：“小编制的国风民乐，加上星石的磬声”。参考《江南百景图》《墨魂》《王国保卫战》那种循环耐听、不抢戏的音乐，以及一段旋律在不同场景反复变奏的做法。
+**一句话**：“小编制的国风民乐，加上星石的磬声”。参考《江南百景图》《阴风怪》《王国保卫战》那种循环耐听、不抢戏的音乐，以及一段旋律在不同场景反复变奏的做法。
 
-- **核心乐器**：古筝、琵琶、竹笛、二胡、笙，打击乐用堂鼓、板鼓、小锣、木鱼，弦乐组只做铺底。守星军偏堂鼓、大鼓和号角（军阵感），逐星骑偏琵琶、竹笛和马头琴，司星监偏编钟、古琴和箫，墨蚀者偏低音埙、大锣和低沉男声吟唱，青丘灵族偏古筝泛音、女声哼唱和风铃。
+- **核心乐器**：古筝、琵琶、竹笛、二胡、笙，打击乐用堂鼓、板鼓、小锣、木鱼，弦乐组只做铺底。天兵营偏堂鼓、大鼓和号角（军阵感），花果山偏琵琶、竹笛和马头琴，兜率宫偏编钟、古琴和箫，妖魔偏低音埙、大锣和低沉男声吟唱，四海龙宫偏古筝泛音、女声哼唱和风铃。
 - **星石的声音**：一种带泛音拍频的磬声 / 编钟声（合成器里的 `crystal` 可以先顶着），出现在主菜单、布阵、湖心枢纽和结局，代表星线和阿织。
 - **星线主题**：一段五声音阶的八小节旋律（第 2 节），所有曲子都从它变奏出来。主菜单古筝和竹笛奏完整版，草原战斗里由号角吹出片段，沈寂一战由低音埙和大鼓奏出暗色版，结局由二胡和女声唱完，象征星线被重新织起。
 - **短局优先**：一局战斗不超过 45 秒、默认 2 倍速（决策 69），战斗曲要在开头 4 小节内就有主旋律，不要长前奏。微信小游戏常被静音玩，音乐只是加分项，音效（出手、击中、星石点亮）要单独就能听懂。
@@ -34,12 +36,12 @@ D 宫调式（五声：D E F# A B），4/4
 | `map` | 沿着星线 | 地图、关卡选择、领奖励 | G 宫 100 | 琵琶轮指、竹笛、小锣、木鱼；出发上路的轻快感，中段是主题 | 60 秒 |
 | `deploy` | 推演 | 布阵、战前推演 | A 羽 88 | 古筝低音固定音型、木鱼滴答、磬声提示音；冷静地思考 | 50 秒 |
 | `battle_plains` | 望星城外 | 城郊草原（第 1 章） | D 羽 128 | 堂鼓、号角、二胡快弓；最后八小节是主题暗色版 | 50 秒 |
-| `battle_forest` | 逐星岭 | 古木山林（第 2 章） | E 商 6/8 | 竹笛、琵琶、马头琴、框鼓；逐星骑在林间穿行 | 55 秒 |
-| `battle_bone_waste` | 墨城 | 墨泥荒原（第 3 章） | C 羽 100 | 低音埙、男声吟唱“嗯”、大锣、大鼓；阴沉压迫，但不做恐怖音效 | 50 秒 |
-| `battle_arcane_court` | 司星台 | 司星台庭院（第 4 章） | A 徵 3/4 150 | 编钟、古琴泛音、拨弦、箫；神秘优雅 | 50 秒 |
+| `battle_forest` | 花果山 | 古木山林（第 2 章） | E 商 6/8 | 竹笛、琵琶、木鱼、框鼓，加一点调皮的滑音；猴兵在林间穿行 | 55 秒 |
+| `battle_bone_waste` | 黑风岭 | 墨泥荒原（第 3 章） | C 羽 100 | 低音埙、男声吟唱“嗯”、大锣、大鼓；阴沉压迫，但不做恐怖音效 | 50 秒 |
+| `battle_arcane_court` | 兜率下院 | 丹房庭院（第 4 章） | A 徵 3/4 150 | 编钟、古琴泛音、拨弦、箫；神秘优雅 | 50 秒 |
 | `battle_desert` | 饥城 | 灰沙荒漠（第 5 章） | D 商 108 | 唢呐（弱奏）、热瓦普、手鼓，D-A 持续音；干燥荒凉 | 55 秒 |
 | `battle_lake` | 湖心夜 | 湖心枢纽（第 6 章，夜战） | B 羽 96 | 古筝琶音加回声、磬声、低音脉冲、箫；水面倒影 | 50 秒 |
-| `battle_mist_marsh` | 青丘雾林 | 迷雾沼泽（第 7 章） | 升 F 羽 6/8 | 女声哼唱、古筝泛音、风铃、竹笛；方向感模糊 | 55 秒 |
+| `battle_mist_marsh` | 东海雾岛 | 迷雾沼泽（第 7 章） | 升 F 羽 6/8 | 女声哼唱、古筝泛音、风铃、竹笛；方向感模糊 | 55 秒 |
 | `battle_night_tundra` | 永夜冰原 | 永夜冰原（第 8 章） | G 羽 112 | 二胡高音颤弓、碰铃、低音弦乐、号角；寒冷空旷 | 55 秒 |
 | `battle_abyss` | 初源 | 永夜深渊（第 9 章） | C 羽 132 | 大鼓、男声吟唱、琵琶扫弦、二胡十六分音符、锣；中段主题被扭成暗色版 | 50 秒 |
 | `boss` | 首领战 | 章末 Boss | D 羽 144 | 大鼓与堂鼓、唢呐、琵琶扫弦、男女声“啊”；最后八小节主题暗色版 | 45 秒 |
@@ -83,12 +85,12 @@ python3 tools/music/compose.py --preview out/   # 另存一份 mp3 试听
 | `map` | Light adventurous Chinese folk, G major pentatonic, 100 BPM, pipa tremolo, dizi melody, small gong and woodblock, plucked bass, travelling along a mountain road, cheerful but not silly |
 | `deploy` | Calm tactical planning music, A minor pentatonic, 88 BPM, low guzheng ostinato, woodblock ticking, sparse stone chime notes, soft string pad, focused and thoughtful, minimal melody, strategy game |
 | `battle_plains` | Heroic Chinese battle march, D minor pentatonic, 128 BPM, tanggu war drums, horn calls, fast erhu bowing, pipa strums, soldiers defending a city at dawn, energetic but leaves room for sound effects |
-| `battle_forest` | Chinese mountain forest battle, E pentatonic, 6/8, 112 BPM, fast dizi melody, pipa and morin khuur, frame drum, scouts riding through the woods |
+| `battle_forest` | Playful Chinese mountain forest battle, E pentatonic, 6/8, 112 BPM, fast dizi melody with slides, pipa, woodblock, frame drum, monkey warriors leaping through the trees |
 | `battle_bone_waste` | Dark ink-corrupted fortress battle, C minor pentatonic, 100 BPM, low xun ocarina, low male humming, large gong, bass drum, grim and oppressive, no horror screams |
-| `battle_arcane_court` | Mysterious Chinese court waltz battle, A pentatonic, 3/4, 150 BPM, bianzhong bronze bells, guqin harmonics, plucked strings, xiao flute melody, star charts in an observatory courtyard |
+| `battle_arcane_court` | Mysterious Taoist alchemy court waltz battle, A pentatonic, 3/4, 150 BPM, bianzhong bronze bells, guqin harmonics, plucked strings, xiao flute melody, star charts in an observatory courtyard |
 | `battle_desert` | Chinese desert frontier battle, D pentatonic, 108 BPM, soft suona lead, rawap, hand drum, drone on D and A, dusty ruined city at noon, tense and dry |
 | `battle_lake` | Night battle on a starlit lake, B minor pentatonic, 96 BPM, guzheng arpeggios with delay, stone chimes, deep pulsing bass, soft xiao flute, cold reflections on water, atmospheric but driving |
-| `battle_mist_marsh` | Eerie fox-spirit forest battle, F# minor pentatonic, 6/8, 84 BPM, ethereal female humming, guzheng harmonics, wind chimes, soft dizi, thick fog, beautiful but unsettling |
+| `battle_mist_marsh` | Eerie sea-fog island battle near an underwater dragon palace, F# minor pentatonic, 6/8, 84 BPM, ethereal female humming, guzheng harmonics, wind chimes, soft dizi, thick fog, beautiful but unsettling |
 | `battle_night_tundra` | Frozen tundra battle under eternal night, G minor pentatonic, 112 BPM, high erhu tremolo, small bells, low strings pulse, horn melody, sparse war drums, icy and vast |
 | `battle_abyss` | Climactic Chinese fantasy battle at the edge of an abyss, C minor pentatonic, 132 BPM, big drums, male chant, pipa strumming, fast erhu 16th notes, gongs, the main theme twisted into a dark mode |
 | `boss` | Epic Chinese boss battle, D minor pentatonic, 144 BPM, taiko-like big drums and tanggu, suona melody, pipa strumming, choir "ah", gong crash every 8 bars, intense but not chaotic |
