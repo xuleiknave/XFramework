@@ -121,6 +121,23 @@ section { padding: 96px 20px; }
   position: relative;
 }
 .card .no { font-family: var(--serif); color: var(--gold); font-size: 13px; letter-spacing: .3em; }
+.facts { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: rgba(30, 34, 48, .2); border: 1px solid rgba(30, 34, 48, .2); margin-bottom: 56px; }
+.facts div { background: var(--paper); padding: 18px 10px; text-align: center; }
+.facts b { display: block; font-family: var(--serif); font-size: 28px; color: var(--cinnabar); line-height: 1.3; }
+.facts span { font-size: 13px; color: var(--muted); }
+.loop { display: grid; grid-template-columns: 300px 1fr; gap: 48px; align-items: center; margin-bottom: 64px; }
+.board { background: var(--paper); border: 1px solid var(--ink); padding: 18px; }
+.board svg { display: block; width: 100%; height: auto; }
+.steps { list-style: none; margin: 0; padding: 0; counter-reset: s; }
+.steps li { counter-increment: s; position: relative; padding: 0 0 18px 56px; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid var(--gold); color: var(--gold); font-family: var(--serif); font-size: 18px; display: grid; place-items: center; }
+.steps b { font-family: var(--serif); font-size: 20px; letter-spacing: .08em; }
+.steps p { margin: 4px 0 0; color: #4a4436; font-size: 15px; }
+.sub-h { text-align: center; font-size: 24px; letter-spacing: .15em; margin-bottom: 24px; }
+.grow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; margin-top: 56px; border-top: 1px solid rgba(30, 34, 48, .25); padding-top: 36px; }
+.grow h3 { font-size: 19px; letter-spacing: .08em; margin-bottom: 6px; }
+.grow h3::before { content: "◆ "; color: var(--cinnabar); font-size: 12px; vertical-align: 3px; }
+.grow p { margin: 0; color: #4a4436; font-size: 15px; }
 .card h3 { font-size: 21px; margin: 6px 0 10px; letter-spacing: .08em; }
 .card p { margin: 0; color: #4a4436; font-size: 15px; }
 .card svg { width: 44px; height: 44px; position: absolute; right: 20px; top: 22px; }
@@ -157,11 +174,15 @@ footer p { margin: 4px 0; }
 @media (max-width: 860px) {
   .five { grid-template-columns: repeat(2, 1fr); }
   .five .fac:last-child { grid-column: span 2; }
+  .loop { grid-template-columns: 1fr; gap: 28px; }
+  .board { max-width: 320px; margin: 0 auto; }
+  .grow { grid-template-columns: 1fr; gap: 20px; }
 }
 @media (max-width: 600px) {
   .nav ul { display: none; }
   section { padding: 72px 16px; }
   .story .scroll { font-size: 16px; }
+  .facts { grid-template-columns: repeat(2, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -239,32 +260,79 @@ footer p { margin: 4px 0; }
       <div class="kicker">玩 法</div>
       <h2>一站一关，下车收工</h2>
       <svg class="rule"><use href="#rule"/></svg>
-      <p>竖屏单手，打开 30 秒内开战，一关两分钟。策略都在布阵，战斗自动进行。</p>
+      <p>为上下班路上的几分钟设计：竖屏单手，策略都在布阵，战斗自动进行。</p>
     </div>
+    <div class="facts reveal">
+      <div><b>30 秒</b><span>打开到开战</span></div>
+      <div><b>2 分钟</b><span>打完一关</span></div>
+      <div><b>45 秒</b><span>一场战斗上限，默认 2 倍速</span></div>
+      <div><b>0</b><span>体力和每日任务</span></div>
+    </div>
+
+    <div class="loop">
+      <div class="board reveal" aria-hidden="true">
+        <svg viewBox="0 0 250 300">
+          <g fill="#E8DCC2" stroke="#1E2230" stroke-opacity=".25">
+            <rect x="10" y="10" width="42" height="42" rx="4"/><rect x="58" y="10" width="42" height="42" rx="4"/><rect x="106" y="10" width="42" height="42" rx="4"/><rect x="154" y="10" width="42" height="42" rx="4"/><rect x="202" y="10" width="42" height="42" rx="4"/>
+            <rect x="10" y="58" width="42" height="42" rx="4"/><rect x="58" y="58" width="42" height="42" rx="4"/><rect x="106" y="58" width="42" height="42" rx="4"/><rect x="154" y="58" width="42" height="42" rx="4"/><rect x="202" y="58" width="42" height="42" rx="4"/>
+            <rect x="10" y="164" width="42" height="42" rx="4"/><rect x="58" y="164" width="42" height="42" rx="4"/><rect x="106" y="164" width="42" height="42" rx="4"/><rect x="154" y="164" width="42" height="42" rx="4"/><rect x="202" y="164" width="42" height="42" rx="4"/>
+            <rect x="10" y="212" width="42" height="42" rx="4"/><rect x="58" y="212" width="42" height="42" rx="4"/><rect x="106" y="212" width="42" height="42" rx="4"/><rect x="154" y="212" width="42" height="42" rx="4"/><rect x="202" y="212" width="42" height="42" rx="4"/>
+          </g>
+          <path d="M10 132 H244" stroke="#C8402F" stroke-dasharray="4 5" stroke-opacity=".6"/>
+          <g fill="#4A4560"><path d="M68 44 a10 12 0 0 1 22 0 v4 h-22z"/><path d="M164 44 a10 12 0 0 1 22 0 v4 h-22z"/><path d="M116 92 a10 12 0 0 1 22 0 v4 h-22z"/><path d="M20 92 a10 12 0 0 1 22 0 v4 h-22z"/><path d="M212 92 a10 12 0 0 1 22 0 v4 h-22z"/></g>
+          <g fill="#9C7BD8"><circle cx="75" cy="38" r="1.6"/><circle cx="83" cy="38" r="1.6"/><circle cx="171" cy="38" r="1.6"/><circle cx="179" cy="38" r="1.6"/><circle cx="123" cy="86" r="1.6"/><circle cx="131" cy="86" r="1.6"/><circle cx="27" cy="86" r="1.6"/><circle cx="35" cy="86" r="1.6"/><circle cx="219" cy="86" r="1.6"/><circle cx="227" cy="86" r="1.6"/></g>
+          <path d="M127 185 V233 H79 M127 233 H175" stroke="#C9A14A" stroke-width="2.5" fill="none"/>
+          <g fill="#E8C77A" stroke="#C9A14A"><path d="M127 177 l7 8 -7 8 -7 -8z"/><path d="M127 225 l7 8 -7 8 -7 -8z"/><path d="M79 225 l7 8 -7 8 -7 -8z"/><path d="M175 225 l7 8 -7 8 -7 -8z"/></g>
+          <g><circle cx="31" cy="185" r="13" fill="#2E6E8E"/><circle cx="79" cy="185" r="13" fill="#2E6E8E"/><circle cx="175" cy="185" r="13" fill="#C8402F"/><circle cx="223" cy="185" r="13" fill="#9A5A34"/><circle cx="31" cy="233" r="13" fill="#4F8A7A" opacity=".45"/></g>
+          <g fill="none" stroke="#E8C77A" stroke-width="2"><circle cx="79" cy="185" r="17"/><circle cx="175" cy="185" r="17"/></g>
+          <circle cx="31" cy="233" r="17" fill="none" stroke="#C8402F" stroke-width="1.5" stroke-dasharray="3 3"/>
+          <text x="125" y="290" text-anchor="middle" font-size="13" fill="#7A6F5E">金圈：接入星络　红虚线：断开</text>
+        </svg>
+      </div>
+      <ol class="steps">
+        <li class="reveal"><b>布阵</b><p>每方前排 5 格、纵深 3~4 格。盾卫顶前排，弓手和术士藏在身后，鹤骑放两翼去绕后。忙的时候一键上阵，或者沿用上次的阵容直接开战。</p></li>
+        <li class="reveal"><b>连星络</b><p>把星石摆在格子上，同一行或同一列、相距 3 格以内的星石自动连线，一路连回观星台。站在星络范围里的伙伴灵力不断、护盾回复；断开的人用完灵力就只能干站着。</p></li>
+        <li class="reveal"><b>战前推演</b><p>阿织能预见战局。点一下推演，几十场模拟算出胜率和常见败因，再决定改阵还是出征。</p></li>
+        <li class="reveal"><b>自动战斗</b><p>看 Q 版小人自己打，手里只留 1~2 个技能：“星落”砸向敌阵，“玄武盾”给全队回护盾。打穿敌方星石，墨蚀者的后排就没了灵力。</p></li>
+      </ol>
+    </div>
+
+    <h3 class="sub-h reveal">四种玩法</h3>
     <div class="cards">
       <div class="card reveal">
-        <svg viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="#2E6E8E" stroke-width="1.5"><rect x="4" y="8" width="10" height="10"/><rect x="17" y="8" width="10" height="10"/><rect x="30" y="8" width="10" height="10"/><rect x="4" y="22" width="10" height="10"/><rect x="17" y="22" width="10" height="10" fill="#2E6E8E" fill-opacity=".25"/><rect x="30" y="22" width="10" height="10"/></g></svg>
-        <div class="no">壹</div>
-        <h3>布阵</h3>
-        <p>选兵、站位、看克制。盾卫顶在前排，弓手和术士藏在身后，每一格都有讲究。</p>
+        <div class="no">主线</div>
+        <h3>重织星线</h3>
+        <p>三幕九章，跟着阿织把熄灭的星石一颗颗点亮，一路结识五方伙伴。打过的关卡可以重复挑战，刷经验和碎片。首发第一幕“边州”三章。</p>
       </div>
       <div class="card reveal">
-        <svg viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="#C9A14A" stroke-width="1.5"><path d="M8 34 L18 12 L28 24 L37 8"/></g><g fill="#E8C77A"><circle cx="8" cy="34" r="3"/><circle cx="18" cy="12" r="3"/><circle cx="28" cy="24" r="3"/><circle cx="37" cy="8" r="3"/></g></svg>
-        <div class="no">贰</div>
-        <h3>连星络</h3>
-        <p>把星石摆在格子上，伙伴连成星宿的形状。接入星络的人发着金光，断开的人会变弱。</p>
+        <div class="no">远征</div>
+        <h3>一趟十分钟</h3>
+        <p>带自己培养的伙伴闯随机路线：三幕各两个节点加一个 Boss，沿途三选一拿技能和祝福。到站了随时退出，下次接着走。</p>
       </div>
       <div class="card reveal">
-        <svg viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="#7A5BA6" stroke-width="1.5"><circle cx="22" cy="22" r="15"/><circle cx="22" cy="22" r="8"/><path d="M22 4 V10 M22 34 V40 M4 22 H10 M34 22 H40"/></g><circle cx="22" cy="22" r="2.5" fill="#7A5BA6"/></svg>
-        <div class="no">叁</div>
-        <h3>战前推演</h3>
-        <p>阿织能预见战局。开战前推演一遍，看看胜率，再决定改阵还是出征。</p>
+        <div class="no">摘星楼</div>
+        <h3>布阵解谜</h3>
+        <p>一层一场，敌方阵容完全公开，失败无限重试。越往上规则越刁钻：只准放一颗星石、连线距离变短、看不见敌方后排……</p>
       </div>
       <div class="card reveal">
-        <svg viewBox="0 0 44 44" aria-hidden="true"><g fill="none" stroke="#C8402F" stroke-width="1.5"><path d="M6 36 Q14 20 22 26 T38 10"/><path d="M32 10 H38 V16"/></g><circle cx="6" cy="36" r="2.5" fill="#C8402F"/></svg>
-        <div class="no">肆</div>
-        <h3>远征</h3>
-        <p>每局不同的路线和三选一，八到十分钟一趟，到站了随时退出，下次接着走。</p>
+        <div class="no">天工坊</div>
+        <h3>解析墨晶</h3>
+        <p>把战斗里缴获的墨晶拿回来研究，看破墨蚀者的隐藏特性，推演从此更准。</p>
+      </div>
+    </div>
+
+    <div class="grow">
+      <div class="reveal">
+        <h3>伙伴养成</h3>
+        <p>剧情里结识伙伴，关卡掉落碎片。刷关升级，攒碎片升星（一星到五星），每升一星换一身更华丽的装束，解锁一段个人小故事。</p>
+      </div>
+      <div class="reveal">
+        <h3>羁绊</h3>
+        <p>同阵营或同职业的不同伙伴凑够人数就激活羁绊。墨蚀者被唤醒后也能上阵，凑出敌人想不到的组合。</p>
+      </div>
+      <div class="reveal">
+        <h3>不卖战力</h3>
+        <p>没有体力，没有付费抽卡。看广告只换便利：奖励翻倍、失败重打、多刷新一次，不看也不耽误进度。</p>
       </div>
     </div>
   </div>
