@@ -48,11 +48,17 @@ def call(action, _endpoint=ENDPOINT, _version="2014-05-26", **params):
     body = urllib.parse.urlencode(q).encode()
     req = urllib.request.Request(_endpoint, data=body, method="POST",
                                  headers={"Content-Type": "application/x-www-form-urlencoded"})
-    try:
-        with urllib.request.urlopen(req, timeout=30) as r:
-            return json.load(r)
-    except urllib.error.HTTPError as e:
-        raise SystemExit(f"{action} 失败：{e.code} {e.read().decode(errors='replace')}")
+    for attempt in range(4):
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            raise SystemExit(f"{action} 失败：{e.code} {e.read().decode(errors='replace')}")
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
+            # 网络偶尔断开：查询类接口重试；签名带时间戳和随机数，重发同一请求即可
+            if attempt == 3 or not action.startswith(("Describe", "List")):
+                raise
+            time.sleep(2 ** attempt)
 
 
 def build_script():
