@@ -1,7 +1,7 @@
-"""把官网文件压缩打包进一个 PowerShell 脚本（控制在 16 KB 内，能直接粘进阿里云云助手），在 Windows 服务器上以管理员身份运行即可部署到 IIS。
+"""把官网文件压缩打包进一个 PowerShell 脚本，在 Windows 服务器上以管理员身份运行即可部署到 IIS。
 
 用法：python3 website/make_deploy_script.py [输出路径]
-默认输出到 website/dist/deploy-website.ps1。
+默认输出到 website/dist/deploy-website.ps1。远程部署用 deploy_aliyun.py，它分段上传文件，不受单条命令大小限制。
 """
 import base64
 import gzip
@@ -9,7 +9,8 @@ import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-FILES = ["index.html", "favicon.svg", "web.config"]
+FILES = ["index.html", "favicon.svg", "web.config", "design/index.html"]
+STAGING_DIR = r"C:\inetpub\starline-staging"
 SITE_DIR = r"C:\inetpub\starline"
 
 TEMPLATE = r"""# 星线官网部署脚本（由 website/make_deploy_script.py 生成，不要手改）
@@ -36,10 +37,20 @@ New-Item -ItemType Directory -Force -Path $site | Out-Null
 $files = @{
 __FILES__
 }
-foreach ($name in $files.Keys) {
-    $gz = New-Object IO.Compression.GZipStream((New-Object IO.MemoryStream(,[Convert]::FromBase64String($files[$name]))), [IO.Compression.CompressionMode]::Decompress)
-    $out = [IO.File]::Create((Join-Path $site $name)); $gz.CopyTo($out); $out.Close(); $gz.Close()
+# deploy_aliyun.py 会先把较大的文件分段上传到暂存目录（文件名里的 / 写成 __）
+$staging = '__STAGING_DIR__'
+if (Test-Path $staging) {
+    foreach ($f in Get-ChildItem $staging -Filter *.b64) {
+        $files[$f.BaseName.Replace('__', '/')] = [IO.File]::ReadAllText($f.FullName).Trim()
+    }
 }
+foreach ($name in $files.Keys) {
+    $path = Join-Path $site $name
+    New-Item -ItemType Directory -Force -Path (Split-Path $path) | Out-Null
+    $gz = New-Object IO.Compression.GZipStream((New-Object IO.MemoryStream(,[Convert]::FromBase64String($files[$name]))), [IO.Compression.CompressionMode]::Decompress)
+    $out = [IO.File]::Create($path); $gz.CopyTo($out); $out.Close(); $gz.Close()
+}
+if (Test-Path $staging) { Remove-Item -Recurse -Force $staging }
 
 Write-Host '3/4 把 IIS 默认站点指向官网目录...'
 Import-Module WebAdministration
@@ -66,16 +77,22 @@ Write-Host '别忘了在云服务商控制台的安全组里放行 TCP 80 端口
 """
 
 
+def encode(name):
+    return base64.b64encode(gzip.compress((HERE / name).read_bytes(), 9, mtime=0)).decode("ascii")
+
+
+def build(inline=True):
+    """inline=False 时脚本里不带文件内容，由调用方先把文件分段上传到暂存目录。"""
+    entries = [f"    '{name}' = '{encode(name)}'" for name in FILES] if inline else []
+    return (TEMPLATE.replace("__SITE_DIR__", SITE_DIR).replace("__STAGING_DIR__", STAGING_DIR)
+            .replace("__FILES__", "\n".join(entries)))
+
+
 def main():
     out = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else HERE / "dist" / "deploy-website.ps1"
-    entries = []
-    for name in FILES:
-        data = base64.b64encode(gzip.compress((HERE / name).read_bytes(), 9, mtime=0)).decode("ascii")
-        entries.append(f"    '{name}' = '{data}'")
-    script = TEMPLATE.replace("__SITE_DIR__", SITE_DIR).replace("__FILES__", "\n".join(entries))
     out.parent.mkdir(parents=True, exist_ok=True)
     # Windows PowerShell 5.1 要有 BOM 才按 UTF-8 读中文，换行用 CRLF
-    out.write_bytes(b"\xef\xbb\xbf" + script.replace("\n", "\r\n").encode("utf-8"))
+    out.write_bytes(b"\xef\xbb\xbf" + build().replace("\n", "\r\n").encode("utf-8"))
     print(out)
 
 

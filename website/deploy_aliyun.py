@@ -5,7 +5,7 @@
 或 AliyunSWASFullAccess），网络能访问 ecs/swas.cn-hongkong.aliyuncs.com。
 
 用法：python3 website/deploy_aliyun.py [公网 IP]
-会依次：找到实例 → 安全组放行 TCP 80 → 生成部署脚本并用云助手执行 → 打印执行输出。
+会依次：找到实例 → 防火墙放行 TCP 80 → 把文件分段上传到暂存目录 → 执行部署脚本 → 打印输出。
 """
 import base64
 import datetime
@@ -14,12 +14,15 @@ import hmac
 import json
 import os
 import pathlib
-import subprocess
 import sys
 import time
 import urllib.parse
 import urllib.request
 import uuid
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import make_deploy_script as mds  # noqa: E402
 
 REGION = "cn-hongkong"
 ENDPOINT = f"https://ecs.{REGION}.aliyuncs.com/"
@@ -28,7 +31,6 @@ SWAS_ENDPOINT = f"https://swas.{REGION}.aliyuncs.com/"
 
 def swas(action, **params):
     return call(action, _endpoint=SWAS_ENDPOINT, _version="2020-06-01", **params)
-HERE = pathlib.Path(__file__).resolve().parent
 
 
 def call(action, _endpoint=ENDPOINT, _version="2014-05-26", **params):
@@ -61,10 +63,59 @@ def call(action, _endpoint=ENDPOINT, _version="2014-05-26", **params):
             time.sleep(2 ** attempt)
 
 
-def build_script():
-    out = HERE / "dist" / "deploy-website.ps1"
-    subprocess.run([sys.executable, str(HERE / "make_deploy_script.py"), str(out)], check=True)
-    return out.read_bytes().lstrip(b"\xef\xbb\xbf").decode("utf-8")
+CHUNK = 12000  # 每条云助手命令带的 base64 字符数，留足余量（单条命令内容上限约 16 KB）
+
+
+def swas_runner(iid):
+    def run(script, name):
+        inv = swas("RunCommand", InstanceId=iid, Type="RunPowerShellScript", Name=name,
+                   CommandContent=script, Timeout=1800)["InvokeId"]
+        while True:
+            time.sleep(5)
+            res = swas("DescribeInvocationResult", InstanceId=iid, InvokeId=inv)["InvocationResult"]
+            if res.get("InvocationStatus") not in ("Pending", "Running", "Scheduled", None):
+                out = res.get("Output", "")
+                try:
+                    out = base64.b64decode(out).decode("utf-8", errors="replace")
+                except Exception:
+                    pass
+                return res["InvocationStatus"], out + (res.get("ErrorInfo") or "")
+    return run
+
+
+def ecs_runner(iid):
+    def run(script, name):
+        inv = call("RunCommand", Type="RunPowerShellScript", InstanceId_1=iid,
+                   CommandContent=base64.b64encode(script.encode("utf-8")).decode(),
+                   ContentEncoding="Base64", Timeout=1800, Name=name)["InvokeId"]
+        while True:
+            time.sleep(5)
+            items = call("DescribeInvocationResults", InvokeId=inv, ContentEncoding="PlainText")[
+                "Invocation"]["InvocationResults"]["InvocationResult"]
+            if items and items[0]["InvocationStatus"] not in ("Pending", "Running", "Scheduled"):
+                return items[0]["InvocationStatus"], items[0].get("Output", "") + (items[0].get("ErrorInfo") or "")
+    return run
+
+
+def deploy(run):
+    """先把每个文件分段写进服务器暂存目录，再执行部署脚本解码到站点目录。"""
+    staging = mds.STAGING_DIR
+    status, out = run(f"Remove-Item -Recurse -Force '{staging}' -ErrorAction SilentlyContinue; "
+                      f"New-Item -ItemType Directory -Force -Path '{staging}' | Out-Null", "starline-stage")
+    if status != "Success":
+        raise SystemExit("清空暂存目录失败：" + out)
+    for name in mds.FILES:
+        data = mds.encode(name)
+        target = staging + "\\" + name.replace("/", "__") + ".b64"
+        parts = [data[i:i + CHUNK] for i in range(0, len(data), CHUNK)]
+        for n, part in enumerate(parts, 1):
+            status, out = run(f"[IO.File]::AppendAllText('{target}', '{part}')", "starline-upload")
+            if status != "Success":
+                raise SystemExit(f"上传 {name} 第 {n} 段失败：" + out)
+        print(f"已上传 {name}（{len(parts)} 段）")
+    status, out = run(mds.build(inline=False), "starline-website")
+    print("状态", status)
+    print(out)
 
 
 def deploy_swas(ip):
@@ -78,26 +129,7 @@ def deploy_swas(ip):
     if not any(r.get("Port") == "80" and r.get("RuleProtocol", "").upper() in ("TCP", "TCP+UDP") for r in rules):
         swas("CreateFirewallRule", InstanceId=iid, RuleProtocol="TCP", Port="80", Remark="Starline website HTTP")
     print("防火墙已放行 TCP 80")
-
-    r = swas("RunCommand", InstanceId=iid, Type="RunPowerShellScript", Name="starline-website",
-             CommandContent=build_script(), Timeout=1800)
-    inv = r["InvokeId"]
-    print("云助手任务", inv)
-    while True:
-        time.sleep(10)
-        res = swas("DescribeInvocationResult", InstanceId=iid, InvokeId=inv)["InvocationResult"]
-        if res.get("InvocationStatus") not in ("Pending", "Running", "Scheduled", None):
-            print("状态", res["InvocationStatus"], "退出码", res.get("ExitCode"))
-            out = res.get("Output", "")
-            try:
-                out = base64.b64decode(out).decode("utf-8", errors="replace")
-            except Exception:
-                pass
-            print(out)
-            if res.get("ErrorInfo"):
-                print("错误", res["ErrorInfo"])
-            break
-        print("执行中...")
+    deploy(swas_runner(iid))
 
 
 def main():
@@ -121,25 +153,7 @@ def main():
             if "Duplicate" not in str(e):
                 raise
         print("安全组", sg, "已放行 TCP 80")
-
-    script = build_script()
-    r = call("RunCommand", Type="RunPowerShellScript", InstanceId_1=iid,
-             CommandContent=base64.b64encode(script.encode("utf-8")).decode(),
-             ContentEncoding="Base64", Timeout=1800, Name="starline-website")
-    inv = r["InvokeId"]
-    print("云助手任务", inv)
-    while True:
-        time.sleep(10)
-        res = call("DescribeInvocationResults", InvokeId=inv, ContentEncoding="PlainText")
-        items = res["Invocation"]["InvocationResults"]["InvocationResult"]
-        if items and items[0]["InvocationStatus"] not in ("Pending", "Running", "Scheduled"):
-            it = items[0]
-            print("状态", it["InvocationStatus"], "退出码", it.get("ExitCode"))
-            print(it.get("Output", ""))
-            if it.get("ErrorInfo"):
-                print("错误", it["ErrorInfo"])
-            break
-        print("执行中...")
+    deploy(ecs_runner(iid))
 
 
 if __name__ == "__main__":
