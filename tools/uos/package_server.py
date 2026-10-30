@@ -12,6 +12,11 @@ root of the archive. In the UOS console:
 
     python3 tools/uos/package_server.py                 # -> dist/starline-server-<version>.zip
     python3 tools/uos/package_server.py --out some.zip
+    python3 tools/uos/package_server.py --windows       # -> dist/starline-server-<version>-win-x64.zip
+
+--windows builds for the Hong Kong Windows server instead (decision 71): self-contained win-x64, so the
+server needs no .NET runtime, plus server/deploy/windows/install.ps1, which installs MongoDB and starts
+the server at boot (server/README.md, "部署到自己的 Windows 服务器").
 """
 import argparse
 import pathlib
@@ -26,6 +31,7 @@ import zipfile
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 PROJECT = ROOT / "server/src/Starline.Server.Host/Starline.Server.Host.csproj"
 EXECUTABLE = "starline-server"
+WINDOWS_INSTALLER = ROOT / "server/deploy/windows/install.ps1"
 
 
 def version():
@@ -39,15 +45,20 @@ def version():
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", help="zip path (default dist/starline-server-<version>.zip)")
+    parser.add_argument("--windows", action="store_true", help="self-contained win-x64 build with install.ps1")
     args = parser.parse_args()
-    out = pathlib.Path(args.out) if args.out else ROOT / "dist" / "starline-server-{0}.zip".format(version())
+    suffix = "-win-x64" if args.windows else ""
+    out = pathlib.Path(args.out) if args.out else ROOT / "dist" / "starline-server-{0}{1}.zip".format(version(), suffix)
     out.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as tmp:
         publish = pathlib.Path(tmp) / "publish"
-        subprocess.run(["dotnet", "publish", str(PROJECT), "-c", "Release", "-r", "linux-x64", "--no-self-contained",
-                        "-o", str(publish), "-nologo", "-v", "q", "-p:DebugType=none"], check=True)
-        exe = publish / EXECUTABLE
+        runtime = ["-r", "win-x64", "--self-contained"] if args.windows else ["-r", "linux-x64", "--no-self-contained"]
+        subprocess.run(["dotnet", "publish", str(PROJECT), "-c", "Release"] + runtime
+                       + ["-o", str(publish), "-nologo", "-v", "q", "-p:DebugType=none"], check=True)
+        if args.windows:
+            shutil.copy(WINDOWS_INSTALLER, publish / WINDOWS_INSTALLER.name)
+        exe = publish / (EXECUTABLE + (".exe" if args.windows else ""))
         if not exe.exists():
             print("错误：发布结果里没有 " + EXECUTABLE, file=sys.stderr)
             return 1
@@ -65,7 +76,10 @@ def main():
                 z.writestr(info, path.read_bytes())
     size = out.stat().st_size / 1024 / 1024
     print("已生成 {0}（{1:.1f} MB）".format(out.relative_to(ROOT) if out.is_relative_to(ROOT) else out, size))
-    print("UOS：需要增加执行权限的文件填 {0}，入口程序启动命令填 ./{0}，端口 8899".format(EXECUTABLE))
+    if args.windows:
+        print("Windows：解压后在管理员 PowerShell 里运行 powershell -ExecutionPolicy Bypass -File .\\install.ps1 -DevLogin")
+    else:
+        print("UOS：需要增加执行权限的文件填 {0}，入口程序启动命令填 ./{0}，端口 8899".format(EXECUTABLE))
     return 0
 
 

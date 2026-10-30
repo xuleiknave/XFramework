@@ -113,6 +113,31 @@ Multiverse 要求服务器进程启动后报告“就绪”（`sdk.ready()`）�
 - **UOS 账号登录**：服务器要能校验 Passport 令牌才能确认玩家身份。需要知道 UOS 给常驻服务器的校验方式（JWT 公钥或校验接口），可以在 UOS 后台或问 UOS 客服：“自建 / Func Stateful 服务器怎么校验 Passport 的 access token 并拿到 userId”。知道以后我在 `Starline.Server.Host` 里接上，客户端把令牌放进请求头 `X-UOS-Token`。
 - **固定地址**：客户端填的是服务器的 IP。服务器换了 IP 要改 `server.json` 重新发包，正式上线前要有固定域名。
 
+## 部署到自己的 Windows 服务器（香港测试服）
+
+混合部署（决策 71）：正式的微信小游戏走 UOS 云函数（小游戏的请求域名要 ICP 备案，香港服务器和 `.ai` 域名备不了）；自己的香港阿里云服务器（Windows Server 2025，IIS 上跑着官网）跑同一个 `starline-server`，做测试服和 TapTap 测试版 App 的后端，以后也可以做海外版。
+
+```
+python3 tools/uos/package_server.py --windows
+```
+
+生成 `dist/starline-server-<版本>-win-x64.zip`（约 36 MB，自带 .NET 运行时，服务器上不用装 .NET）。上传到服务器解压，在**管理员** PowerShell 里运行：
+
+```
+powershell -ExecutionPolicy Bypass -File .\install.ps1 -DevLogin
+```
+
+`install.ps1`（源文件 `server/deploy/windows/install.ps1`）做四件事，再跑一次就是更新：
+
+1. 没装过时下载安装 MongoDB 7.0 社区版（Windows 服务 `MongoDB`，只监听 127.0.0.1，外网连不到）
+2. 停掉旧的服务端，复制到 `C:\Starline\server`
+3. 注册计划任务 `StarlineServer`：开机以 SYSTEM 身份启动，退出后 1 分钟内重启；日志在 `C:\Starline\logs\server.log`
+4. Windows 防火墙放行端口（默认 8899），访问 `http://localhost:8899/status` 自检
+
+参数：`-Port`、`-DevLogin`（测试服才加）、`-WechatAppId`、`-WechatSecret`（写成机器级环境变量，不落文件）。**不改 IIS 和官网**。还要在阿里云控制台“轻量应用服务器 → 防火墙”里放行 TCP 8899，之后客户端的 `server.json` 填 `http://47.242.236.216:8899`。
+
+现在是明文 HTTP、IP 直连，只适合测试。要给 App 正式用时再加 HTTPS：在 IIS 里装 URL Rewrite 和 ARR，给一个子域名（比如 `api.xulei.ai`）反向代理到 `localhost:8899`。国内玩家访问不要走 Cloudflare 代理（国内经常很慢或断开）。备份：每天用 `mongodump` 导出 `starline` 库，还没写成计划任务。
+
 ## 部署成云函数
 
 这一节是 Func Stateless（云函数）的做法，账号和存档服务现在用它（决策 65）。UOS 的 C# 云函数要从团结编辑器里的 Func Stateless 插件上传（UOS 文档“开发指南(C#)”），代码放在工程的 `Assets/Scripts/CloudService/`，所有函数代码都要在这一个目录里。服务端代码平时放在 `server/src`，部署前用脚本复制过去。
