@@ -1,5 +1,9 @@
 # 服务端数据结构（UOS CRUD Save / MySQL）
 
+> 2026-10-30（决策 76）：Steam 不做。本文里的 Steam 登录、Steam 票据、SteamID、已购内容（DLC）、海外 Steam 玩家延迟和商店页等内容都不再做，账号走微信小游戏登录（App 端以服务端设计为准）；正文暂时保留，改到相关部分时再删。
+
+存档里还要加抽卡数据（决策 74）：招贤令、魂、各卡池的保底计数、招贤值、新手招贤已抽次数和已领的章节招贤；`recruit_source` 增加“抽卡”；每次抽卡在 `economy_log` 记一条（抽了哪个池、出了谁），保存不少于 90 天。
+
 开发者要求：服务端用 C# 开发，数据库用 MySQL，先设计表结构。之后定为服务端全部托管在 UOS（决策 50）：数据库起步用 CRUD Save（文档存储），量大后换 CRUD Storage（托管 MySQL）。本文第 0 节说明两个阶段，第 11 节是 CRUD Save 阶段的文档结构；第 1~10 节是 MySQL 阶段的表，建表语句在 [`server/db/schema.sql`](../server/db/schema.sql)。
 
 这一步只有数据结构设计，还没有服务端代码。玩家必须联网登录才能玩（决策 49），服务端怎么登录、怎么结算、有哪些接口，见 [server-design.md](server-design.md)。通关录像的业务规则（重跑验证、榜单）见 [replay-server.md](replay-server.md)（PR #6 的方案草案）；录像相关的表收在本文第 6 节，CRUD Save 阶段的放法见第 11 节。

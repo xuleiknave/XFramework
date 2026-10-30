@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Starline（星线）
 
-西游后传题材（取经之后，星线断了、星宿坠落成妖）的战略游戏，先做国内微信小游戏（广告变现、需联网登录，服务端在 UOS；Steam 买断版搁置，见 `docs/decisions.md` 决策 66~72）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
+西游后传题材（取经之后，星线断了、星宿坠落成妖）的战略游戏，先做国内微信小游戏（广告变现、角色靠免费抽卡获得、需联网登录，服务端在 UOS；Steam 不做，约 300 名角色一次做完整版上线，见 `docs/decisions.md` 决策 66~76）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
 
 ## 先读这些
 
@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docs/decisions.md`：关键决策和理由，改设计前先看
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
-- `docs/characters.md`：47 名角色的小传（升星逐段解锁的个人小故事）
+- `docs/characters.md`：已写好的 49 名角色的小传（升星逐段解锁的个人小故事；总规模约 300 名，见设计文档第 15 节）
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
 - `docs/server-design.md`：服务端设计（必须联网登录、服务端为准、战斗登记和重跑结算、接口清单）
 - `docs/server-database.md`：服务端数据结构（CRUD Save 文档、MySQL 表）
