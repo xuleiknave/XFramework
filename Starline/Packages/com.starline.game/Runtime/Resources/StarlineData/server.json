@@ -1,0 +1,4 @@
+{
+  "_说明": "游戏服务器的地址（客户端读取，内核不用）。url 填 UOS 服务器程序的地址，例如 http://1.2.3.4:8899（不带 /call）；留空时不连服务器，存档放在本机（装了 Func Stateless SDK 并定义 STARLINE_UOS_FUNC 时改走云函数）。启动参数 -server <地址> 可以临时覆盖。见 server/README.md。",
+  "url": ""
+}

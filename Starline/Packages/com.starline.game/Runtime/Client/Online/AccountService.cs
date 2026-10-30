@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Starline.Online;
 using UnityEngine;
 
 namespace Starline.Client
@@ -46,13 +47,70 @@ namespace Starline.Client
 
         public static bool HasAnyMethod => Registered.Count > 0;
 
+        /// <summary>
+        /// Signs in with the provider, then with the game server when this build has one: the server
+        /// checks the Passport token (or takes the developer account name), ends the account's other
+        /// sessions and returns the game's own session token (docs/server-design.md section 7).
+        /// </summary>
         public static async Task<AuthSession> SignIn(ILoginProvider provider)
         {
             AuthSession session = await provider.SignInAsync();
+            if (GameServerClient.IsAvailable)
+            {
+                session = await SignInToServer(session);
+            }
             Session = session;
             PlayerPrefs.SetString(LastMethodPref, provider.Id);
             PlayerPrefs.Save();
             return session;
+        }
+
+        private static async Task<AuthSession> SignInToServer(AuthSession provided)
+        {
+            var request = new ServerRequest
+            {
+                op = ServerOps.Login,
+                method = ServerMethod(provided.Method),
+                devAccount = provided.Method == LoginMethods.Dev ? provided.AccountId : null,
+                code = provided.Credential,
+            };
+            ServerResponse response;
+            try
+            {
+                response = await GameServerClient.Call(request);
+            }
+            catch (ServerCallException e)
+            {
+                // The provider stays signed in: pressing the button again only retries the server.
+                throw new LoginException(LoginException.ServerRefused, e.Describe());
+            }
+            GameServerClient.Session = response.session;
+            string name = string.IsNullOrEmpty(response.displayName) ? provided.DisplayName : response.displayName;
+            return new AuthSession(provided.Method, response.accountId, name, response.session);
+        }
+
+        private static string ServerMethod(string method)
+        {
+            switch (method)
+            {
+                case LoginMethods.Dev:
+                    return ServerOps.LoginMethodDev;
+                case LoginMethods.Wechat:
+                    return ServerOps.LoginMethodWechat;
+                default:
+                    return ServerOps.LoginMethodUos;
+            }
+        }
+
+        /// <summary>
+        /// After a link code moved this login to another account (link.redeem): the answer's session and
+        /// account replace the current ones; the login method stays the same.
+        /// </summary>
+        public static void Relinked(ServerResponse response)
+        {
+            GameServerClient.Session = response.session;
+            string name = string.IsNullOrEmpty(response.displayName) ? Session?.DisplayName : response.displayName;
+            Session = new AuthSession(Session?.Method, response.accountId, name, response.session);
         }
 
         /// <summary>Signs out; the next launch shows the login screen without logging in automatically.</summary>
@@ -62,10 +120,27 @@ namespace Starline.Client
             {
                 return;
             }
+            if (GameServerClient.IsAvailable && !string.IsNullOrEmpty(GameServerClient.Session))
+            {
+                // Best effort: the session also ends by itself at the next login or after a week unused.
+                _ = GameServerClient.Call(new ServerRequest { op = ServerOps.Logout }).ContinueWith(t => _ = t.Exception);
+            }
             Find(Session.Method)?.SignOut();
-            Session = null;
+            Forget();
             PlayerPrefs.DeleteKey(LastMethodPref);
             PlayerPrefs.Save();
+        }
+
+        /// <summary>
+        /// The game server ended the session (signed in on another device, expired). The login method
+        /// stays signed in and remembered, so logging in again is one click.
+        /// </summary>
+        public static void SessionLost() => Forget();
+
+        private static void Forget()
+        {
+            GameServerClient.Session = null;
+            Session = null;
         }
     }
 }

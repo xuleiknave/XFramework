@@ -11,6 +11,10 @@
             <ui:Label text="#menu.title" class="menu-title" picking-mode="Ignore" />
             <ui:Label text="#menu.tagline" class="menu-tagline" picking-mode="Ignore" />
 
+            <ui:Button name="login-wechat" class="menu-item menu-item--on">
+                <ui:Label text="#login.wechat" class="menu-item-title" picking-mode="Ignore" />
+                <ui:Label text="#login.wechat_sub" class="menu-item-sub" picking-mode="Ignore" />
+            </ui:Button>
             <ui:Button name="login-uos" class="menu-item menu-item--on">
                 <ui:Label text="#login.uos" class="menu-item-title" picking-mode="Ignore" />
                 <ui:Label text="#login.uos_sub" class="menu-item-sub" picking-mode="Ignore" />

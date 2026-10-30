@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    第一阶段的数据层：UOS CRUD Save（MongoDB）。云函数里通过 UOS 的 CRUD SDK 拿连接，
+    本机用连接字符串（比如 Docker 里的 MongoDB）。表结构见 docs/server-database.md。
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Starline.Server.Data/Starline.Server.Data.csproj" />
+    <PackageReference Include="UOS.FuncStateless.MongoDB" Version="1.1.8" />
+  </ItemGroup>
+
+</Project>

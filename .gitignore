@@ -17,3 +17,10 @@ Starline/*.csproj
 Starline/*.sln
 Starline/*.slnx
 __pycache__/
+
+# UOS 云函数源码的副本，由 tools/uos/sync_cloud_service.py 生成
+Starline/Assets/Scripts/CloudService/
+Starline/Assets/Scripts/CloudService.meta
+
+# 打包输出（tools/uos/package_server.py）
+dist/

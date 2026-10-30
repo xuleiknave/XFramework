@@ -12,6 +12,7 @@ namespace Starline.Client
     /// </summary>
     public sealed class LoginScreen : UiScreen
     {
+        private readonly Button _wechat;
         private readonly Button _uos;
         private readonly Button _dev;
         private readonly Button _cancel;
@@ -26,9 +27,11 @@ namespace Starline.Client
 
         public override bool UsesMenuScene => true;
 
-        public LoginScreen(GameApp app, bool autoLogin) : base(app, "Login")
+        /// <param name="message">Shown instead of "choose a login method", e.g. why the game server ended the session.</param>
+        public LoginScreen(GameApp app, bool autoLogin, string message = null) : base(app, "Login")
         {
             _status = Find<Label>("status");
+            _wechat = Button("login-wechat", () => SignIn(AccountService.Find(LoginMethods.Wechat)));
             _uos = Button("login-uos", () => SignIn(AccountService.Find(LoginMethods.Uos)));
             _dev = Button("login-dev", () => SignIn(AccountService.Find(LoginMethods.Dev)));
             _cancel = Button("cancel", Cancel);
@@ -45,6 +48,7 @@ namespace Starline.Client
             Button("quit", App.Quit);
             Find<Label>("version").text = Loc.Ui("menu.version", Application.version);
 
+            Show(_wechat, AccountService.Find(LoginMethods.Wechat) != null);
             Show(_uos, AccountService.Find(LoginMethods.Uos) != null);
             var devLogin = AccountService.Find(LoginMethods.Dev) as DevLogin;
             Show(Find<VisualElement>("dev-section"), devLogin != null);
@@ -53,10 +57,18 @@ namespace Starline.Client
                 _devAccount.value = devLogin.Account;
             }
             SetBusy(false);
-            SetStatus(AccountService.HasAnyMethod ? Loc.Ui("login.choose") : Loc.Ui("login.none"), !AccountService.HasAnyMethod);
+            if (message != null)
+            {
+                SetStatus(message, true);
+            }
+            else
+            {
+                SetStatus(AccountService.HasAnyMethod ? Loc.Ui("login.choose") : Loc.Ui("login.none"), !AccountService.HasAnyMethod);
+            }
             if (autoLogin)
             {
-                _autoLogin = AccountService.Find(AccountService.LastMethod);
+                // In the WeChat mini game the first launch signs in by itself too: WeChat already knows who is playing.
+                _autoLogin = AccountService.Find(AccountService.LastMethod) ?? AccountService.Find(LoginMethods.Wechat);
             }
         }
 
@@ -80,6 +92,8 @@ namespace Starline.Client
             {
                 case LoginMethods.Uos:
                     return Loc.Ui("login.method_uos");
+                case LoginMethods.Wechat:
+                    return Loc.Ui("login.method_wechat");
                 case LoginMethods.Dev:
                     return Loc.Ui("login.method_dev");
                 default:
@@ -103,6 +117,13 @@ namespace Starline.Client
             try
             {
                 await AccountService.SignIn(provider);
+                SetStatus(Loc.Ui("login.loading_saves"), false);
+                await App.LoadSaves();
+            }
+            catch (ServerCallException e)
+            {
+                Fail(attempt, Loc.Ui(LoginException.ServerRefused, e.Describe()));
+                return;
             }
             catch (LoginException e)
             {
@@ -142,6 +163,7 @@ namespace Starline.Client
         private void SetBusy(bool busy)
         {
             _busy = busy;
+            _wechat.SetEnabled(!busy);
             _uos.SetEnabled(!busy);
             _dev.SetEnabled(!busy);
             _devAccount.SetEnabled(!busy);

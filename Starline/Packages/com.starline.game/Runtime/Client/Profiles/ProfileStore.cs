@@ -5,12 +5,13 @@ using UnityEngine;
 namespace Starline.Client
 {
     /// <summary>
-    /// Save slots on disk: one JSON file per slot in Application.persistentDataPath/saves.
+    /// Save slots on disk: one JSON file per slot in Application.persistentDataPath/saves. Used by
+    /// <see cref="LocalSaveRepository"/> in builds without the game server.
     /// Writes go to a temporary file first so a crash never leaves a half-written save.
     /// </summary>
     public static class ProfileStore
     {
-        public const int SlotCount = 3;
+        public const int SlotCount = Starline.Online.ServerLimits.SlotCount;
 
         private static string Folder => Path.Combine(Application.persistentDataPath, "saves");
 
@@ -40,21 +41,6 @@ namespace Starline.Client
                 Debug.LogWarning("Starline：读取存档 " + path + " 失败：" + e.Message);
                 return null;
             }
-        }
-
-        /// <summary>The most recently played profile, or null when there is no save yet.</summary>
-        public static CommanderProfile LoadLastPlayed()
-        {
-            CommanderProfile last = null;
-            for (int i = 0; i < SlotCount; i++)
-            {
-                CommanderProfile profile = Load(i);
-                if (profile != null && (last == null || profile.lastPlayedTicks > last.lastPlayedTicks))
-                {
-                    last = profile;
-                }
-            }
-            return last;
         }
 
         /// <summary>The first slot without a save file, or -1 when all are taken.</summary>

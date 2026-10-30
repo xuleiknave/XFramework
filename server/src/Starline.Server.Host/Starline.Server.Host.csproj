@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    常驻进程版的服务端：一个 HTTP 服务，部署成 UOS 的“服务器程序镜像”（dotnet-runtime:9.0）。
+    规则和数据层与云函数版共用。打包：python3 tools/uos/package_server.py（见 server/README.md）。
+    目标 net8.0 并允许大版本前滚，所以镜像里的 .NET 9 运行时能直接运行。
+  -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <RollForward>Major</RollForward>
+    <AssemblyName>starline-server</AssemblyName>
+    <RootNamespace>Starline.Server.Host</RootNamespace>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Starline.Server.Game/Starline.Server.Game.csproj" />
+    <ProjectReference Include="../Starline.Server.Data.CrudSave/Starline.Server.Data.CrudSave.csproj" />
+  </ItemGroup>
+
+</Project>

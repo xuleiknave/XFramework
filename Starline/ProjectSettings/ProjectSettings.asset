@@ -1043,7 +1043,7 @@ PlayerSettings:
   androidEGLPriority: 0
   platformRequiresReadableAssets: 0
   virtualTexturingSupportEnabled: 0
-  insecureHttpOption: 0
+  insecureHttpOption: 1
   useStringInternPool: 0
   renderThreadTakeSnapshotOnlyOnce: 0
   miniGameRenderThreadSyncMode: 0

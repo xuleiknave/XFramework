@@ -28,6 +28,8 @@ namespace Starline.Client
         public ExpeditionRun Run { get; private set; }
         /// <summary>The save slot in use, or null before the first commander is created.</summary>
         public CommanderProfile Profile { get; private set; }
+        /// <summary>The signed-in account's save slots (on the game server, or local files without one); null before login.</summary>
+        public SaveRepository Saves { get; private set; }
         /// <summary>Language and graphics settings, shared by all save slots (changed on the settings screen).</summary>
         public GameSettings Settings { get; private set; }
 
@@ -59,10 +61,28 @@ namespace Starline.Client
         {
             yield return Loc.Initialize(Settings.language);
             Loc.LanguageChanged += OnLanguageChanged;
+            GameServerClient.SessionLost += OnSessionLost;
             ShowLogin(autoLogin: true);
         }
 
-        private void OnDestroy() => Loc.LanguageChanged -= OnLanguageChanged;
+        private void OnDestroy()
+        {
+            Loc.LanguageChanged -= OnLanguageChanged;
+            GameServerClient.SessionLost -= OnSessionLost;
+        }
+
+        /// <summary>Signed in on another device, or the session expired: back to the login screen with the reason.</summary>
+        private void OnSessionLost(ServerCallException reason)
+        {
+            if (!AccountService.IsSignedIn)
+            {
+                return;
+            }
+            ForgetAccount();
+            AccountService.SessionLost();
+            Ui.CloseModals();
+            ShowLogin(message: reason.Describe());
+        }
 
         private void OnLanguageChanged() => _languageChanged = true;
 
@@ -109,21 +129,40 @@ namespace Starline.Client
         {
             if (paused)
             {
-                SaveProfile();
+                SaveProfile(force: true);
             }
         }
 
-        private void OnApplicationQuit() => SaveProfile();
+        private void OnApplicationQuit() => SaveProfile(force: true);
 
-        /// <summary>Writes the current profile with an updated "last played" time.</summary>
-        public void SaveProfile()
+        /// <summary>
+        /// Keeps the current profile with an updated "last played" time (on the game server: reported
+        /// at most once a minute unless <paramref name="force"/>d or the expedition counts changed).
+        /// </summary>
+        public void SaveProfile(bool force = false)
         {
-            if (Profile == null)
+            if (Profile == null || Saves == null)
             {
                 return;
             }
             Profile.lastPlayedTicks = System.DateTime.Now.Ticks;
-            ProfileStore.Save(Profile);
+            Saves.Save(Profile, force);
+        }
+
+        /// <summary>After logging in: the account's save slots. Fails with <see cref="ServerCallException"/>.</summary>
+        public async System.Threading.Tasks.Task LoadSaves()
+        {
+            SaveRepository saves = SaveRepository.ForCurrentAccount();
+            await saves.Load();
+            Saves = saves;
+            Profile = null;
+        }
+
+        private void ForgetAccount()
+        {
+            Saves = null;
+            Profile = null;
+            Run = null;
         }
 
         public bool IsPointerOverUi(Vector2 screenPosition) => Ui.IsPointerOverUi(screenPosition);
@@ -182,7 +221,7 @@ namespace Starline.Client
                 StartRun();
                 return;
             }
-            int slot = ProfileStore.FirstEmptySlot();
+            int slot = Saves.FirstEmptySlot();
             if (slot < 0)
             {
                 ShowSaveSlots();
@@ -199,20 +238,21 @@ namespace Starline.Client
         /// The login screen, shown first at launch and after signing out. At launch it signs in again
         /// with the login method used last time.
         /// </summary>
-        public void ShowLogin(bool autoLogin = false)
+        public void ShowLogin(bool autoLogin = false, string message = null)
         {
-            SaveProfile();
+            SaveProfile(force: true);
             Run = null;
             Stage.Clear();
             Stage.SetVisible(false);
-            Show(new LoginScreen(this, autoLogin));
+            Show(new LoginScreen(this, autoLogin, message));
             Music.PlayScreen("menu");
         }
 
         /// <summary>Signs out of the account (from the main menu) and goes back to the login screen.</summary>
         public void LogOut()
         {
-            SaveProfile();
+            SaveProfile(force: true);
+            ForgetAccount();
             AccountService.SignOut();
             ShowLogin();
         }
@@ -220,14 +260,14 @@ namespace Starline.Client
         /// <summary>The home screen; picks up the most recently played save when none is in use. Needs a signed-in account.</summary>
         public void ShowMainMenu()
         {
-            if (!AccountService.IsSignedIn)
+            if (!AccountService.IsSignedIn || Saves == null)
             {
                 ShowLogin();
                 return;
             }
             if (Profile == null)
             {
-                Profile = ProfileStore.LoadLastPlayed();
+                Profile = Saves.LastPlayed();
             }
             SaveProfile();
             Run = null;

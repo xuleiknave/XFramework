@@ -8,6 +8,8 @@ namespace Starline.Client
     {
         /// <summary>UOS Passport (the account service of Tuanjie's online services).</summary>
         public const string Uos = "uos";
+        /// <summary>WeChat mini game: signs in by itself with wx.login, no button to press.</summary>
+        public const string Wechat = "wechat";
         /// <summary>Developer login without a password, only in the editor and development builds.</summary>
         public const string Dev = "dev";
     }
@@ -36,6 +38,8 @@ namespace Starline.Client
         public const string Cancelled = "login.cancelled";
         public const string Failed = "login.failed";
         public const string EmptyAccount = "login.empty_account";
+        /// <summary>Signed in with the provider, but the game server refused or could not be reached; {0} says why.</summary>
+        public const string ServerRefused = "login.server_failed";
 
         public LoginException(string reasonKey, string detail = null) : base(detail ?? reasonKey)
         {

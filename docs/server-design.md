@@ -6,7 +6,7 @@
 
 本文是服务端的整体设计：怎么登录、战斗怎么结算、养成操作怎么提交、工程怎么分、有哪些接口。表结构见 [server-database.md](server-database.md)，通关录像的规则见 [replay-server.md](replay-server.md)（PR #6，其中“断网时先存本地队列”的部分不再需要）。
 
-这一步仍是设计，还没有服务端代码。
+S1（登录、存档位）已经写好，代码和部署步骤见 [server/README.md](../server/README.md)；后面的阶段仍是设计。
 
 ---
 
@@ -114,7 +114,7 @@ POST /v1/battles/{battle_id}/finish  结束：带帧号的指令、客户端算�
 
 | 职责 | UOS 服务 | 说明 |
 |---|---|---|
-| 所有接口（登录、存档、战斗结算、养成、远征、录像榜） | Func Stateless（C# 云函数，HTTP 触发） | 战斗重跑单场几毫秒，按 GB·秒计费；上限 100 QPS，个人项目起步够用 |
+| 所有接口（登录、存档、战斗结算、养成、远征、录像榜） | 部署成 Func Stateless 云函数 `StarlineService.Call`（决策 63、65）；同一套规则也能部署成服务器程序镜像（常驻 HTTP 进程 `starline-server`，`POST /call`，决策 64），但 Multiverse 单台有存活上限、IP 会变，不用来做账号和存档。两种都是同一个 `ServerRequest`，请求里的 `op` 区分接口 | 战斗重跑单场几毫秒，按 GB·秒计费；上限 100 QPS，个人项目起步够用 |
 | 数据库 | CRUD Save → CRUD Storage（托管 MySQL） | 两个阶段见 [server-database.md](server-database.md) 第 0 节；只有云函数能读写 |
 | 账号 | Passport：微信小游戏直接登录；Steam、iOS 走“外部 ID 登录”，由云函数先校验 Steam 票据再映射 | 计费口径待确认，太贵就由云函数自己处理登录（replay-server.md 第 12 节） |
 | 配置表、客户端资源 | CDN | 配置表 JSON 跟云函数一起打包，客户端的随包发 |
@@ -125,14 +125,13 @@ POST /v1/battles/{battle_id}/finish  结束：带帧号的指令、客户端算�
 
 ```
 server/
-  Starline.Server.sln
   src/
-    Starline.Server.Game/      游戏规则：战斗登记和结算、养成、商店、工坊、远征、录像榜（引用 src/Starline.Battle）
-                               纯 .NET 类库，不依赖 UOS，也不直接碰数据库
-    Starline.Server.Data/      数据层接口（IAccountStore、ISaveStore、IBattleStore、IReplayStore……）
-      CrudSave/                CRUD Save 实现（第一阶段）
-      MySql/                   MySQL 实现（第二阶段，MySqlConnector + Dapper，表结构见 db/schema.sql）
-    Starline.Server.Uos/       UOS 云函数入口：路由、鉴权、参数解析，调 Game 层；很薄
+    Starline.Server.Game/      游戏规则：登录和会话、存档（S1 已写）；以后加战斗登记和结算、养成、商店、工坊、远征、录像榜
+                               纯 .NET 类库，不依赖 UOS，也不直接碰数据库；和客户端共用的消息格式在内核的 Online/ 目录
+    Starline.Server.Data/      数据层接口 IServerStore + 内存实现
+    Starline.Server.Data.CrudSave/  CRUD Save（MongoDB）实现（第一阶段）
+    （以后）Starline.Server.Data.MySql/  MySQL 实现（第二阶段，MySqlConnector + Dapper，表结构见 db/schema.sql）
+    Starline.Server.Uos/       UOS 云函数入口 StarlineService：取 Passport 身份、调 Game 层；很薄
   tests/
     Starline.Server.Tests/     规则、结算、重试幂等、乐观锁冲突的测试（数据层用内存实现）
   db/
@@ -147,24 +146,28 @@ server/
 
 ### 6.3 部署和备份
 
-- 云函数用 UOS 后台或 `usf-cli` 部署；配置表按 `data/<data_hash>/` 一起打进函数包。
+- C# 云函数用团结编辑器里的 Func Stateless 插件上传（`usf-cli` 只支持 JS）：`tools/uos/sync_cloud_service.py` 把 `server/src` 的源码复制到工程的 `Assets/Scripts/CloudService/`，步骤见 server/README.md；配置表以后按 `data/<data_hash>/` 一起打进函数包。
 - 每天由一个定时云函数把 CRUD 里的数据导出成 JSON 存档备份，防误删，也方便以后迁出 UOS 或换到 MySQL。
-- 开发和正式环境分开两个 UOS 应用。UOS 的试用额度不能用于正式商用。
+- 开发和正式环境分开两个 UOS 应用。UOS 的试用额度不能用于正式商用。两边代码相同，只差环境变量（开发应用设 `STARLINE_DEV_LOGIN=1` 接受开发者登录）；每次上传后调一次自检云函数 `StarlineService.Status`，看版本、数据库和 Passport 校验是否正常（server/README.md“部署到 UOS”）。
 
 ---
 
 ## 7. 接口
 
-全部 HTTPS + JSON，由 UOS 云函数的 HTTP 触发器提供，路径以 `/v1` 开头。除了登录，都要带 `Authorization: Bearer <访问令牌>`；修改类请求还要带 `Idempotency-Key: <UUID>`。
+下面按 REST 的样子列出全部接口，方便看清有哪些功能。**实际实现**（决策 63）是一个云函数 `StarlineService.Call`：客户端交一个 `ServerRequest`（JSON），`op` 对应下表的一行（如 `saves.create`），`session` 是会话令牌，修改类请求的 `key` 就是 Idempotency-Key；返回 `ServerResponse`，`code` 为空表示成功，否则是错误码。消息格式见 `Runtime/Battle/Online/ServerProtocol.cs`，S1 已实现的 op 见 server/README.md。
 
 ### 登录与账号
 
-令牌由云函数自己签发（里面带会话 id），不直接用 Passport 的令牌：这样“一个账号只能在一台电脑上登录”和踢下线都由我们控制，以后不用 Passport 也不影响客户端。Passport 只负责“这个人是谁”。
+登录方式（决策 70）：微信小游戏用微信登录（不用点按钮），安卓 App 用 Passport 手机号验证码登录（App 接微信登录要企业资质）；两边靠绑定码共用一个账号。一个账号可以挂多个登录身份（`identities` 集合），所以以后加 TapTap 登录也只是多一种身份。
+
+令牌由云函数自己签发（里面带会话 id），不直接用 Passport 的令牌：这样“一个账号只能在一台电脑上登录”和踢下线都由我们控制，以后不用 Passport 也不影响客户端。Passport 只负责“这个人是谁”：客户端把 Passport 令牌放进 `FuncContext`（请求头 `X-UOS-Token`），登录时云函数用 `FuncContext.ValidateToken` 校验。S1 只发一个会话令牌，7 天不用才过期，不分访问令牌和刷新令牌（决策 63）；下表的 `refresh` 暂不需要。
 
 | 方法 | 路径 | 用途 |
 |---|---|---|
 | POST | `/v1/auth/steam` | 云函数校验 Steam 票据 → 用 Passport 外部 ID 登录换出玩家 id → 签发访问令牌（15 分钟）和刷新令牌（30 天）；第一次登录自动建账号；**作废这个账号的其他会话** |
-| POST | `/v1/auth/wechat` | 微信小游戏：Passport 微信登录，之后同上 |
+| POST | `/v1/auth/wechat` | 微信小游戏：客户端 `wx.login` 拿一次性 code，云函数调微信 code2Session 换 openid（身份 `wx:<openid>`），之后同上。已实现（`auth.login`，`method` = `wechat`，决策 70） |
+| POST | `/v1/link/code` | 生成 6 位绑定码（5 分钟、只能用一次）。已实现（`link.create`） |
+| POST | `/v1/link/redeem` | 在另一台设备输入绑定码：这台设备的登录身份挂到绑定码所属的账号上，两边从此是同一个账号、同一份存档；两边都有存档时先返回 `link_choice` 和两边的存档，玩家选 `keep`（`mine` / `linked`）后再执行，没保留的一边移进已删除的存档。同一账号每 10 分钟最多输错 5 次。已实现（`link.redeem`） |
 | POST | `/v1/auth/refresh` | 用刷新令牌换新的一对令牌 |
 | POST | `/v1/auth/logout` | 作废当前会话 |
 | GET | `/v1/me` | 账号信息、已购内容、设置、存档列表 |
@@ -232,7 +235,7 @@ server/
 | 阶段 | 内容 |
 |---|---|
 | S0 UOS 验证 | 验证云函数已写好（`server/probe/`，部署步骤见它的 README）。在 UOS 后台部署这个最小的 C# 云函数：带上内核和配置表跑一场战斗、读写一份 CRUD Save 文档（试条件写）、访问 Steam Web API。第 9 节列的问题在这一步得到答案 |
-| S1 服务端骨架 | `server/` 工程、登录（开发期用 `dev` 登录方式免 Steam）、存档接口、CRUD Save 数据层、部署到 UOS |
+| S1 服务端骨架 | ✅ 已写（server/README.md）：`server/` 工程、登录（UOS Passport；开发用的 UOS 应用另接受 `dev` 登录）、存档位接口、CRUD Save 数据层、客户端存档改走服务器。部署到 UOS 要在团结编辑器里做，还没实际部署过 |
 | S2 战斗结算 | 战斗登记和重跑、关卡进度、经验和掉落；配置表新增 `progression.json`（经验曲线、升星消耗、等级上限）、`stages.json`（主线关卡、掉落） |
 | S3 客户端联网 | 登录界面（✅ 已做：UOS Passport 和开发者登录，见 client-architecture.md“登录”，还没接服务端）、网络层（令牌刷新、重试、断线重连）、存档从本地 JSON 改为服务端快照；主菜单和存档界面改为读服务端 |
 | S4 养成和玩法 | 召唤、升星、符文、商店、炼金工坊、星辉高塔；远征改为服务端推进 |

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    UOS Func Stateless 的入口（云函数类 StarlineService），很薄：解析调用、交给 Starline.Server.Game。
+    这里用 NuGet 上的 UOS.FuncStateless.SDK 做编译检查；实际部署走团结编辑器里的 Func Stateless 插件，
+    步骤见 server/README.md。
+  -->
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <Nullable>disable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../Starline.Server.Game/Starline.Server.Game.csproj" />
+    <ProjectReference Include="../Starline.Server.Data.CrudSave/Starline.Server.Data.CrudSave.csproj" />
+    <PackageReference Include="UOS.FuncStateless.SDK" Version="0.1.0" />
+  </ItemGroup>
+
+</Project>
