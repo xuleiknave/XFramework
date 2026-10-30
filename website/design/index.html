@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>星线 · 设计资料</title>
-<meta name="description" content="《星线》的世界观、五方阵营、角色名录、玩法规则和美术风格。">
+<meta name="description" content="《星线》的故事章节、五个阵营的特色词条和组合技、布阵与八门阵、灵脉和玩法规则。">
 <meta name="theme-color" content="#141A2A">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<!-- 由 website/build_design.py 生成，改内容请改脚本或设计文档后重新生成 -->
+<!-- 由 website/build_design.py 生成，改内容请改脚本后重新生成 -->
 <style>
 :root {
   --paper: #F3EAD8; --paper-deep: #E8DCC2; --ink: #1E2230; --night: #141A2A; --night-2: #232B40;
@@ -39,6 +39,7 @@ em { font-style: normal; color: var(--cinnabar); }
 table { border-collapse: collapse; width: 100%; font-size: 15px; background: #F7F0E2; }
 th, td { border: 1px solid rgba(30, 34, 48, .25); padding: 9px 12px; text-align: left; vertical-align: top; }
 td:first-child { white-space: nowrap; }
+tr.act td { background: var(--night-2); color: var(--gold-hi); font-family: var(--serif); letter-spacing: .1em; }
 th { background: var(--paper-deep); font-family: var(--serif); white-space: nowrap; }
 ul.list { padding-left: 1.2em; margin: 0 0 1em; color: var(--body); }
 ul.list li { margin-bottom: .35em; }
@@ -73,85 +74,78 @@ footer a { color: var(--gold-hi); }
 <nav class="nav">
   <a class="brand" href="../">← 星线</a>
   <ul>
-    <li><a href="#world">世界观</a></li>
-    <li><a href="#factions">五方阵营</a></li>
-    <li><a href="#story">第一幕</a></li>
-    <li><a href="#roster">角色名录</a></li>
+    <li><a href="#story">故事</a></li>
+    <li><a href="#factions">阵营</a></li>
+    <li><a href="#combos">组合技</a></li>
     <li><a href="#rules">玩法规则</a></li>
-    <li><a href="#growth">养成</a></li>
-    <li><a href="#art">美术风格</a></li>
+    <li><a href="#gates">八门阵</a></li>
+    <li><a href="#art">美术</a></li>
+    <li><a href="../roster/">角色名录</a></li>
   </ul>
 </nav>
 <header class="top">
   <h1>设计资料</h1>
-  <p>《星线》正在开发中，这里整理了目前的世界观、角色和玩法设计。名字和规则都还是草案，会随开发和测试调整，以正式上线版本为准。</p>
+  <p>《星线》正在开发中，这里整理了目前的故事、阵营和玩法设计。名字和规则都还是草案，会随开发和测试调整，以正式上线版本为准。</p>
 </header>
 <main>
 
-<section class="doc" id="world">
-  <h2>世界观<small>WORLD</small></h2>
-  <h3>星线是一道封印</h3>
-  <p>一千年前，大地深处醒来一股吞食灵力的饥饿，人们叫它<em>永夜</em>。天上的织女带着人间的术士和青丘的灵族，把二十八星宿落下的碎星——<em>星石</em>——一颗颗立在九州大地上，照着天上星宿的样子连成<em>星络</em>，把永夜压在大地尽头。这群人叫<em>织网者</em>，这张网就是<em>星线</em>。</p>
-  <p>千年过去，人们忘了星线是封印，只记得它是城池的灯火、结界和田地的来源。青丘灵族记得，但他们不再信任贪图灵力的人，退回了山林。</p>
-  <h3>断线日</h3>
-  <p>星历四百一十二年，司星监的前任监正打开了初源星石。星线从源头开始被永夜吸干，这一天叫<em>断线日</em>。失去灵力的城池结界崩塌，永夜的墨色漫进城里，被墨色沾上的人成了<em>墨蚀者</em>：他们不是天生的妖魔，而是陷落城池的百姓和守军，记忆被墨色封住，只剩下饥饿。</p>
-  <h3>望星城与持线人</h3>
-  <p>星线最末端的边城望星城，靠一座观星台撑了下来。观星台的星石里住着一缕星魂<em>阿织</em>，她能预见战局，却记不起自己是谁。断线日那一夜，观星台也选中了一个人：只有这个人听得见阿织的声音。这个人就是玩家，望星城新任的<em>持线人</em>。持线人不配语音、不定性别，要沿着星线一段段打回去，把星石重新点亮，把各方的人连在一起。</p>
-  <h3>五根线</h3>
-  <p>阿织说，重织星线需要五根线，五方各出一根。主界面的星图上从一开始就有五个空的星宿位，每拿到一根亮一个。最意外的是“救赎”：墨蚀者也能成为一根线。</p>
+<section class="doc" id="story">
+  <h2>故事<small>STORY</small></h2>
+  <p>故事就是《西游记》原著，没有原创的世界观和主角。玩家直接指挥取经队，从大闹天宫一路走到灵山。每一章是原著里的一难，章末的妖王打赢后按原著收服，或者被主人领回去，游戏里都能招募。一章约五关，适合通勤路上打。</p>
   <div class="table"><table>
-    <tr><th>线</th><th>阵营</th><th>主题</th></tr>
-    <tr><td>守护</td><td>守星军</td><td>宁可自己倒下，也不让星石熄灭</td></tr>
-    <tr><td>自由</td><td>逐星骑</td><td>只为自己认的人拼命</td></tr>
-    <tr><td>知识</td><td>司星监</td><td>力量来自理解，也会被它反噬</td></tr>
-    <tr><td>救赎</td><td>墨蚀者</td><td>想起自己是谁，就能选择站在哪一边</td></tr>
-    <tr><td>信任</td><td>青丘灵族</td><td>一千年前的约，要不要再立一次</td></tr>
+    <tr><th>章</th><th>原著情节</th><th>章末妖王（打赢后加入）</th></tr>
+    <tr><td>序章 大闹天宫</td><td>打天兵、斗巨灵神、战哪吒，最后和二郎神打成平手，被压在五行山下</td><td>—</td></tr>
+    <tr class="act"><td colspan="3">第一幕 师徒聚齐</td></tr>
+    <tr><td>1 两界山</td><td>唐僧揭帖救出悟空</td><td>—（悟空、唐僧加入）</td></tr>
+    <tr><td>2 鹰愁涧</td><td>白龙吃了白马</td><td>小白龙</td></tr>
+    <tr><td>3 黑风山</td><td>观音院失火，袈裟被盗</td><td>黑熊精</td></tr>
+    <tr><td>4 高老庄</td><td>假女婿是猪刚鬣</td><td>猪八戒</td></tr>
+    <tr><td>5 黄风岭</td><td>三昧神风吹伤悟空的眼</td><td>黄风怪</td></tr>
+    <tr><td>6 流沙河</td><td>水战收沙僧，师徒五人齐了</td><td>沙悟净</td></tr>
+    <tr class="act"><td colspan="3">第二幕 西行路上</td></tr>
+    <tr><td>7 五庄观</td><td>偷人参果，推倒果树</td><td>镇元子（不打，比试）</td></tr>
+    <tr><td>8 平顶山</td><td>紫金葫芦与羊脂玉净瓶</td><td>金角、银角</td></tr>
+    <tr><td>9 火云洞</td><td>三昧真火</td><td>红孩儿</td></tr>
+    <tr><td>10 通天河</td><td>陈家庄献祭，冰面往西</td><td>灵感大王</td></tr>
+    <tr class="act"><td colspan="3">第三幕 灵山在望</td></tr>
+    <tr><td>11 真假美猴王</td><td>六耳猕猴，和自己打</td><td>六耳猕猴</td></tr>
+    <tr><td>12 火焰山</td><td>三借芭蕉扇</td><td>牛魔王、铁扇公主</td></tr>
+    <tr><td>13 狮驼岭</td><td>三魔封路，最难的一难</td><td>青狮、白象、大鹏</td></tr>
+    <tr><td>14 灵山</td><td>取得真经，最后一难</td><td>—（结局）</td></tr>
   </table></div>
+  <p>通关回顾叫“八十一难”：每过一关点亮一难，最后是一张西行路线图，记下你走过的路、最常上阵的角色和最难打的那一仗。</p>
 </section>
 
 <section class="doc" id="factions">
-  <h2>五方阵营<small>FACTIONS</small></h2>
+  <h2>五个阵营<small>FACTIONS</small></h2>
+  <p>阵营按原著里“是谁的人”来分，不按人、仙、妖分。原著里最有名的梗就是：有后台的妖怪被主人领回家，没后台的被打死。</p>
   <div class="table"><table>
-    <tr><th>阵营</th><th>方位</th><th>是谁</th><th>和持线人的关系</th></tr>
-    <tr><td>守星军</td><td>北 · 玄武</td><td>望星城的守军，由老将军雷震带领，旗上绣玄武</td><td>开局就在身边</td></tr>
-    <tr><td>逐星骑</td><td>西 · 白虎</td><td>散落在边州的猎户、斥候和游侠，旗上绣白虎</td><td>第一章起陆续加入</td></tr>
-    <tr><td>司星监</td><td>南 · 朱雀</td><td>观星的术士，掌管星线的学问；断线日后半数术士失踪，旗上绣朱雀</td><td>第二幕加入</td></tr>
-    <tr><td>墨蚀者</td><td>中</td><td>被永夜墨色侵蚀的陷落城池之民</td><td>先是敌人；洗去墨色、唤醒记忆后加入</td></tr>
-    <tr><td>青丘灵族</td><td>东 · 青龙方位</td><td>山林里的狐族和花木之灵，织网者的另一半</td><td>先因误会交战，第三幕结盟</td></tr>
+    <tr><th>阵营</th><th>是谁</th><th>特色词条</th><th>打法</th></tr>
+    <tr><td>西天路</td><td>师徒五人，暗中保护他们的护法，还有一路上遇到的凡人和地方神</td><td><b>护持</b>：开场给相邻的一名友方加护盾。<br><b>渡难</b>：本方每倒下一人记一“难”，难越多，西天路的角色越强</td><td>不怕挫，越打越硬，适合持久战</td></tr>
+    <tr><td>凌霄殿</td><td>天庭的神将和星官，悟空打不过时上天搬来的救兵</td><td><b>点将</b>：开场召唤天兵助阵。<br><b>天罗地网</b>：两名以上凌霄殿角色同时打中一个敌人，就把它定住</td><td>人多压人，围住单个大怪</td></tr>
+    <tr><td>水晶宫</td><td>四海龙宫和水里的亲戚</td><td><b>兴云布雨</b>：站的格子变成水。<br><b>潮汐</b>：定时涨潮，把水上的敌人推退一格</td><td>改地形、打控制</td></tr>
+    <tr><td>洞天府</td><td>有后台的妖：神仙家里偷跑下界的童子、坐骑和宠物</td><td><b>法宝</b>：每人一件主人家的法宝，一场只能用一次，但很强。<br><b>靠山</b>：倒下时不算战死，算“被主人领回家”，全队得到一次加成</td><td>爆发型，前几秒交法宝定胜负</td></tr>
+    <tr><td>妖王寨</td><td>没后台的山头妖王，悟空在花果山时代的兄弟和对手</td><td><b>占山</b>：站在原地越久越强。<br><b>野性</b>：血越少越凶</td><td>守住一块地盘硬扛，残血反杀</td></tr>
   </table></div>
-  <h3>阵营克制</h3>
-  <p>五个阵营首尾相连、各克制一个，克制只带来小幅伤害加成，让“看敌方阵容换阵”多一个理由，又不压过站位和星络。</p>
-  <div class="ring">守星军<b>→</b>墨蚀者<b>→</b>司星监<b>→</b>青丘灵族<b>→</b>逐星骑<b>→</b>守星军</div>
-  <ul class="list">
-    <li>守星军镇守星石，星光克制墨色</li>
-    <li>墨蚀者以灵力为食，克制术士</li>
-    <li>司星监的星术照破青丘的隐身</li>
-    <li>山林是青丘的主场</li>
-    <li>逐星骑轻骑绕后，重甲转身慢</li>
-  </ul>
+  <p>每个阵营的角色见<a href="../roster/">角色名录</a>。</p>
 </section>
 
-<section class="doc" id="story">
-  <h2>第一幕 · 边州<small>ACT I</small></h2>
-  <p>主线分三幕九章，每一幕回答一个大问题，同时抛出下一个。首发是第一幕三章，第一幕的问题是：<em>墨蚀者到底是什么？</em></p>
+<section class="doc" id="combos">
+  <h2>组合技<small>COMBOS</small></h2>
+  <p>原著里有关系的人物同时上阵才会触发，名字和效果都从原著情节里来，可以跨阵营。</p>
   <div class="table"><table>
-    <tr><th>章</th><th>这一章发生什么</th><th>章末 Boss</th></tr>
-    <tr><td>1 望星城</td><td>第一次出城，点亮最近的星石。只有持线人听得见阿织，阿织说“要五根线”。点亮的星石里传出墨蚀者的低语：“让我们回家。”</td><td>蚀爪头目</td></tr>
-    <tr><td>2 白虎岭</td><td>逐星骑在山岭里独自抵抗墨蚀者，答应合作。陆离和燕回有一笔旧账，孟婉在找她的妹妹。</td><td>墨聚巨灵莫大</td></tr>
-    <tr><td>3 墨城</td><td>攻下墨蚀者用陷落城池改成的墨城。林大师在废墟里唤醒了第一个墨蚀者灰爪：墨蚀者是陷落城池的人，能想起自己是谁。</td><td>墨城</td></tr>
+    <tr><th>组合技</th><th>人物</th><th>效果</th></tr>
+    <tr><td>师徒同心</td><td>孙悟空、猪八戒、沙悟净</td><td>三人轮番出手，对一名敌人连击三次</td></tr>
+    <tr><td>紧箍</td><td>唐僧、孙悟空</td><td>悟空攻击更强，但要改打唐僧指定的目标</td></tr>
+    <tr><td>雷电交加</td><td>雷公、电母</td><td>电母照亮的目标，雷公必定暴击</td></tr>
+    <tr><td>父子</td><td>托塔天王、哪吒</td><td>宝塔镇住一名敌人</td></tr>
+    <tr><td>梅山七圣</td><td>二郎神、梅山六兄弟</td><td>二郎神一门同场作战</td></tr>
+    <tr><td>四海</td><td>任意两位龙王</td><td>全场下雨，火系技能变弱；四位龙王齐了，整个敌方半场都变成水</td></tr>
+    <tr><td>葫芦净瓶</td><td>金角大王、银角大王</td><td>叫一名敌人的名字，把它收进葫芦</td></tr>
+    <tr><td>狮驼三魔</td><td>青狮、白象、大鹏</td><td>大鹏抓起一名敌人，扔到青狮白象面前</td></tr>
+    <tr><td>火焰山</td><td>牛魔王、铁扇公主、红孩儿</td><td>芭蕉扇把三昧真火扇成一片火海</td></tr>
+    <tr><td>结义</td><td>牛魔王、孙悟空</td><td>同场时互不攻击，各自变强</td></tr>
   </table></div>
-  <p class="note">第二、三幕的剧情留到游戏里揭晓。</p>
-</section>
-
-<section class="doc" id="roster">
-  <h2>角色名录<small>CHARACTERS</small></h2>
-  <p>角色不分敌我：墨蚀者和青丘灵族在剧情前半段是对手，打赢、唤醒或结盟后都能招募。每名角色有一段五节的个人小故事，招募时能看第一节，每升一星解锁一节。下面是每名角色的第一节。</p>
-  <p class="note">定位：轻装、重装、远程、支援、对空、飞骑；“2×2”表示大型单位占四格。还有几名隐藏角色不在这里列出。</p>
-<section class="fac-block" style="--fc:#2B3A4A;--fg:#E8C77A"><h3><i></i>守星军<small>北 · 玄武 · 守护</small></h3><div class="chs"><article class="ch"><h4>岳擎<span>玄甲将</span></h4><div class="meta">重装（2×2） · 第 1 章剧情加入</div><p>望星城守军里最年轻的玄甲将，雷震老将军的徒弟。断线日那年他十九岁，是城楼上第一个看见墨蚀者大军的人。</p><p class="look">造型：2×2 底座上一名骑黑马、披玄青披风的将军；长戟和背后的玄武纹护心镜</p></article><article class="ch"><h4>石敢<span>盾卫</span></h4><div class="meta">重装 · 第 1 章剧情加入</div><p>望星城城门的守门人，扛着一面比他还宽的玄龟大盾。城里的孩子都说，只要石敢还站在门口，墨蚀者就进不来。</p><p class="look">造型：圆盔红缨、玄青短甲，身前一面龟甲纹大圆盾，盾心一颗星石</p></article><article class="ch"><h4>凌霄<span>鹤骑</span></h4><div class="meta">飞骑 · 第 3 章剧情加入</div><p>守星军的王牌鹤骑，专门飞到敌后啄断墨蚀者的墨碑。她在战场上的喊话比谁都多，骂墨蚀者的词从来不重样。</p><p class="look">造型：一名骑白鹤的骑手，悬空；展开的鹤翅和红顶</p></article><article class="ch"><h4>素心<span>医官</span></h4><div class="meta">支援 · 第 2 章起掉碎片</div><p>望星城星祠的医官，随军出城照顾伤员。她的医术要借星络的灵力，所以她总是待在星石旁边。</p><p class="look">造型：月白长衫、发髻插木簪，背药箱，手托一盏发光的药灯；★4 起头顶一圈星光</p></article><article class="ch"><h4>陈锋<span>长枪手</span></h4><div class="meta">轻装 · 第 1 章起掉碎片</div><p>守军里的长枪手，枪又快又准，一枪能穿透两个蚀爪。他是守星军里最爱干净的人，打完仗第一件事是擦枪。</p><p class="look">造型：斗笠盔、鱼鳞甲，长枪斜指前方，左臂小圆盾；★3 起枪头系红缨</p></article><article class="ch"><h4>霍旌<span>掌旗</span></h4><div class="meta">支援 · 第 6 章剧情加入</div><p>中原一座陷落城池的掌旗官。城破时她扛着城旗突围，一路跟着星线的光走到了远征军的营地。</p><p class="look">造型：高马尾，高举守星军黑底金纹大旗；旗面饰边、金穗、旗顶星石逐档增加</p></article><article class="ch"><h4>鲁正<span>床弩手</span></h4><div class="meta">对空 · 第 6 章起掉碎片</div><p>守了一辈子城墙的老弩手，管着一架比他年纪还大的床弩。他眼睛不太好，可从没射偏过一只墨魂。</p><p class="look">造型：白胡子老兵、铁盔，身前一架仰射的床弩</p></article><article class="ch"><h4>小鹞<span>鹤童</span></h4><div class="meta">飞骑 · 第 3 章起掉碎片</div><p>凌霄的鹤童，骑着一只还没长大的小鹤。他做梦都想成为和凌霄一样的王牌。</p><p class="look">造型：骑小白鹤的少年，冲天辫、风镜、红围巾</p></article></div></section>
-<section class="fac-block" style="--fc:#9A5A34;--fg:#E6E2D6"><h3><i></i>逐星骑<small>西 · 白虎 · 自由</small></h3><div class="chs"><article class="ch"><h4>陆离<span>游侠</span></h4><div class="meta">轻装 · 第 1 章剧情加入</div><p>逐星骑的游侠，跑得比谁都快，箭也射得比谁都准。他是第一个答应跟着远征军出城的游侠，理由是“城里的酒太贵了”。</p><p class="look">造型：一名戴斗笠的弓手；斗笠和长弓</p></article><article class="ch"><h4>燕回<span>刺客</span></h4><div class="meta">轻装 · 第 2 章剧情加入</div><p>来去无声的刺客，曾是逐星骑的人。她在墨蚀者后排出现时，敌人往往还没看清她的脸就倒下了。</p><p class="look">造型：黑面巾、短打劲装，双手反握发光短刀，发光的眼睛</p></article><article class="ch"><h4>阿图<span>驯鹰人</span></h4><div class="meta">飞骑 · 第 2 章剧情加入</div><p>住在山林边上的驯鹰人，身边总跟着几只他养大的鹰隼。他是少数和青丘灵族打过交道的人。</p><p class="look">造型：骑褐色大鹰的大胡子，虎皮帽，肩上停着小鹰</p></article><article class="ch"><h4>孟婉<span>连弩手</span></h4><div class="meta">对空 · 第 2 章剧情加入</div><p>逐星骑最好的连弩手，专打墨魂。别人看到墨魂会躲，孟婉看到墨魂会追。</p><p class="look">造型：一名戴皮盔的弩手，背后插一面小旗；连弩斜指天空</p></article><article class="ch"><h4>柏丫<span>机关师</span></h4><div class="meta">支援 · 第 2 章起掉碎片</div><p>逐星骑的机关师，开战前就在前排埋好了捕兽夹。踩中的墨蚀者动不了，只能干瞪着眼看箭飞过来。</p><p class="look">造型：双丫髻、皮围裙，手提一只木制机关兽夹，腰挂工具</p></article><article class="ch"><h4>葛山<span>猎户</span></h4><div class="meta">远程 · 第 5 章起掉碎片</div><p>头发花白的老猎户，弓不快，但每一箭都落在猎物最疼的地方。被他盯上的墨蚀者，很少能走出射程。</p><p class="look">造型：斗笠、胡茬，长弓搭箭，背箭筒；★4 起箭羽发光</p></article><article class="ch"><h4>小麦<span>采药女</span></h4><div class="meta">支援 · 第 1 章起掉碎片</div><p>边州村子里的采药女，背着一个比她还大的药篓。她熬的药闻起来很苦，但伤员们都抢着要。</p><p class="look">造型：草帽丸子头、碎花围裙，背大竹篓，双手捧发光药草</p></article><article class="ch"><h4>杜铁<span>投石手</span></h4><div class="meta">远程 · 第 2 章起掉碎片</div><p>力气大、嗓门更大的投石手，一块石头能砸塌一座墨碑。他说法术太贵，石头遍地都是。</p><p class="look">造型：红头巾、圆肚子，头顶甩着一圈投石索，腰挂石袋</p></article><article class="ch"><h4>养由<span>神射手</span></h4><div class="meta">远程 · 第 5 章起掉碎片</div><p>逐星骑的神射手，射程全场最远，一箭要瞄很久。别人说他慢，他说墨蚀者又跑不了。</p><p class="look">造型：插翎宽檐帽、长披风，肩扛带望山的长弩</p></article></div></section>
-<section class="fac-block" style="--fc:#C8402F;--fg:#F08A4B"><h3><i></i>司星监<small>南 · 朱雀 · 知识</small></h3><div class="chs"><article class="ch"><h4>朱弦<span>星术士</span></h4><div class="meta">远程 · 第 4 章剧情加入</div><p>司星监的年轻星术士，星矢的射程是全监第一。她被困在司星台里，是远征军把她救了出来。</p><p class="look">造型：一名穿朱红长袍、戴高冠的术士；手里的铜星盘和环绕的星点（表示剩余灵力）</p></article><article class="ch"><h4>风泽<span>雷法师</span></h4><div class="meta">对空 · 第 4 章起掉碎片</div><p>司星监的雷法师，召来的雷能在一群墨魂之间跳来跳去。他总是站在高处，衣袍永远被风吹得乱七八糟。</p><p class="look">造型：朱红道袍、金色高领、白胡子，手托一团雷云，法尺上跳着电光</p></article><article class="ch"><h4>符瑶<span>符咒师</span></h4><div class="meta">支援 · 第 5 章剧情加入</div><p>研究符咒的术士，能让一段敌方星络连线失效。她念咒的声音很轻，听到的人都会起鸡皮疙瘩。</p><p class="look">造型：朱红短袍、黑长发，指间夹着一串飘起的黄符</p></article><article class="ch"><h4>铁砧<span>铜人傀儡</span></h4><div class="meta">重装（2×2） · 第 4 章剧情加入</div><p>朱弦亲手造的铜人傀儡，一拳能砸碎墨碑。它只听朱弦一个人的话。</p><p class="look">造型：铜铸的圆胖力士，胸口嵌星石，一条发光眼缝，巨大铜拳；★5 鎏金</p></article><article class="ch"><h4>阿燎<span>火术士</span></h4><div class="meta">远程 · 第 5 章起掉碎片</div><p>脾气和法术一样火爆的火术士，一出手就是一整面火墙。墨蚀者最怕火，所以他在墨蚀者面前一直很神气。</p><p class="look">造型：火红刺猬头，左手托火球，扇子形法器</p></article><article class="ch"><h4>苏霜<span>冰术士</span></h4><div class="meta">远程 · 第 4 章起掉碎片</div><p>司星监的冰术士，冷静得像她的法术一样。她放出寒霜时，周围的墨蚀者都会慢下来。</p><p class="look">造型：冰蓝长袍、银白长发，冰晶法尺，手上一枚雪花；★4 冰晶发冠</p></article><article class="ch"><h4>闻道<span>少监</span></h4><div class="meta">支援 · 第 4 章剧情加入</div><p>司星监的少监，能让全体友军的灵力回复一次。他被困在台顶，和朱弦一起被远征军救了出来。</p><p class="look">造型：高冠长须，身旁悬着一卷星图，铜星盘上绕着 1~3 道金环</p></article><article class="ch"><h4>微光<span>星石傀儡</span></h4><div class="meta">轻装 · 第 6 章起掉碎片</div><p>用星石碎片拼成的傀儡，身体会折射光线，被远程攻击时有时能把攻击反弹回去。它总是一闪一闪的。</p><p class="look">造型：石块拼成的小傀儡，背上肩上长金色星石，胸口发光核心</p></article><article class="ch"><h4>甘澜<span>符甲卫</span></h4><div class="meta">重装 · 第 6 章起掉碎片</div><p>司星台的护卫，既会刀法也会符法。他的护盾会随着星络节点的增多变厚，站在星石旁边的他几乎打不穿。</p><p class="look">造型：刻符文的铁甲，一手长刀，一手一面发光的符盾</p></article></div></section>
-<section class="fac-block" style="--fc:#4A4560;--fg:#9C7BD8"><h3><i></i>墨蚀者<small>中 · 永夜 · 救赎</small></h3><div class="chs"><article class="ch"><h4>灰爪<span>蚀爪</span></h4><div class="meta">轻装 · 第 3 章剧情加入（唤醒）</div><p>第一个被林大师唤醒的墨蚀者。他的爪子又长又利，抓一下能让伤口一直渗墨。被唤醒后，他站在了远征军这边。</p><p class="look">造型：一个前倾的墨色人形，手臂拖成长爪；长爪和发光的眼睛</p></article><article class="ch"><h4>胖汤<span>墨傀</span></h4><div class="meta">重装 · 第 3 章起掉碎片（唤醒后招募）</div><p>体型巨大的墨傀，能用铁链把远处的敌人拉到身前。被唤醒后，他是远征军里最结实的一堵墙。</p><p class="look">造型：一个圆滚滚的墨色巨汉，腰间缠铁链；铁链和大铁钩</p></article><article class="ch"><h4>低语<span>墨魂</span></h4><div class="meta">飞骑 · 第 5 章起掉碎片（唤醒后招募）</div><p>飘在空中的墨魂，专门撕咬星络连线。她的声音很轻，像风吹过空房间。</p><p class="look">造型：一团漂浮的墨色人影，下身拖成墨迹尾巴；发光的面孔</p></article><article class="ch"><h4>魏客<span>招魂师</span></h4><div class="meta">支援 · 第 6 章剧情加入</div><p>从永夜那边逃回来的招魂师，能把倒下的敌人变成己方的墨影兵。他帮林大师研究唤醒墨蚀者的方法。</p><p class="look">造型：墨色宽袍、斗篷兜帽，手持挂铃的长幡，身边飘着两团墨色小人影</p></article><article class="ch"><h4>毒眼<span>墨雾塔</span></h4><div class="meta">远程 · 第 1 章出现，第 3 章起掉碎片（唤醒后招募）</div><p>墨蚀者用碎星石和墨泥垒起的瞭望塔，不会移动，命中处会留下墨雾。被唤醒后，他守在远征军的后方。</p><p class="look">造型：一座歪斜的墨色瓦塔，塔顶托着一团墨雾球；紫色雾球</p></article><article class="ch"><h4>莫大<span>墨聚巨灵</span></h4><div class="meta">重装（2×2） · 第 2 章 Boss，第 3 章唤醒后加入</div><p>由许多被吞掉的人聚成的墨色巨灵，每第三次攻击会震晕一片。它是逐星岭的噩梦，被唤醒后成了远征军最可怕的盟友。</p><p class="look">造型：2×2 很多墨色人影聚成的佝偻巨人，长臂拖地；背上的光斑</p></article><article class="ch"><h4>薛薇<span>墨歌姬</span></h4><div class="meta">对空 · 第 4 章 Boss，唤醒后加入</div><p>尖啸能打断施法的墨歌姬，曾经守在司星台外，把台里的术士困了很久。被唤醒后，她的尖啸转向了永夜。</p><p class="look">造型：没有腿、拖着墨迹尾巴，长发向后飞扬，张口歌唱、双臂张开</p></article><article class="ch"><h4>柯思<span>噬灵者</span></h4><div class="meta">远程 · 第 5 章剧情加入（唤醒）</div><p>靠近敌方星络时伤害会提高的噬灵者。他曾是被困在饥城里的术士，被墨色困住，变成了吞食灵力的墨蚀者。</p><p class="look">造型：佝偻的墨色术士，背上一只葫芦正吸着星石的金光</p></article><article class="ch"><h4>万仞<span>墨骑</span></h4><div class="meta">轻装 · 第 8 章 Boss，第 9 章唤醒后加入</div><p>永夜之主麾下的墨骑，造成伤害时会汲取对方的灵力回复自己。他是初源之路上最难缠的对手，被打败后，他选择了跟随远征军。</p><p class="look">造型：墨色重甲、幽紫眼光，长披风，细长的刀；★5 背后墨色羽翼</p></article></div></section>
-<section class="fac-block" style="--fc:#4F8A7A;--fg:#9FD8D0"><h3><i></i>青丘灵族<small>东 · 青龙 · 信任</small></h3><div class="chs"><article class="ch"><h4>绥绥<span>狐影舞者</span></h4><div class="meta">轻装 · 第 7 章剧情加入</div><p>在影子里起舞的狐族刺客，开战时隐身，第一击必定暴击。她是青丘雾林的守卫，也是第一个和远征军交手的青丘人。</p><p class="look">造型：狐耳、面纱、高马尾，前倾双持弯刃，身后一条大狐尾</p></article><article class="ch"><h4>素岚<span>狐剑客</span></h4><div class="meta">轻装 · 第 7 章起掉碎片</div><p>青丘的剑客，连续攻击同一个目标时会越来越快。他的剑舞像一首曲子，越到后面越急。</p><p class="look">造型：狐耳、月白长发、青绿轻甲长摆，双手持长剑，身边绕着剑气</p></article><article class="ch"><h4>老槐<span>树灵守卫</span></h4><div class="meta">重装（2×2） · 第 7 章 Boss，结盟后加入</div><p>青丘雾林最古老的树灵，扎根不动时每秒都在回复生命。他是第 7 章的守关者，结盟后成了远征军最坚实的盾。</p><p class="look">造型：粗树干身躯，树根扎进底座，挂着红绳和小铃铛，树冠开淡紫槐花</p></article><article class="ch"><h4>望舒<span>月弓手</span></h4><div class="meta">远程 · 第 7 章剧情加入</div><p>青丘的月弓手，射中的敌人会显形，无法隐身。她的箭在夜里会发出淡淡的银光。</p><p class="look">造型：月白兜帽，新月形银弓，发光箭头</p></article><article class="ch"><h4>葛藟<span>藤灵</span></h4><div class="meta">远程 · 第 8 章起掉碎片</div><p>能唤来藤蔓的藤灵，可以把一名敌人缠住动弹不得。她和山林里的每一棵树都说过话。</p><p class="look">造型：鹿角藤冠、叶片长袍，藤蔓法杖，身边开花</p></article><article class="ch"><h4>飞廉<span>鹏骑</span></h4><div class="meta">飞骑 · 第 8 章起掉碎片</div><p>骑着青鹏的青丘骑手，离开星络时速度会加倍。他飞得比任何白鹤都快，这件事他说过很多遍。</p><p class="look">造型：骑青色大鹏的少年，发带飘扬，手持长枪</p></article><article class="ch"><h4>涂山薇<span>使者</span></h4><div class="meta">支援 · 第 8 章剧情加入</div><p>青丘的使者，人和青丘同时在场时，她能让所有人加速。她是第三幕的关键人物，揭开了星线的真相。</p><p class="look">造型：九尾狐耳、青绿长裙，双手捧盟约竹简；★4 起背后光尾</p></article><article class="ch"><h4>星眠<span>星语者</span></h4><div class="meta">对空 · 第 8 章剧情加入</div><p>能和星星说话的星语者，可以对空中的目标降下星光。她总是在夜里抬头看天，嘴里念着谁也听不懂的话。</p><p class="look">造型：星纹深色长袍、新月发饰，手持星杖，身边漂浮星光</p></article><article class="ch"><h4>芳野<span>林哨</span></h4><div class="meta">对空 · 第 9 章剧情加入</div><p>守在山林边界的青丘哨兵，第一个进入射程的飞行单位必会被她射中。她站岗时从不眨眼，据说已经站了一千年。</p><p class="look">造型：叶纹半盔、举标枪朝天，肩上停着猫头鹰</p></article></div></section>
 </section>
 
 <section class="doc" id="rules">
@@ -159,90 +153,66 @@ footer a { color: var(--gold-hi); }
   <h3>布阵</h3>
   <ul class="list">
     <li>竖向战场：我方在下、敌方在上，前排隔着中间的接触线相对。</li>
-    <li>每方前排 5 格、纵深 3~4 格，一格要够手指点准。小型和中型角色占 1 格，大型单位占 2×2。</li>
-    <li>上阵人数受指挥点上限限制。可以一键上阵，或沿用上次阵容直接开战。</li>
-    <li>前排适合重装，先接敌；后排放远程和术士；两翼适合速度快、能绕后的飞骑。</li>
+    <li>每方前排 5 格、纵深 3~4 格，一格要够手指点准。小型和中型角色占 1 格，大型角色占 2×2。</li>
+    <li>上阵人数受指挥点限制。可以一键上阵，或沿用上次阵容直接开战。</li>
+    <li>定位分轻装、重装、远程、支援、对空、飞骑：重装顶前排，远程和支援放后排，飞骑放两翼绕后。</li>
   </ul>
-  <h3>星络</h3>
+  <h3>灵脉</h3>
   <ul class="list">
-    <li>每场战斗己方后方有一座观星台，是星络的源头。</li>
-    <li>布阵时可以在格子上放星石（占一格，不能和角色同格）。两颗星石在同一行或同一列、相距不超过 3 格时自动连线。</li>
-    <li>星石周围一圈是覆盖范围。角色在范围里，并且这片范围能沿连线连回观星台，就算<em>接入星络</em>：灵力持续补充，护盾正常恢复。</li>
-    <li>没接入的角色只有自身的灵力，用完就停手，护盾也不再恢复。</li>
-    <li>战斗中星石可以被摧毁，下游的星石和角色全部断开。墨蚀者也有自己的网络（墨祭坛和墨碑），布阵时看得到，可以规划切断路线。</li>
+    <li>每场战斗己方后方有一座土地庙，是灵脉的源头。</li>
+    <li>布阵时可以在格子上放灵石。两颗灵石在同一行或同一列、离得不远时自动连成灵脉。</li>
+    <li>角色站在灵石的范围里，并且这片范围能沿灵脉连回土地庙，就算接入灵脉：法力持续补充，护盾正常恢复。没接入的角色只有自身的法力，用完就停手。</li>
+    <li>战斗中灵石可以被打掉，下游的灵石和角色全部断开。妖怪也有自己的灵脉，布阵时看得到，可以规划去切断它。</li>
   </ul>
-  <p>于是阵型紧凑容易覆盖，但怕范围攻击；分散需要更多星石。派鹤骑绕后切断敌方网络，敌方后排用光灵力就失去威胁。</p>
+  <h3>土地公推演</h3>
+  <p>原著里悟空每到一处就喊土地出来问话。布阵后点一下，土地公把这一仗用不同的随机种子推演几十遍，给出胜率和常见败因。推演不算你手里的两个招；部分妖怪有隐藏本事，推演看不出来，所以会有误差。</p>
   <h3>自动战斗</h3>
   <ul class="list">
-    <li>角色按自己的索敌偏好自动选目标：鹤骑优先攻击星石和远程，连弩手优先打飞骑，其余攻击最近的敌人。</li>
-    <li>默认 2 倍速，可以切换或跳过；一场最长 45 秒，到时比较双方剩余耐久。</li>
-    <li>持线人带 1~2 个技能，按钮在屏幕下方，单手好按，消耗随时间恢复的灵力点数。例如“星落”砸向选定的区域，“玄武盾”给全队恢复护盾。</li>
+    <li>角色按自己的习惯自动选目标；默认 2 倍速，可以切换或跳过，一场最长 45 秒。</li>
+    <li>手里留两个招：一个悟空的本事（筋斗云、分身），一个“请救兵”——原著里悟空打不过就上天搬救兵。</li>
   </ul>
-  <h3>战前推演</h3>
-  <p>布阵后点一下推演，用不同的随机种子模拟几十场，给出胜率、平均用时、常见败因和阿织的建议。推演不算持线人技能；敌方部分单位有隐藏特性，推演按默认值计算，所以有误差。真实战斗使用推演中没用过的随机种子。</p>
-  <h3>四种玩法</h3>
+  <h3>玩法模式</h3>
   <div class="table"><table>
-    <tr><th>玩法</th><th>节奏</th><th>说明</th></tr>
-    <tr><td>主线</td><td>一关 1~2 分钟</td><td>三幕九章，跟着剧情结识伙伴；打过的关卡可以重复挑战，刷经验和碎片</td></tr>
-    <tr><td>远征</td><td>一趟 8~10 分钟，可中途退出</td><td>带自己培养的伙伴闯随机路线：三幕各两个节点加一个 Boss，沿途三选一拿技能和祝福</td></tr>
-    <tr><td>摘星楼</td><td>一层 1~2 分钟</td><td>一层一场，敌方阵容完全公开，失败无限重试；越往上规则越刁钻，强度统一、不看养成</td></tr>
-    <tr><td>天工坊</td><td>局外</td><td>研究战斗中缴获的墨晶，看破墨蚀者的隐藏特性，推演更准</td></tr>
+    <tr><th>模式</th><th>节奏</th><th>说明</th></tr>
+    <tr><td>主线</td><td>一关 1~2 分钟</td><td>序章加十四章，按原著重走取经路；打过的关卡可以重复挑战</td></tr>
+    <tr><td>西行路</td><td>一趟 8~10 分钟，可中途退出</td><td>带自己培养的队伍闯随机路线：三段各两个节点加一个妖王，沿途三选一拿法宝和祝福</td></tr>
+    <tr><td>镇妖塔</td><td>一层 1~2 分钟</td><td>一层一场，妖怪阵容完全公开，失败无限重试；越往上规则越刁钻</td></tr>
   </table></div>
 </section>
 
-<section class="doc" id="growth">
-  <h2>养成<small>GROWTH</small></h2>
-  <ul class="list">
-    <li><b>获得角色</b>：剧情里每章固定加入几名；其余角色从对应章节起掉落碎片，集齐后招募。敌对阵营的角色主要靠碎片。</li>
-    <li><b>等级</b>：关卡给经验，打过的关卡可以重复挑战。星级决定等级上限。</li>
-    <li><b>星级</b>：一星到五星，用本角色的碎片升星。每升一星属性提高，解锁一个符文槽或强化专属技能，再解锁一节个人小故事。</li>
-    <li><b>升星外观</b>：每升一星换一身更华丽的装束和装备，体型也略微变大。</li>
-    <li><b>羁绊</b>：同阵营或同职业的不同角色凑够人数就激活。五个阵营羁绊、六个职业羁绊（轻装、重装、飞骑、对空、远程、支援），只做加成，不改定位。敌方也吃羁绊。</li>
-    <li><b>离线收益</b>：上下班各打开一次就能领。</li>
-  </ul>
-  <h3>不卖战力</h3>
-  <p>没有体力，没有每日任务，没有付费抽卡，也不卖碎片、经验和金币。看广告只换便利：关卡奖励翻倍、失败后直接重打、远征和商店多刷新一次，不看也不耽误进度。</p>
+<section class="doc" id="gates">
+  <h2>八门阵<small>FORMATION</small></h2>
+  <p>八卦在原著里本来就有（太上老君的八卦炉）。每方半场中间划一块 3×3 的九宫，周围八格是八门，中间一格是阵眼。角色站在哪个门上，就吃哪个门的加成。布阵时只多一个选择：把阵转到哪一门朝前。伤门朝前是进攻阵，杜门朝前是防守阵。</p>
+  <div class="table"><table>
+    <tr><th>门</th><th>卦</th><th>大意</th><th>适合</th></tr>
+    <tr><td>开门</td><td>乾</td><td>出手更快</td><td>输出</td></tr>
+    <tr><td>休门</td><td>坎</td><td>慢慢回血</td><td>前排</td></tr>
+    <tr><td>生门</td><td>艮</td><td>受到的治疗和护盾更多</td><td>前排</td></tr>
+    <tr><td>伤门</td><td>震</td><td>伤害更高</td><td>输出</td></tr>
+    <tr><td>杜门</td><td>巽</td><td>受到的伤害更少</td><td>前排</td></tr>
+    <tr><td>景门</td><td>离</td><td>射程更远</td><td>远程</td></tr>
+    <tr><td>惊门</td><td>兑</td><td>打中的敌人变慢</td><td>远程、支援</td></tr>
+    <tr><td>死门</td><td>坤</td><td>伤害大涨，但自己不断掉血</td><td>赌一把</td></tr>
+    <tr><td>阵眼</td><td>中宫</td><td>站在这里的角色活着，八门加成全部生效；它倒下，加成减半</td><td>最耐打的角色</td></tr>
+  </table></div>
+  <p>妖怪也摆阵：布阵和推演时能看到敌方的八门朝向和阵眼，“先打阵眼”是一个简单的战术。</p>
 </section>
 
 <section class="doc" id="art">
-  <h2>美术风格<small>ART</small></h2>
-  <p>“墨蓝夜空上的宣纸棋盘”：圆润卡通的东方角色，每个角色像一枚摆在宣纸棋盘上的棋子；星络是画面里最亮的金线。参考方向是国潮插画加手游 Q 版，不是写实古装，也不是水墨写意。</p>
+  <h2>美术<small>ART</small></h2>
   <ul class="list">
-    <li><b>竖屏、小屏先看清</b>：一名角色在手机上只有三四十像素高，每个兵种靠一个夸张的特征认出来：玄甲将的长戟和披风、游侠的斗笠和长弓、星术士的星盘和高冠。</li>
+    <li><b>Q 版 3D 棋子</b>：圆润卡通的角色，每个角色像一枚摆在棋盘上的棋子；灵脉是画面里最亮的金线。</li>
+    <li><b>造型从原著文字来</b>：照着原著里对人物、兵器和法宝的描写自己设计，不参考任何影视、动画或其他游戏的形象。</li>
+    <li><b>竖屏小屏先看清</b>：一名角色在手机上只有三四十像素高，每人靠一个夸张的特征认出来：金箍棒、九齿钉耙、降妖宝杖、风火轮。</li>
     <li><b>颜色就是阵营</b>：衣服大块用阵营色，敌我在棋盘上一眼分开。</li>
-    <li><b>星络是光</b>：每名角色脚下一圈光环，接入星络时常亮，断开时变暗、闪朱砂红。</li>
-    <li><b>纹样点到为止</b>：云纹、回纹、星宿连线纹只用在饰边、底座和面板角上。</li>
-    <li><b>墨蚀者</b>：被墨色侵蚀的人，墨色剪影加发光的眼睛；唤醒后墨色褪去，露出原来的衣着。</li>
-    <li><b>造型</b>：头身比约 1:3，大头、大眼睛、圆球手，轮廓有一圈墨色描边。</li>
+    <li><b>音乐</b>：自己创作的民乐配器。</li>
   </ul>
-  <h3>色板</h3>
-  <div class="swatches">
-    <div class="sw"><b style="background:#F3EAD8"></b><span>宣纸<br><code>#F3EAD8</code></span></div>
-    <div class="sw"><b style="background:#1E2230"></b><span>墨<br><code>#1E2230</code></span></div>
-    <div class="sw"><b style="background:#141A2A"></b><span>夜空<br><code>#141A2A</code></span></div>
-    <div class="sw"><b style="background:#C9A14A"></b><span>金 · 星络<br><code>#C9A14A</code></span></div>
-    <div class="sw"><b style="background:#C8402F"></b><span>朱砂 · 敌方<br><code>#C8402F</code></span></div>
-    <div class="sw"><b style="background:#2E6E8E"></b><span>石青 · 我方<br><code>#2E6E8E</code></span></div>
-    <div class="sw"><b style="background:#7A5BA6"></b><span>紫檀 · 推演<br><code>#7A5BA6</code></span></div>
-    <div class="sw"><b style="background:#5E9C6A"></b><span>松绿 · 胜利<br><code>#5E9C6A</code></span></div>
-  </div>
-  <h3>阵营色</h3>
-  <div class="table"><table>
-    <tr><th>阵营</th><th>主色 / 辅色</th><th>发光</th></tr>
-    <tr><td>守星军</td><td>玄青 / 石青，铁甲</td><td>金</td></tr>
-    <tr><td>逐星骑</td><td>月白 / 赭石，皮革</td><td>金</td></tr>
-    <tr><td>司星监</td><td>朱砂 / 金</td><td>橘红</td></tr>
-    <tr><td>青丘灵族</td><td>青绿 / 月白，藤叶</td><td>月青</td></tr>
-    <tr><td>墨蚀者</td><td>墨 / 灰紫</td><td>幽紫（眼睛和墨痕）</td></tr>
-  </table></div>
-  <h3>界面</h3>
-  <p>夜景（登录、主界面）用墨蓝夜空和金色星宿连线，夜空里的星宿连线就是菜单；局内面板用宣纸底加一像素墨线，四角各一个小云纹角花。主按钮朱砂底宣纸色字，主要按钮放在屏幕下半部分，大拇指够得着。音乐用民乐配器。</p>
 </section>
 
 </main>
 <footer>
   <p>© 星线 Starline · 独立游戏开发中 · 设计资料为开发中的草案</p>
-  <p><a href="../">返回首页</a></p>
+  <p><a href="../">返回首页</a> · <a href="../roster/">角色名录</a></p>
 </footer>
 </body>
 </html>

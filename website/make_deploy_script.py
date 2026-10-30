@@ -9,7 +9,7 @@ import pathlib
 import sys
 
 HERE = pathlib.Path(__file__).resolve().parent
-FILES = ["index.html", "favicon.svg", "web.config", "design/index.html"]
+FILES = ["index.html", "favicon.svg", "web.config", "design/index.html", "roster/index.html"]
 STAGING_DIR = r"C:\inetpub\starline-staging"
 SITE_DIR = r"C:\inetpub\starline"
 
