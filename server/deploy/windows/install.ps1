@@ -1,3 +1,4 @@
+﻿# (Saved as UTF-8 with BOM: Windows PowerShell 5.1 reads files without one as ANSI and garbles the Chinese text.)
 # Installs or updates the Starline game server on a Windows server (the Hong Kong test server,
 # decision 71). Run in an administrator PowerShell from the unzipped package folder:
 #
