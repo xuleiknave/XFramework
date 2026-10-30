@@ -68,6 +68,30 @@ PALETTE = [
     ("fire", "E0662A"),
     ("ice", "A8DDF2"),
     ("moss", "6E8F3E"),
+    # 西游原著角色
+    ("kasaya_red", "B8322A"),
+    ("monk_yellow", "E2BC63"),
+    ("monkey_fur", "A8743A"),
+    ("monkey_face", "F2C9A0"),
+    ("tiger", "E08A2E"),
+    ("pig_skin", "6E6878"),
+    ("pig_snout", "A096A8"),
+    ("indigo", "4A6A96"),
+    ("sash_flower", "D9663A"),
+    ("sha_blue", "4E6FB0"),
+    ("flame_hair", "D2502E"),
+    ("goose_yellow", "EAD27C"),
+    ("horse_white", "F3F1EA"),
+    ("hair_black", "24222A"),
+    ("nezha_red", "D8342C"),
+    ("dragon_teal", "2F8F86"),
+    ("sea_blue", "1F5E8C"),
+    ("pearl", "F4EEE2"),
+    ("coral", "E06A55"),
+    ("dao_purple", "5B3F8C"),
+    ("cinnabar", "C8462E"),
+    ("bull_hide", "5B4237"),
+    ("bull_muzzle", "8A6E5E"),
 ]
 PALETTE_CELLS = 8
 PALETTE_CELL_PX = 32
@@ -2836,6 +2860,582 @@ def _cartoon_hive(b):
         S(b, P(0.7, x, 0.84), (0.035, 0.035, 0.06), GLOW, 8, 6)
 
 
+# ---- 西游原著角色（Q 版棋子） --------------------------------------------------------
+# 头身比约 1:1（头占全身一半），短手短脚，从俯视的棋盘镜头看也一眼认得出是谁。
+# 造型只从原著文字出发（见 docs/art-direction.md），不参考任何影视、动画、游戏改编。
+# 五个阵营各有一套视觉语言，换掉颜色也能靠轮廓和材质认出来：
+#   西天路   土黄、袈裟红、木色；布衣和行路的家什，轮廓圆润朴素
+#   凌霄殿   金、白、天青；金甲、高冠和绕身飘带，轮廓向上挺拔
+#   水晶宫   碧青、海蓝、珍珠白、珊瑚红；鳞片、鳍、龙角和龙须，轮廓弯曲流动
+#   洞天府   紫、丹砂红；道袍、发髻和主人家的法宝（发光），脚下踩着仙云
+#   妖王寨   铁黑、兽皮褐、暗红；粗铁、毛皮和大角，块头最大，眼睛发光
+
+
+def front(c, radii, x, dz, out=0.0):
+    """椭球 c（半径 radii，Blender 轴）正面上横向 x、高度 dz 处的点，out 再往外推一点。"""
+    rx, ry, rz = radii
+    t = max(0.0, 1.0 - (x / rx) ** 2 - (dz / rz) ** 2)
+    return Vector((c.x + x, c.y - ry * math.sqrt(t) - out, c.z + dz))
+
+
+def chibi(b, z0=0.0, body="white", legs="leather", boots="leather", skin="skin", belt=None, robe=None,
+          head_r=0.32, eye="iron", brows=None, has_face=True, nose=True, w=1.0, belly=1.0):
+    """Q 版大头身体：短腿、圆肚、大头。手臂由各角色自己画。返回关键点（和 hero 一样）。"""
+    if robe:
+        R(b, P(0, 0, z0), P(0, 0, z0 + 0.44), 0.27 * w, 0.19 * w, robe)
+        b.ring(P(0, 0, z0 + 0.03), 0.265 * w, 0.03, boots, segments=24, sides=8)
+        for s in (-1, 1):  # 袍子下露出的鞋尖
+            b.rbox(P(0.2 * w, s * 0.09, z0 + 0.04), (0.11, 0.13, 0.08), boots, 0.45)
+    else:
+        for s in (-1, 1):
+            b.rbox(P(0.04, s * 0.11 * w, z0 + 0.05), (0.16, 0.21, 0.1), boots, 0.45)
+            R(b, P(0, s * 0.11 * w, z0 + 0.08), P(0, s * 0.11 * w, z0 + 0.26), 0.072, 0.08, legs, 12)
+        S(b, P(0, 0, z0 + 0.27), (0.2 * w, 0.15, 0.1), legs)
+    torso = P(0, 0, z0 + 0.44)
+    radii = (0.23 * w * belly, 0.18 * belly, 0.22)
+    S(b, torso, radii, body)
+    if belt:
+        S(b, P(0, 0, z0 + 0.32), (radii[0] * 0.9 + 0.02, radii[1] * 0.9 + 0.02, 0.045), belt)
+    head = P(0, 0, z0 + 0.64 + head_r * 0.85)
+    S(b, head, (head_r, head_r * 0.95, head_r * 0.93), skin, 22, 14)
+    if has_face:
+        face(b, head, head_r, eye=eye, brows=brows, nose=nose)
+    b.bone("hips", P(0, 0, z0 + 0.16), P(0, 0, z0 + 0.34))
+    b.bone("spine", P(0, 0, z0 + 0.34), P(0, 0, z0 + 0.64), "hips")
+    b.bone("head", P(0, 0, z0 + 0.64), head + Vector((0, 0, head_r)), "spine")
+    if not robe:
+        for side, s in (("R", 1), ("L", -1)):
+            b.bone("leg." + side, P(0, s * 0.11 * w, z0 + 0.26), P(0.02, s * 0.11 * w, z0 + 0.02), "hips")
+    return {
+        "head": head, "head_r": head_r, "torso": torso, "radii": radii,
+        "shoulder": (P(0, 0.2 * w, z0 + 0.56), P(0, -0.2 * w, z0 + 0.56)),  # 右、左
+        "chest": front(torso, radii, 0, 0.02), "z0": z0, "w": w,
+    }
+
+
+def sleeve_arm(b, shoulder, elbow, hand, sleeve, glove="skin", r=0.07, cuff=None, wide=0.0):
+    """Q 版手臂：比 hero 粗一点；wide > 0 时袖口张开（僧袍、道袍的大袖）。"""
+    arm(b, shoulder, elbow, hand, sleeve, glove, r)
+    if wide or cuff:
+        d = (elbow - hand).normalized()
+        with b.attach(b.hand_bone(hand)):
+            R(b, hand + d * 0.16, hand + d * 0.05, r, r + wide, sleeve, 14)
+            if cuff:
+                b.ring(hand + d * 0.05, r + wide, 0.014, cuff, segments=16, sides=4)
+
+
+def head_ring(b, k, colour, dz=0.42, thick=0.022, scale=1.0):
+    """绕头一圈的箍或冠的底边。"""
+    h, hr = k["head"], k["head_r"]
+    rr = hr * math.sqrt(max(0.0, 1.0 - dz * dz)) * 1.02 * scale
+    b.ring(h + Vector((0, 0, hr * dz * 0.93)), rr, thick, colour, segments=28, sides=6)
+
+
+def on_head(k, a, dz, out=1.0):
+    """头部表面上的点：a 是从正面算起绕头转的角度（弧度，向右为正），dz 是高度（按头半径）。"""
+    h, hr = k["head"], k["head_r"]
+    rr = hr * math.sqrt(max(0.0, 1.0 - dz * dz)) * out
+    return h + Vector((math.sin(a) * rr, -math.cos(a) * rr, hr * dz * 0.93))
+
+
+def cloud_puff(b, c, s=1.0, colour="pearl"):
+    """一朵小祥云：几颗扁球。"""
+    for dx, df, dz, r in ((0, 0, 0.02, 0.07), (0.07, 0.01, 0, 0.055), (-0.07, -0.01, 0, 0.055),
+                          (0.03, -0.05, -0.01, 0.045)):
+        S(b, c + Vector((dx * s, -df * s, dz * s)), (r * s * 1.2, r * s, r * s * 0.8), colour, 12, 8)
+
+
+def tang_seng(b, star=1):  # 唐僧：光头戴毗卢帽，黄僧袍外披红底金格锦襕袈裟，右手九环锡杖，左手单掌立在胸前
+    star_base(b, 0.75, star, "wood")
+    k = chibi(b, body="kasaya_red", robe="monk_yellow", boots="kasaya_red", brows="hair_brown", head_r=0.33)
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    # 袈裟：金色格线和斜披的金边，左胸一枚金环
+    for x in (-0.12, 0.0, 0.12):
+        b.chain([front(torso, radii, x, dz, 0.004) for dz in (-0.16, -0.08, 0.0, 0.08, 0.15)], 0.009, 0.009,
+                "gold", 6)
+    for dz in (-0.08, 0.06):
+        b.chain([front(torso, radii, x, dz, 0.004) for x in (-0.19, -0.1, 0, 0.1, 0.19)], 0.009, 0.009, "gold", 6)
+    b.rbox(P(0.0, 0, z0 + 0.47), (0.5, 0.4, 0.05), "gold", 0.4, rot=(0, -40, 0))
+    b.ring(front(torso, radii, -0.1, 0.08, 0.01), 0.04, 0.012, "gold", axis="f", segments=16, sides=6)
+    # 袈裟下摆垂在僧袍前面
+    b.rbox(P(0.2, 0.0, z0 + 0.2), (0.3, 0.04, 0.26), "kasaya_red", 0.3, rot=(-12, 0, 0))
+    b.rbox(P(0.215, 0.0, z0 + 0.075), (0.31, 0.03, 0.025), "gold", 0.4, rot=(-12, 0, 0))
+    b.ring(P(0, 0, z0 + 0.64), 0.13, 0.03, "monk_yellow", segments=20, sides=6)  # 黄色内领
+    # 毗卢帽：一圈金边加五片冠叶
+    head_ring(b, k, "gold", dz=0.38, thick=0.026)
+    for i in range(-2, 3):
+        a = i * 0.42
+        p = on_head(k, a, 0.55, 0.98)
+        S(b, p + Vector((0, 0, 0.07)), (0.07, 0.022, 0.1), "gold", 14, 8, rot=(-14, 0, -math.degrees(a)))
+        S(b, p + Vector((0, 0, 0.065)) + Vector((math.sin(a), -math.cos(a), 0)) * 0.014, (0.045, 0.014, 0.065),
+          "kasaya_red", 12, 8, rot=(-14, 0, -math.degrees(a)))
+    for s in (-1, 1):  # 冠带垂在耳后
+        R(b, h + Vector((s * hr * 0.9, hr * 0.2, hr * 0.3)), h + Vector((s * hr * 0.95, hr * 0.45, -hr * 0.6)),
+          0.022, 0.02, "kasaya_red", 8)
+        S(b, h + Vector((s * hr * 0.95, 0, -hr * 0.05)), (0.04, 0.06, 0.08), "skin", 10, 8)  # 耳朵
+    # 右手锡杖，左手单掌
+    rs, ls = k["shoulder"]
+    rh = P(0.16, 0.32, z0 + 0.4)
+    sleeve_arm(b, rs, P(0.04, 0.3, z0 + 0.42), rh, "monk_yellow", wide=0.04, cuff="kasaya_red")
+    lh = P(0.27, -0.06, z0 + 0.58)
+    sleeve_arm(b, ls, P(0.12, -0.26, z0 + 0.42), lh, "monk_yellow", wide=0.04, cuff="kasaya_red")
+    with b.attach(b.hand_bone(lh)):
+        b.rbox(lh + Vector((0, 0, 0.06)), (0.035, 0.06, 0.11), "skin", 0.5)  # 立掌
+        for i in range(6):  # 腕上念珠
+            a = i * math.pi / 3
+            S(b, lh + Vector((math.cos(a) * 0.075, math.sin(a) * 0.075, -0.05)), (0.022,) * 3, "bark", 8, 6)
+    with b.held(rh):
+        base_p, top = Vector((rh.x, rh.y, z0 + 0.02)), Vector((rh.x, rh.y, z0 + 1.5))
+        R(b, base_p, top, 0.024, 0.022, "wood", 10)
+        R(b, top, top + Vector((0, 0, 0.06)), 0.035, 0.03, "gold", 10)
+        c = top + Vector((0, 0, 0.16))
+        b.ring(c, 0.11, 0.016, "gold", axis="f", segments=24, sides=6)
+        R(b, top, c + Vector((0, 0, 0.14)), 0.014, 0.01, "gold", 8)
+        S(b, c + Vector((0, 0, 0.15)), (0.03, 0.03, 0.04), "gold", 10, 6)
+        for i in range(9):  # 九个小环挂在大环上
+            a = math.radians(-160 + i * 40)
+            b.ring(Vector((rh.x + math.sin(a) * 0.11, c.y, c.z + math.cos(a) * 0.11)), 0.028, 0.007, "gold_light",
+                   axis="x", segments=12, sides=4)
+
+def sun_wukong(b, star=1):  # 孙悟空：毛脸雷公嘴、头戴金箍，白布直裰系虎皮裙，肩扛两头金箍中间乌铁的如意金箍棒，左手搭凉棚
+    star_base(b, 0.75, star, "wood")
+    k = chibi(b, body="white", legs="monkey_fur", boots="monkey_fur", skin="monkey_fur", has_face=False,
+              head_r=0.34)
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    # 脸：心形浅色脸盘、突出的嘴、两撮眉毛
+    S(b, h + Vector((0, -hr * 0.42, -hr * 0.1)), (hr * 0.74, hr * 0.56, hr * 0.66), "monkey_face", 20, 12)
+    for s in (-1, 1):
+        S(b, h + Vector((s * hr * 0.3, -hr * 0.55, hr * 0.32)), (hr * 0.36, hr * 0.4, hr * 0.32), "monkey_face",
+          16, 10)
+    face(b, h + Vector((0, -hr * 0.2, 0.02)), hr, nose=False)
+    S(b, h + Vector((0, -hr * 0.88, -hr * 0.4)), (hr * 0.4, hr * 0.3, hr * 0.26), "monkey_face", 16, 10)
+    b.rbox(h + Vector((0, -hr * 1.13, -hr * 0.45)), (hr * 0.32, 0.02, 0.018), "hair_brown", 0.5)  # 嘴
+    S(b, h + Vector((0, -hr * 1.14, -hr * 0.28)), (0.03, 0.02, 0.02), "hair_brown", 8, 6)  # 鼻头
+    for s in (-1, 1):
+        b.rbox(h + Vector((s * hr * 0.36, -hr * 0.9, hr * 0.36)), (hr * 0.34, 0.05, 0.05), "monkey_fur", 0.5,
+               rot=(0, s * 14, 0))
+        S(b, h + Vector((s * hr * 1.0, 0, 0.0)), (hr * 0.14, hr * 0.2, hr * 0.26), "monkey_face", 12, 8)  # 耳朵
+    for i in range(5):  # 头顶一撮毛
+        a = (i - 2) * 0.3
+        o = h + Vector((math.sin(a) * hr * 0.3, hr * 0.1, hr * 0.85))
+        R(b, o, o + Vector((math.sin(a) * hr * 0.25, hr * 0.15, hr * 0.32)), hr * 0.14, 0.01, "monkey_fur", 10)
+    # 金箍：一圈细金环，正中一颗小突起
+    head_ring(b, k, "gold", dz=0.4, thick=0.026)
+    S(b, on_head(k, 0, 0.4, 1.03), (0.035, 0.025, 0.035), "gold", 10, 6)
+    # 直裰交领和虎皮裙
+    b.rbox(front(torso, radii, -0.04, 0.06, 0.0), (0.05, 0.03, 0.26), "monk_yellow", 0.4, rot=(0, -28, 0))
+    R(b, P(0, 0, z0 + 0.36), P(0, 0, z0 + 0.14), 0.22, 0.28, "tiger", 20)
+    for i in range(10):
+        a = i * 2 * math.pi / 10
+        for dz in (0.2, 0.29):
+            r = 0.28 - (dz - 0.14) / 0.22 * 0.06
+            b.rbox(P(r * math.cos(a + dz), r * math.sin(a + dz), z0 + dz), (0.026, 0.03, 0.07), "iron", 0.5,
+                   rot=(0, 0, math.degrees(a + dz) + 90))
+    S(b, P(0, 0, z0 + 0.36), (0.235, 0.2, 0.04), "monkey_fur")  # 系裙的毛绳
+    # 尾巴翘在身后
+    b.chain([P(-0.16, 0, z0 + 0.25), P(-0.34, 0.02, z0 + 0.22), P(-0.46, 0.05, z0 + 0.38), P(-0.44, 0.08, z0 + 0.58),
+             P(-0.34, 0.1, z0 + 0.66)], 0.045, 0.025, "monkey_fur", 10)
+    # 金箍棒扛在右肩，右手握住
+    rs, ls = k["shoulder"]
+    p1, p2 = P(0.5, 0.3, z0 + 0.3), P(-0.55, 0.3, z0 + 1.18)
+    d = (p2 - p1).normalized()
+    rh = p1 + d * 0.38
+    sleeve_arm(b, rs, P(0.12, 0.34, z0 + 0.38), rh, "white", glove="monkey_fur")
+    with b.held(rh):
+        R(b, p1 + d * 0.14, p2 - d * 0.14, 0.034, 0.034, "iron", 12)
+        for a, c in ((p1, p1 + d * 0.15), (p2 - d * 0.15, p2)):
+            R(b, a, c, 0.044, 0.044, "gold", 14)
+            for t in (0.0, 1.0):
+                b.ring(a + (c - a) * t, 0.044, 0.01, "gold_light", axis="z", segments=14, sides=4)
+    # 左手搭凉棚
+    lh = h + Vector((-hr * 0.3, -hr * 0.78, hr * 0.98))
+    sleeve_arm(b, ls, P(0.02, -0.5, z0 + 0.86), lh, "white", glove="monkey_fur")
+
+
+def zhu_bajie(b, star=1):  # 猪八戒：黑脸短毛、长嘴大耳，青不青蓝不蓝的直裰系花布手巾，腆着肚子，肩扛九齿钉钯
+    star_base(b, 0.75, star, "wood")
+    k = chibi(b, body="indigo", legs="indigo", boots="robe_black", skin="pig_skin", has_face=False, w=1.15,
+              belly=1.28, head_r=0.34)
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    face(b, h + Vector((0, 0, hr * 0.26)), hr * 0.85, nose=False, brows="robe_black")
+    # 长嘴和大耳朵
+    sn = h + Vector((0, -hr * 1.18, -hr * 0.18))
+    R(b, h + Vector((0, -hr * 0.6, -hr * 0.15)), sn, hr * 0.36, hr * 0.31, "pig_skin", 16)
+    S(b, sn, (hr * 0.33, 0.05, hr * 0.27), "pig_snout", 16, 8)
+    for s in (-1, 1):
+        S(b, sn + Vector((s * hr * 0.12, -0.03, 0)), (0.025, 0.02, 0.035), "robe_black", 8, 6)
+        S(b, h + Vector((s * hr * 0.95, -hr * 0.05, hr * 0.25)), (hr * 0.12, hr * 0.42, hr * 0.55), "pig_skin",
+          14, 10, rot=(20, s * 40, 0))
+        S(b, h + Vector((s * hr * 0.97, -hr * 0.12, hr * 0.22)), (hr * 0.06, hr * 0.3, hr * 0.42), "pig_snout",
+          12, 8, rot=(20, s * 40, 0))
+    for i in range(4):  # 头顶短鬃
+        o = h + Vector(((i - 1.5) * hr * 0.15, hr * 0.15, hr * 0.85))
+        R(b, o, o + Vector((0, hr * 0.2, hr * 0.28)), hr * 0.1, 0.01, "robe_black", 8)
+    b.rbox(h + Vector((0, -hr * 1.05, -hr * 0.58)), (hr * 0.3, 0.03, 0.02), "robe_black", 0.5)  # 嘴角
+    # 花布手巾：腰上一圈，前面打结垂下两角
+    S(b, P(0, 0, z0 + 0.3), (radii[0] * 0.88, radii[1] * 0.9, 0.05), "sash_flower")
+    knot = front(torso, radii, 0.08, -0.13, 0.01)
+    S(b, knot, (0.05, 0.04, 0.045), "sash_flower", 12, 8)
+    for dx in (-0.03, 0.05):
+        b.rbox(knot + Vector((dx, -0.01, -0.1)), (0.06, 0.02, 0.14), "sash_flower", 0.4, rot=(0, dx * 300, 0))
+    for i in range(12):
+        a = i * 2 * math.pi / 12
+        S(b, P(radii[1] * 0.92 * math.cos(a), radii[0] * 0.9 * math.sin(a), z0 + 0.3), (0.016,) * 3, "gold", 8, 6)
+    # 交领
+    b.rbox(front(torso, radii, -0.05, 0.12, 0.0), (0.05, 0.03, 0.2), "robe_black", 0.4, rot=(0, -30, 0))
+    # 钉钯扛在左肩
+    rs, ls = k["shoulder"]
+    p1, p2 = P(0.5, -0.34, z0 + 0.22), P(-0.5, -0.34, z0 + 1.1)
+    d = (p2 - p1).normalized()
+    lh = p1 + d * 0.36
+    sleeve_arm(b, ls, P(0.1, -0.38, z0 + 0.36), lh, "indigo", glove="pig_skin", r=0.075)
+    rh = front(torso, radii, 0.14, -0.04, 0.03)
+    sleeve_arm(b, rs, P(0.05, 0.36, z0 + 0.36), rh, "indigo", glove="pig_skin", r=0.075)
+    with b.held(lh):
+        R(b, p1, p2, 0.026, 0.026, "wood", 10)
+        S(b, p1, (0.034,) * 3, "gold", 8, 6)
+        n = Vector((0, -d.z, -d.y)).normalized()  # 垂直于钯杆、朝后下
+        bar = p2
+        R(b, bar + Vector((0.2, 0, 0)), bar - Vector((0.2, 0, 0)), 0.035, 0.035, "steel_dark", 12)
+        b.rbox(bar + n * 0.02, (0.12, 0.06, 0.06), "gold", 0.4)
+        for i in range(9):
+            x = -0.18 + i * 0.045
+            R(b, bar + Vector((x, 0, 0)), bar + Vector((x, 0, 0)) + n * 0.15, 0.014, 0.004, "silver", 6)
+
+
+def sha_wujing(b, star=1):  # 沙悟净：红焰发蓬松、蓝靛脸、两只圆睛亮如灯，颈挂九颗大念珠，披鹅黄氅、腰束白藤，手持降妖宝杖
+    star_base(b, 0.75, star, "wood")
+    k = chibi(b, body="leather", legs="leather", boots="robe_black", skin="sha_blue", has_face=False, belt="white",
+              head_r=0.33, w=1.05)
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    for s in (-1, 1):  # 大圆眼：眼白比眼珠大一圈
+        S(b, h + Vector((s * hr * 0.36, -hr * 0.84, hr * 0.06)), (hr * 0.21, hr * 0.08, hr * 0.23), "white", 12, 8)
+    face(b, h + Vector((0, -hr * 0.06, 0.02)), hr, nose=True, brows="flame_hair")
+    for s in (-1, 1):
+        S(b, h + Vector((s * hr * 0.98, 0, 0)), (hr * 0.12, hr * 0.18, hr * 0.24), "sha_blue", 12, 8)
+    b.rbox(h + Vector((0, -hr * 0.92, -hr * 0.46)), (hr * 0.36, 0.03, 0.02), "robe_black", 0.5)
+    # 红焰发：头顶一圈向上翘的火苗
+    S(b, h + Vector((0, hr * 0.15, hr * 0.35)), (hr * 1.0, hr * 0.92, hr * 0.7), "flame_hair", 20, 12)
+    for i in range(9):
+        a = math.pi * (i / 8 - 0.5) * 1.4
+        o = h + Vector((math.sin(a) * hr * 0.6, math.cos(a) * hr * 0.2 - hr * 0.1 + hr * 0.25, hr * 0.7))
+        tip = o + Vector((math.sin(a) * hr * 0.35, hr * 0.3, hr * (0.55 + 0.15 * math.cos(a))))
+        R(b, o, tip, hr * 0.2, 0.01, "flame_hair", 10)
+    # 九颗大念珠
+    for i in range(9):
+        a = math.pi * (-0.85 + 1.7 * i / 8)
+        p = P(0.16 * math.cos(a) + 0.03, 0.2 * math.sin(a), z0 + 0.58 - 0.12 * math.cos(a) * (math.cos(a) > 0))
+        S(b, p, (0.042,) * 3, "bark", 10, 8)
+    # 鹅黄氅：披在背后，两肩搭过来
+    cape(b, z0 + 0.62, z0 + 0.04, 0.2, 0.32, "goose_yellow", trim="kasaya_red", f0=-0.14, flare=0.1)
+    for sh in k["shoulder"]:
+        S(b, sh + Vector((0, 0.02, 0.02)), (0.1, 0.12, 0.07), "goose_yellow", 14, 8)
+    # 宝杖立在右手，杖头金饰托一颗发光宝珠
+    rs, ls = k["shoulder"]
+    rh = P(0.16, 0.34, z0 + 0.42)
+    sleeve_arm(b, rs, P(0.03, 0.32, z0 + 0.42), rh, "leather", glove="sha_blue")
+    lh = P(0.26, -0.18, z0 + 0.36)
+    sleeve_arm(b, ls, P(0.1, -0.3, z0 + 0.36), lh, "leather", glove="sha_blue")
+    with b.held(rh):
+        top = Vector((rh.x, rh.y, z0 + 1.4))
+        R(b, Vector((rh.x, rh.y, z0 + 0.02)), top, 0.026, 0.024, "wood", 10)
+        for dz in (0.3, 0.75, 1.15):
+            R(b, Vector((rh.x, rh.y, z0 + dz)), Vector((rh.x, rh.y, z0 + dz + 0.06)), 0.034, 0.034, "gold", 10)
+        R(b, top, top + Vector((0, 0, 0.08)), 0.03, 0.06, "gold", 12)
+        for s in (-1, 1):
+            b.chain([top + Vector((0, 0, 0.06)), top + Vector((0, s * 0.09, 0.12)), top + Vector((0, s * 0.07, 0.22)),
+                     top + Vector((0, s * 0.02, 0.25))], 0.018, 0.01, "gold", 8)
+        gem(b, top + Vector((0, 0, 0.17)), (0.05, 0.05, 0.06))
+
+
+def bai_longma(b, star=1):  # 白龙马：小白龙变的白马，冰蓝鬃尾，额上一对小金角和两缕龙须，背上红鞍金镫
+    star_base(b, 0.75, star, "wood")
+    W = "horse_white"
+    body = P(0, 0, 0.56)
+    S(b, body, (0.24, 0.4, 0.25), W)
+    for f in (0.2, -0.2):
+        for s in (-1, 1):
+            R(b, P(f, s * 0.13, 0.46), P(f, s * 0.13, 0.12), 0.08, 0.07, W, 12)
+            R(b, P(f + 0.01, s * 0.13, 0.12), P(f + 0.01, s * 0.13, 0.02), 0.075, 0.085, "steel_dark", 12)  # 蹄
+    R(b, P(0.26, 0, 0.62), P(0.42, 0, 0.9), 0.15, 0.13, W)
+    hd = P(0.46, 0, 1.0)
+    S(b, hd, (0.22, 0.24, 0.21), W, 20, 12)
+    S(b, P(0.64, 0, 0.92), (0.15, 0.14, 0.12), W, 16, 10)
+    for s in (-1, 1):
+        S(b, P(0.76, s * 0.06, 0.93), (0.022, 0.015, 0.025), "steel_dark", 8, 6)
+        R(b, hd + Vector((s * 0.12, 0, 0.14)), hd + Vector((s * 0.15, 0.04, 0.3)), 0.045, 0.01, W, 10)  # 耳
+        R(b, hd + Vector((s * 0.06, -0.06, 0.17)), hd + Vector((s * 0.09, 0.0, 0.33)), 0.028, 0.008, "gold", 10)  # 角
+        b.chain([P(0.72, s * 0.1, 0.9), P(0.74, s * 0.22, 0.88), P(0.68, s * 0.3, 0.8), P(0.7, s * 0.34, 0.7)],
+                0.014, 0.006, "ice", 6)  # 龙须
+    face(b, hd + Vector((0, -0.02, 0.03)), 0.2, nose=False)
+    # 冰蓝鬃毛和尾巴
+    for i in range(7):
+        t = i / 6
+        p = P(0.3 + 0.18 * t, 0, 0.78 + 0.42 * t) + Vector((0, 0.07, 0))
+        S(b, p, (0.06, 0.08, 0.07), "ice", 12, 8)
+    S(b, hd + Vector((0, -0.12, 0.17)), (0.07, 0.06, 0.05), "ice", 12, 8)  # 额发
+    b.chain([P(-0.38, 0, 0.66), P(-0.5, 0, 0.6), P(-0.56, 0.03, 0.44), P(-0.52, 0.05, 0.3)], 0.07, 0.04, "ice", 12)
+    # 鞍、鞍褥、镫、缰绳、铃铛
+    S(b, P(-0.02, 0, 0.8), (0.17, 0.2, 0.05), "kasaya_red", 14, 8)
+    b.ring(P(-0.02, 0, 0.8), 0.17, 0.012, "gold", segments=20, sides=4)
+    for s in (-1, 1):
+        b.rbox(P(-0.02, s * 0.235, 0.6), (0.02, 0.32, 0.22), "kasaya_red", 0.3)
+        b.rbox(P(-0.02, s * 0.245, 0.49), (0.012, 0.33, 0.02), "gold", 0.4)
+        R(b, P(-0.02, s * 0.25, 0.6), P(-0.02, s * 0.26, 0.4), 0.006, 0.006, "gold", 4)
+        b.ring(P(-0.02, s * 0.26, 0.37), 0.03, 0.008, "gold", axis="x", segments=12, sides=4)
+    b.ring(P(0.66, 0, 0.93), 0.12, 0.012, "gold", axis="x", segments=20, sides=4)
+    b.ring(P(0.33, 0, 0.72), 0.15, 0.016, "kasaya_red", axis="x", segments=20, sides=4)
+    S(b, P(0.45, 0, 0.62), (0.04, 0.04, 0.045), "gold", 10, 6)
+    # 骨骼：后腿当 leg，前腿当 arm，这样共用的动画也能套上
+    b.bone("hips", P(-0.3, 0, 0.56), P(0.0, 0, 0.56))
+    b.bone("spine", P(0.0, 0, 0.56), P(0.3, 0, 0.68), "hips")
+    b.bone("head", P(0.32, 0, 0.72), P(0.5, 0, 1.22), "spine")
+    for side, s in (("R", 1), ("L", -1)):
+        b.bone("leg." + side, P(-0.2, s * 0.13, 0.46), P(-0.2, s * 0.13, 0.04), "hips")
+        up = b.bone("arm_upper." + side, P(0.2, s * 0.13, 0.46), P(0.2, s * 0.13, 0.26), "spine")
+        b.bone("arm_lower." + side, P(0.2, s * 0.13, 0.26), P(0.2, s * 0.13, 0.04), up)
+
+
+def nezha(b, star=1):  # 哪吒（凌霄殿）：双髻童子，白锦袍金花、红肚兜，混天绫绕身飘起，左手乾坤圈，右手火尖枪，脚踩风火轮
+    star_base(b, 0.75, star, "pearl")
+    z0 = 0.13
+    k = chibi(b, z0=z0, body="white", legs="white", boots="gold", head_r=0.31, brows="hair_black")
+    h, hr, torso, radii = k["head"], k["head_r"], k["torso"], k["radii"]
+    hair(b, k, "hair_black", "short")
+    for s in (-1, 1):
+        c = h + Vector((s * hr * 0.6, hr * 0.05, hr * 0.78))
+        S(b, c, (hr * 0.3,) * 3, "hair_black", 14, 10)
+        b.ring(c - Vector((0, 0, hr * 0.12)), hr * 0.24, 0.016, "nezha_red", segments=16, sides=4)
+        b.chain([c + Vector((s * hr * 0.2, hr * 0.1, 0)), c + Vector((s * hr * 0.45, hr * 0.35, -hr * 0.1)),
+                 c + Vector((s * hr * 0.55, hr * 0.6, -hr * 0.35))], 0.02, 0.01, "nezha_red", 6)
+    # 红肚兜和金花、金项圈
+    b.rbox(front(torso, radii, 0, -0.02, -0.02), (0.22, 0.04, 0.22), "nezha_red", 0.3, rot=(0, 45, 0))
+    b.ring(front(torso, radii, 0, -0.02, 0.012), 0.035, 0.01, "gold", axis="f", segments=12, sides=4)
+    for x, dz in ((-0.17, 0.08), (0.17, 0.08), (-0.18, -0.1), (0.18, -0.1)):
+        S(b, front(torso, radii, x, dz, 0.0), (0.022, 0.012, 0.022), "gold", 8, 6)
+    b.ring(P(0, 0, z0 + 0.63), 0.15, 0.028, "gold", segments=24, sides=6)
+    S(b, P(0.14, 0, z0 + 0.56), (0.04, 0.025, 0.04), "gold", 10, 6)
+    for sh in k["shoulder"]:  # 小金肩甲
+        S(b, sh + Vector((0, 0, 0.03)), (0.09, 0.1, 0.06), "gold", 14, 8)
+    # 混天绫：从左肩绕过身前，飘到身后高处
+    pts = []
+    for i in range(25):
+        t = i / 24
+        a = math.radians(-120 + 300 * t)
+        r = 0.3 + 0.12 * t
+        pts.append(P(r * math.cos(a), r * math.sin(a), z0 + 0.6 - 0.32 * t + 0.5 * t * t))
+    limb(b, pts, 0.034, 0.022, "nezha_red", 10)
+    # 风火轮
+    for s in (-1, 1):
+        c = P(0.04, s * 0.11, z0 - 0.04)
+        b.ring(c, 0.12, 0.024, "gold", segments=24, sides=6)
+        S(b, c, (0.05, 0.05, 0.03), "gold", 10, 6)
+        for i in range(6):
+            a = i * math.pi / 3 + 0.3
+            o = c + Vector((math.cos(a) * 0.12, math.sin(a) * 0.12, 0))
+            R(b, o, o + Vector((math.cos(a + 0.6) * 0.08, math.sin(a + 0.6) * 0.08, 0.06)), 0.03, 0.004, "fire", 8)
+        b.ring(c + Vector((0, 0, -0.01)), 0.07, 0.012, GLOW, segments=16, sides=4)
+    # 右手火尖枪，左手乾坤圈
+    rs, ls = k["shoulder"]
+    rh = P(0.2, 0.3, z0 + 0.4)
+    sleeve_arm(b, rs, P(0.05, 0.32, z0 + 0.42), rh, "white", cuff="gold")
+    with b.held(rh):
+        back = rh + Vector((0, 0.35, -0.42))
+        d = (rh - back).normalized()
+        tip = back + d * 1.35
+        R(b, back, tip, 0.02, 0.02, "nezha_red", 10)
+        S(b, tip, (0.04,) * 3, "gold", 10, 6)
+        R(b, tip, tip + d * 0.22, 0.045, 0.003, "silver", 8)
+        for s in (-1, 1):
+            o = tip + d * 0.02
+            R(b, o, o + d * 0.1 + Vector((s * 0.06, 0, 0)), 0.03, 0.003, "fire", 8)
+        S(b, tip - d * 0.06, (0.05, 0.05, 0.06), "nezha_red", 10, 6)  # 红缨
+    lh = P(0.16, -0.34, z0 + 0.68)
+    sleeve_arm(b, ls, P(0.04, -0.36, z0 + 0.5), lh, "white", cuff="gold")
+    with b.held(lh):
+        b.ring(lh + Vector((0, 0, 0.05)), 0.12, 0.022, "gold", axis="f", segments=28, sides=8)
+        b.ring(lh + Vector((0, 0, 0.05)), 0.12, 0.008, GLOW, axis="x", segments=28, sides=4)
+
+
+def ao_guang(b, star=1):  # 东海龙王敖广（水晶宫）：碧青龙首、珊瑚龙角、长须白髯，海蓝龙袍镶珍珠浪边，左手托定海宝珠，右手珊瑚杖
+    star_base(b, 0.75, star, "sea_blue")
+    k = chibi(b, body="sea_blue", robe="sea_blue", boots="pearl", skin="dragon_teal", has_face=False, head_r=0.33)
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    # 龙首：长吻、鼻孔、大眼、眉棱
+    sn = h + Vector((0, -hr * 0.82, -hr * 0.28))
+    S(b, sn, (hr * 0.55, hr * 0.5, hr * 0.36), "dragon_teal", 18, 12)
+    S(b, sn + Vector((0, -hr * 0.1, -hr * 0.2)), (hr * 0.5, hr * 0.4, hr * 0.18), "pearl", 16, 8)  # 下颌
+    for s in (-1, 1):
+        S(b, sn + Vector((s * hr * 0.22, -hr * 0.42, hr * 0.12)), (0.03, 0.02, 0.025), "robe_black", 8, 6)
+    face(b, h + Vector((0, -0.02, hr * 0.28)), hr * 0.85, nose=False, brows="gold")
+    for s in (-1, 1):
+        # 珊瑚龙角：分叉
+        o = h + Vector((s * hr * 0.42, hr * 0.05, hr * 0.78))
+        m = o + Vector((s * hr * 0.25, hr * 0.25, hr * 0.5))
+        b.chain([o, m, m + Vector((s * hr * 0.1, hr * 0.35, hr * 0.35))], 0.04, 0.015, "coral", 10)
+        b.chain([m, m + Vector((s * hr * 0.3, -hr * 0.05, hr * 0.25))], 0.025, 0.01, "coral", 8)
+        # 鳍耳
+        b.rbox(h + Vector((s * hr * 1.0, hr * 0.15, hr * 0.05)), (0.02, 0.14, 0.18), "ice", 0.4, rot=(-25, 0, s * 20))
+        # 龙须
+        b.chain([sn + Vector((s * hr * 0.4, -hr * 0.3, 0.02)), sn + Vector((s * hr * 0.9, -hr * 0.45, 0.04)),
+                 sn + Vector((s * hr * 1.25, -hr * 0.2, -hr * 0.25)), sn + Vector((s * hr * 1.3, -hr * 0.1, -hr * 0.7))],
+                0.016, 0.006, "gold_light", 6)
+    beard(b, k, "pearl", length=0.14)
+    # 小金冠
+    c = h + Vector((0, 0, hr * 0.88))
+    R(b, c - Vector((0, 0, 0.03)), c + Vector((0, 0, 0.05)), hr * 0.32, hr * 0.36, "gold", 14)
+    for i in range(3):
+        a = (i - 1) * 0.6
+        o = c + Vector((math.sin(a) * hr * 0.33, -math.cos(a) * hr * 0.33, 0.04))
+        R(b, o, o + Vector((0, 0, 0.09)), 0.025, 0.004, "gold", 8)
+    gem(b, c + Vector((0, -hr * 0.36, 0.0)), (0.025, 0.018, 0.03))
+    # 龙袍：珍珠浪边、鳞片肩甲、金领
+    for i in range(20):
+        a = i * 2 * math.pi / 20
+        S(b, P(0.27 * math.cos(a), 0.27 * math.sin(a), z0 + 0.07 + 0.03 * (i % 2)), (0.03,) * 3, "pearl", 8, 6)
+    b.ring(P(0, 0, z0 + 0.63), 0.14, 0.03, "gold", segments=24, sides=6)
+    b.rbox(front(torso, radii, 0, 0.0, 0.0), (0.06, 0.03, 0.34), "gold", 0.4)
+    for sh in k["shoulder"]:
+        for i in range(3):
+            S(b, sh + Vector((0, 0, 0.04 - i * 0.04)) + Vector((math.copysign(0.02 * i, sh.x), 0, 0)),
+              (0.1 - i * 0.012, 0.11 - i * 0.012, 0.05), "dragon_teal", 14, 8)
+    # 龙尾从袍后拖出来
+    b.chain([P(-0.2, 0, z0 + 0.12), P(-0.4, 0.08, z0 + 0.06), P(-0.55, 0.2, z0 + 0.1), P(-0.6, 0.32, z0 + 0.24)],
+            0.08, 0.03, "dragon_teal", 12)
+    b.rbox(P(-0.6, 0.34, z0 + 0.3), (0.03, 0.12, 0.14), "ice", 0.4, rot=(30, 0, 30))
+    # 左手托宝珠，右手珊瑚杖
+    rs, ls = k["shoulder"]
+    lh = P(0.24, -0.26, z0 + 0.5)
+    sleeve_arm(b, ls, P(0.1, -0.32, z0 + 0.4), lh, "sea_blue", glove="dragon_teal", wide=0.04, cuff="pearl")
+    with b.held(lh):
+        S(b, lh + Vector((0, 0, 0.12)), (0.085,) * 3, GLOW, 16, 10)
+        b.ring(lh + Vector((0, 0, 0.04)), 0.06, 0.012, "gold", segments=16, sides=4)
+    rh = P(0.14, 0.34, z0 + 0.42)
+    sleeve_arm(b, rs, P(0.03, 0.32, z0 + 0.42), rh, "sea_blue", glove="dragon_teal", wide=0.04, cuff="pearl")
+    with b.held(rh):
+        top = Vector((rh.x, rh.y, z0 + 1.35))
+        R(b, Vector((rh.x, rh.y, z0 + 0.02)), top, 0.026, 0.03, "coral", 10)
+        for s, dz, l in ((1, -0.25, 0.16), (-1, -0.1, 0.2), (1, 0.05, 0.22), (-1, 0.15, 0.14)):
+            o = top + Vector((0, 0, dz))
+            b.chain([o, o + Vector((0, s * l * 0.6, l * 0.5)), o + Vector((0, s * l * 0.7, l))], 0.02, 0.008, "coral", 8)
+        S(b, top + Vector((0, 0, 0.04)), (0.045,) * 3, "pearl", 10, 8)
+
+
+def jin_jiao(b, star=1):  # 金角大王（洞天府）：老君看金炉的童子下界，额生金角、头挽道髻，紫道袍丹砂边，左手紫金红葫芦，右手七星剑，脚下仙云
+    star_base(b, 0.75, star, "dao_purple")
+    z0 = 0.06
+    k = chibi(b, z0=z0, body="dao_purple", robe="dao_purple", boots="cinnabar", skin="skin", head_r=0.32,
+              brows="cinnabar")
+    h, hr, torso, radii = k["head"], k["head_r"], k["torso"], k["radii"]
+    hair(b, k, "hair_black", "short")
+    # 金角、尖耳、小獠牙
+    o = on_head(k, 0, 0.6, 0.95)
+    b.chain([o, o + Vector((0, -0.05, 0.12)), o + Vector((0, -0.02, 0.24)), o + Vector((0, 0.04, 0.31))],
+            0.055, 0.008, "gold", 12)
+    ears(b, k, "skin")
+    for s in (-1, 1):
+        R(b, front(h, (hr, hr * 0.95, hr * 0.93), s * hr * 0.2, -hr * 0.42, -0.01),
+          front(h, (hr, hr * 0.95, hr * 0.93), s * hr * 0.2, -hr * 0.42, 0.01) + Vector((0, 0, -0.05)),
+          0.018, 0.003, "white", 6)
+    # 道髻和簪子
+    c = h + Vector((0, hr * 0.35, hr * 0.85))
+    S(b, c, (hr * 0.3, hr * 0.3, hr * 0.28), "hair_black", 14, 10)
+    R(b, c + Vector((-hr * 0.5, 0, 0)), c + Vector((hr * 0.5, 0, 0)), 0.012, 0.012, "gold", 6)
+    b.ring(c - Vector((0, 0, hr * 0.18)), hr * 0.22, 0.014, "cinnabar", segments=16, sides=4)
+    # 交领、丹砂边、腰带、胸前八卦圆纹
+    for s in (-1, 1):
+        b.rbox(front(torso, radii, s * 0.05, 0.08, 0.0), (0.05, 0.03, 0.24), "cinnabar", 0.4, rot=(0, s * 30, 0))
+    b.ring(P(0, 0, z0 + 0.06), 0.262, 0.024, "cinnabar", segments=28, sides=6)
+    S(b, P(0, 0, z0 + 0.32), (radii[0] * 0.92, radii[1] * 0.92, 0.04), "cinnabar")
+    em = front(torso, radii, 0, -0.08, 0.008)
+    b.ring(em, 0.045, 0.01, "gold", axis="f", segments=16, sides=4)
+    S(b, em + Vector((0.016, 0, 0.0)), (0.018, 0.01, 0.018), "pearl", 8, 6)
+    S(b, em + Vector((-0.016, 0, 0.0)), (0.018, 0.01, 0.018), "robe_black", 8, 6)
+    # 脚下仙云
+    for a in (0.0, 1.2, 2.4, 3.6, 4.8):
+        cloud_puff(b, P(0.25 * math.cos(a), 0.25 * math.sin(a), 0.04), 0.9)
+    # 左手举紫金红葫芦（发光的葫芦口冒出一缕仙气），右手七星剑
+    rs, ls = k["shoulder"]
+    lh = P(0.16, -0.42, z0 + 0.5)
+    sleeve_arm(b, ls, P(0.02, -0.4, z0 + 0.4), lh, "dao_purple", wide=0.04, cuff="cinnabar")
+    with b.held(lh):
+        g = lh + Vector((0, 0, 0.1))
+        S(b, g, (0.1, 0.1, 0.1), "cinnabar", 16, 10)
+        S(b, g + Vector((0, 0, 0.14)), (0.068, 0.068, 0.07), "cinnabar", 14, 10)
+        b.ring(g + Vector((0, 0, 0.075)), 0.052, 0.014, "gold", segments=16, sides=4)
+        b.chain([g + Vector((0, 0, 0.075)), g + Vector((0.05, -0.05, 0.02)), g + Vector((0.06, -0.08, -0.05))],
+                0.012, 0.008, "dao_purple", 6)
+        mouth = g + Vector((0, 0, 0.21))
+        R(b, mouth - Vector((0, 0, 0.02)), mouth + Vector((0, 0, 0.03)), 0.025, 0.03, "gold", 10)
+        limb(b, [mouth + Vector((0, 0, 0.03)), mouth + Vector((-0.05, 0, 0.12)), mouth + Vector((-0.02, 0.0, 0.22)),
+                 mouth + Vector((-0.09, 0.02, 0.3)), mouth + Vector((-0.06, 0.03, 0.38))], 0.035, 0.01, GLOW, 8)
+    rh = P(0.22, 0.32, z0 + 0.4)
+    sleeve_arm(b, rs, P(0.05, 0.32, z0 + 0.42), rh, "dao_purple", wide=0.04, cuff="cinnabar")
+    with b.held(rh):
+        d = Vector((0, -math.sin(math.radians(55)), math.cos(math.radians(55))))
+        b.rbox(rh + Vector((0, -0.03, 0.02)), (0.2, 0.04, 0.04), "gold", 0.5, rot=(55, 0, 0))
+        mid = rh + d * 0.3
+        b.rbox(mid, (0.06, 0.02, 0.5), "silver", 0.3, rot=(55, 0, 0))
+        for i in range(7):  # 剑身上的七颗金星
+            S(b, rh + d * (0.12 + i * 0.06) + Vector((0, -0.012, 0)), (0.012, 0.016, 0.012), "gold", 6, 4)
+        S(b, rh + Vector((0, 0.06, -0.03)), (0.03,) * 3, "gold", 8, 6)
+        b.chain([rh + Vector((0, 0.07, -0.05)), rh + Vector((0, 0.1, -0.15)), rh + Vector((0, 0.08, -0.22))],
+                0.012, 0.008, "cinnabar", 6)
+
+
+def niu_mowang(b, star=1):  # 牛魔王（妖王寨）：黑面牛首、一对大弯角、金鼻环、红眼，熟铁盔，兽皮披肩和铁甲，右手扛混铁棍
+    star_base(b, 0.8, star, "stone_dark")
+    k = chibi(b, body="iron", legs="leather", boots="iron", skin="bull_hide", has_face=False, w=1.3, belly=1.12,
+              head_r=0.35, belt="crimson")
+    h, hr, z0, torso, radii = k["head"], k["head_r"], k["z0"], k["torso"], k["radii"]
+    face(b, h + Vector((0, 0, hr * 0.2)), hr * 0.9, glow_eyes=True, nose=False, brows="iron")
+    mz = h + Vector((0, -hr * 0.82, -hr * 0.32))
+    S(b, mz, (hr * 0.62, hr * 0.38, hr * 0.38), "bull_muzzle", 18, 12)
+    for s in (-1, 1):
+        S(b, mz + Vector((s * hr * 0.25, -hr * 0.34, hr * 0.06)), (0.035, 0.02, 0.03), "robe_black", 8, 6)
+    b.ring(mz + Vector((0, -hr * 0.36, -hr * 0.12)), 0.05, 0.012, "gold", axis="f", segments=16, sides=6)
+    # 大弯角和横着的牛耳
+    for s in (-1, 1):
+        o = h + Vector((s * hr * 0.75, 0, hr * 0.45))
+        limb(b, [o, o + Vector((s * hr * 0.6, 0, hr * 0.05)), o + Vector((s * hr * 1.05, -hr * 0.15, hr * 0.5)),
+                 o + Vector((s * hr * 1.0, -hr * 0.45, hr * 1.05))], 0.1, 0.014, "bone", 12)
+        S(b, h + Vector((s * hr * 1.0, hr * 0.05, hr * 0.05)), (hr * 0.26, hr * 0.12, hr * 0.12), "bull_hide",
+          12, 8, rot=(0, s * -20, 0))
+    # 熟铁盔：盖住头顶，顶上一根暗红缨
+    S(b, h + Vector((0, hr * 0.06, hr * 0.5)), (hr * 0.97, hr * 0.95, hr * 0.5), "steel_dark", 20, 12)
+    head_ring(b, k, "crimson", dz=0.5, thick=0.03)
+    R(b, h + Vector((0, 0, hr * 0.98)), h + Vector((0, 0.03, hr * 1.25)), 0.03, 0.02, "steel_dark", 8)
+    S(b, h + Vector((0, 0.06, hr * 1.3)), (0.06, 0.06, 0.08), "crimson", 12, 8)
+    # 兽皮披肩：一圈疙瘩毛
+    for i in range(14):
+        a = i * 2 * math.pi / 14
+        S(b, P(0.2 * math.cos(a) - 0.02, 0.27 * math.sin(a), z0 + 0.6 + 0.02 * (i % 2)), (0.09, 0.09, 0.07),
+          "hair_brown", 12, 8)
+    # 胸甲：暗红铁片和骨钉
+    b.rbox(front(torso, radii, 0, 0.0, -0.03), (0.28, 0.06, 0.2), "crimson", 0.3)
+    rivets(b, [front(torso, radii, x, dz, 0.01) for x in (-0.11, 0.11) for dz in (-0.07, 0.07)], "bone", 0.022)
+    # 兽皮短裙
+    for i in range(8):
+        a = i * 2 * math.pi / 8 + 0.2
+        b.rbox(P(0.27 * math.cos(a), 0.3 * math.sin(a), z0 + 0.2), (0.14, 0.03, 0.16), "leather", 0.3,
+               rot=(0, 0, math.degrees(a) + 90))
+    # 右手扛混铁棍，左手握拳
+    rs, ls = k["shoulder"]
+    p1, p2 = P(0.45, 0.44, z0 + 0.2), P(-0.45, 0.44, z0 + 1.25)
+    d = (p2 - p1).normalized()
+    rh = p1 + d * 0.35
+    sleeve_arm(b, rs, P(0.1, 0.46, z0 + 0.36), rh, "bull_hide", glove="bull_hide", r=0.09)
+    with b.held(rh):
+        R(b, p1, p2, 0.05, 0.065, "iron", 12)
+        for t in (0.02, 0.6, 0.98):
+            c = p1 + (p2 - p1) * t
+            R(b, c - d * 0.03, c + d * 0.03, 0.075, 0.075, "crimson", 12)
+    lh = P(0.2, -0.4, z0 + 0.3)
+    sleeve_arm(b, ls, P(0.06, -0.42, z0 + 0.42), lh, "bull_hide", glove="bull_hide", r=0.09)
+    with b.held(lh):
+        b.ring(lh + Vector((0, 0, 0.06)), 0.07, 0.014, "steel_dark", segments=16, sides=4)
+
+
 SMOOTH_PROPS = {"supply_ship", "relay", "hive"}  # 卡通风格的建筑：烘焙贴图和描边，不带骨骼和升星
 PROP_OUTLINE_SCALE = 1.8  # 建筑比角色大，描边跟着加粗
 
@@ -2856,6 +3456,9 @@ UNITS = [
     ("banshee", banshee), ("mana_leech", mana_leech), ("blood_knight", blood_knight),
     ("shadow_dancer", shadow_dancer), ("blade_singer", blade_singer), ("moon_archer", moon_archer), ("druid", druid),
     ("wind_rider", wind_rider), ("envoy", envoy), ("star_speaker", star_speaker), ("sentinel", sentinel),
+    ("tang_seng", tang_seng), ("sun_wukong", sun_wukong), ("zhu_bajie", zhu_bajie), ("sha_wujing", sha_wujing),
+    ("bai_longma", bai_longma), ("nezha", nezha), ("ao_guang", ao_guang), ("jin_jiao", jin_jiao),
+    ("niu_mowang", niu_mowang),
 ]
 
 # 用卡通风格（平滑着色）的单位
@@ -2886,8 +3489,17 @@ CARTOON_FACTIONS = [
     ("elves", ["shadow_dancer", "blade_singer", "moon_archer", "druid", "wind_rider", "envoy", "star_speaker",
                "sentinel"], ELF_GLOW),
 ]
+# 西游原著角色（Q 版棋子）：按五阵营分组，发光色是预览用的阵营色。升星外观还没做，先只出 ★1
+XIYOU_FACTIONS = [
+    ("xitian", ["tang_seng", "sun_wukong", "zhu_bajie", "sha_wujing", "bai_longma"], "F2B84B"),  # 西天路
+    ("lingxiao", ["nezha"], "8FD8FF"),  # 凌霄殿
+    ("shuijing", ["ao_guang"], "5CE0C8"),  # 水晶宫
+    ("dongtian", ["jin_jiao"], "C89BFF"),  # 洞天府
+    ("yaowang", ["niu_mowang"], "FF6A3D"),  # 妖王寨
+]
+XIYOU_UNITS = {u for _, group, _ in XIYOU_FACTIONS for u in group}
 LARGE_UNITS = {"spirit_knight", "siege_golem"}  # 2×2 卡通角色
-SMOOTH_UNITS = set(SAMPLE_UNITS) | {u for _, group, _ in CARTOON_FACTIONS for u in group}
+SMOOTH_UNITS = set(SAMPLE_UNITS) | {u for _, group, _ in CARTOON_FACTIONS + XIYOU_FACTIONS for u in group}
 
 
 # ---- 骨骼和动画 ------------------------------------------------------------------
@@ -2914,6 +3526,8 @@ ATTACK_STYLE = {
     "banshee": "cast", "mana_leech": "cast", "blood_knight": "slash",
     "shadow_dancer": "slash", "blade_singer": "slash", "moon_archer": "shoot", "druid": "cast",
     "wind_rider": "thrust", "envoy": "cast", "star_speaker": "cast", "sentinel": "throw",
+    "tang_seng": "cast", "sun_wukong": "slash", "zhu_bajie": "slash", "sha_wujing": "thrust", "bai_longma": "punch",
+    "nezha": "thrust", "ao_guang": "cast", "jin_jiao": "cast", "niu_mowang": "slash",
 }
 
 
@@ -3290,8 +3904,9 @@ def export_fbx(obj, path):
         path_mode="STRIP", embed_textures=False)
 
 
-def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height_px=480):
-    """把一组模型排成一排，从战斗镜头的角度（侧前方斜看）渲染一张预览图。turn=90 时正面朝画面右侧。"""
+def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height_px=480, tilt=56):
+    """把一组模型排成一排，从战斗镜头的角度（侧前方斜看）渲染一张预览图。turn=90 时正面朝画面右侧。
+    tilt 是镜头偏离竖直向下的角度，越小越接近俯视。"""
     scene = bpy.context.scene
     for i, obj in enumerate(objects):
         _mover(obj).location = Vector((i * spacing, 0, 0))
@@ -3303,8 +3918,9 @@ def render_sheet(objects, path, spacing=4.6, turn=90, margin=4.5, px=320, height
     cam_data.shift_y = 0.06
     cam = bpy.data.objects.new("PreviewCam", cam_data)
     scene.collection.objects.link(cam)
-    cam.location = Vector((width / 2, -13, 8.5))
-    cam.rotation_euler = (math.radians(56), 0, 0)  # 和战斗镜头一样从侧前方斜看
+    a = math.radians(tilt)
+    cam.location = Vector((width / 2, -15.3 * math.sin(a), 15.3 * math.cos(a) + 0.6))
+    cam.rotation_euler = (a, 0, 0)  # 默认和战斗镜头一样从侧前方斜看
     scene.camera = cam
     sun = bpy.data.objects.new("Sun", bpy.data.lights.new("Sun", "SUN"))
     sun.data.energy = 3.5
@@ -3491,6 +4107,29 @@ def render_anim_preview(built, unit_ids, out_prefix):
 
 
 
+def render_xiyou_sheets(built, preview_dir):
+    """西游样品：师徒五人一张，五个阵营各一名代表一张；另渲染一张接近棋盘镜头的俯视图。"""
+    sheets = [("xiyou_xitian", XIYOU_FACTIONS[0][1]),
+              ("xiyou_factions", ["sun_wukong"] + [group[0] for _, group, _ in XIYOU_FACTIONS[1:]])]
+    for name, group in sheets:
+        if any(u not in built for u in group):
+            continue
+        for obj, _ in built.values():
+            _show(obj, False)
+        objects = [built[u][0] for u in group]
+        for obj in objects:
+            _show(obj, True)
+        render_sheet(objects, os.path.join(preview_dir, name + ".png"), spacing=2.2, turn=35, margin=1.6, px=600,
+                     height_px=1000)
+        render_sheet(objects, os.path.join(preview_dir, name + "_board.png"), spacing=2.2, turn=20, margin=1.6,
+                     px=600, height_px=1000, tilt=35)
+        from PIL import Image
+        for suffix in ("", "_board"):
+            path = os.path.join(preview_dir, name + suffix + ".png")
+            _trim_rows(Image.open(path).convert("RGB")).save(path)
+        print("已渲染预览", name)
+
+
 def main():
     argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else sys.argv[1:]
     preview_dir = None
@@ -3520,7 +4159,7 @@ def main():
             continue
         cartoon = unit_id in SMOOTH_UNITS
         prop = unit_id in SMOOTH_PROPS
-        for star in (STAR_TIERS if cartoon else (1,)):
+        for star in (STAR_TIERS if cartoon and unit_id not in XIYOU_UNITS else (1,)):
             mid = model_id(unit_id, star)
             hull, glow = make_materials(palette)
             b = Builder()
@@ -3552,7 +4191,7 @@ def main():
         sheets = PREVIEW_SHEETS + [("samples", [u for u, _ in PREVIEW_SAMPLES], None),
                                    ("buildings", ["supply_ship", "relay", "hive"], None)]
         side_glow = dict(PREVIEW_SAMPLES)
-        for _, group, colour in PREVIEW_SHEETS + CARTOON_FACTIONS:
+        for _, group, colour in PREVIEW_SHEETS + CARTOON_FACTIONS + XIYOU_FACTIONS:
             side_glow.update((u, colour) for u in group)
         for mid, (obj, glow) in built.items():
             unit_id = unit_of[mid]
@@ -3576,6 +4215,7 @@ def main():
                 render_sheet(objects, os.path.join(preview_dir, name + ".png"))
             print("已渲染预览", name)
         render_star_sheet(built, [u for u, _ in PREVIEW_SAMPLES], os.path.join(preview_dir, "stars.png"))
+        render_xiyou_sheets(built, preview_dir)
         for name, group, _ in CARTOON_FACTIONS:
             render_star_sheet(built, group, os.path.join(preview_dir, "stars_%s.png" % name))
         anim_units = [u for u in ANIM_PREVIEW if model_id(u, 3) in built]
