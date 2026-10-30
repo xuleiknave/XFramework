@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 # Starline（星线）
 
-西游后传题材（取经之后，星线断了、星宿坠落成妖）的战略游戏，先做国内微信小游戏（广告变现、需联网登录，服务端在 UOS；Steam 买断版搁置，见 `docs/decisions.md` 决策 66~72）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
+《西游记》原著原班人马题材的战略游戏（人、仙、魔、兽四族，序章大闹天宫，正篇重走取经路，见决策 77），先做国内微信小游戏（广告变现、需联网登录，服务端在 UOS；Steam 买断版搁置，见 `docs/decisions.md` 决策 66~77）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
 
 ## 先读这些
 
@@ -13,6 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docs/conversation-log.md`：此前的完整开发对话（开发者要求“把对话迁移到项目里”时，用 `python3 tools/export_conversation.py ~/.claude/projects/<项目目录>/*.jsonl` 重新导出）
 - `docs/story.md`：故事背景、五个阵营、三幕九章、角色关系
 - `docs/characters.md`：47 名角色的小传（升星逐段解锁的个人小故事）
+- `docs/roster.md`：按四族分的完整角色名单（232 名，卡池以后从这里取）
 - `docs/art-direction.md`：美术方向、色板、部队模型规格和生成流程
 - `docs/server-design.md`：服务端设计（必须联网登录、服务端为准、战斗登记和重跑结算、接口清单）
 - `docs/server-database.md`：服务端数据结构（CRUD Save 文档、MySQL 表）
@@ -57,4 +58,4 @@ dotnet run --project tests/Starline.Battle.Tests -- --balance   # 重新生成 d
 - 内核代码目标 netstandard2.1 / C# 9（团结 / Unity 2022.3 支持的版本）
 - 调整数值后跑测试，看平衡模拟的输出，并用 `-- --balance` 重新生成数值平衡表
 - 设计变更同步更新 `docs/game-design.md`（重大决定补进 `docs/decisions.md`）
-- 用户可见文本用中文，术语与设计文档一致（部队、星石、观星台、星络、灵力、远征军耐久等；新旧术语对照见 `docs/game-design.md` 附录（v4.0 星宿国潮、v5.0 西游后传））。代码里的类名、id 和 JSON `_说明` 还沿用旧术语（如 `relay`、`supply_ship`、Morningstar），不用跟着改
+- 用户可见文本用中文，术语与设计文档一致（部队、灵石、土地庙、灵脉、灵力、取经队耐久、人族 / 仙族 / 魔族 / 兽族等；新旧术语对照见 `docs/game-design.md` 附录（v4.0 星宿国潮、v5.0 西游后传、v6.0 原著））。代码里的类名、id 和 JSON `_说明` 还沿用旧术语（如 `relay`、`supply_ship`、Morningstar），不用跟着改
