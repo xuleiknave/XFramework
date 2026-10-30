@@ -1,4 +1,4 @@
-# 星线留言板部署脚本：在服务器上从 GitHub 拉取指定提交的源码，编译后挂到 IIS 的 /api 应用下。
+# 取经棋局留言板部署脚本：在服务器上从 GitHub 拉取指定提交的源码，编译后挂到 IIS 的 /api 应用下。
 # 由 deploy_chat.py 填好提交号和文件列表后通过云助手执行；也可以远程桌面上以管理员身份手动运行。
 # 第一次运行会安装 ASP.NET Core Hosting Bundle 和 .NET 8 SDK（各需几分钟）。
 $ErrorActionPreference = 'Stop'
