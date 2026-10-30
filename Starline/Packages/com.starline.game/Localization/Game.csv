@@ -1,84 +1,84 @@
 key,zh-Hans,en,note
-unit.supply_ship.name,观星台,,
-unit.supply_ship.description,远征军随行的灵力源头。前沿中点是台口，星络连线从这里出发。,,
-unit.relay.name,星石,,
-unit.relay.description,星络节点。覆盖周围 2 格，同一条格线上 3 格内的节点自动连线。,,
+unit.supply_ship.name,土地庙,,
+unit.supply_ship.description,取经队随行的灵力源头，土地公就住在里面。前沿中点是庙门，灵脉连线从这里出发。,,
+unit.relay.name,灵石,,
+unit.relay.description,灵脉节点。覆盖周围 2 格，同一条格线上 3 格内的节点自动连线。,,
 unit.battleship.name,天将,,
-unit.battleship.description,骑着天马的天将，顶在前排吸收伤害，专克轻装单位。,,
+unit.battleship.description,披甲的天将，顶在前排吸收伤害，专克轻装单位。,,
 unit.frigate.name,猴兵,,
-unit.frigate.description,身手敏捷的花果山猴兵，突进去切掉敌方远程单位。,,
+unit.frigate.description,花果山的猴兵，身手敏捷，突进去切掉敌方远程单位。,,
 unit.pd_ship.name,弩手,,
 unit.pd_ship.description,密集的弩箭火网，专门射落鹤骑和阴风怪。,,
 unit.missile_ship.name,丹童,,
-unit.missile_ship.description,超远射程的丹火星矢，自身灵力有限，必须待在星络覆盖内。,,
+unit.missile_ship.description,超远射程的丹火，自身灵力有限，必须待在灵脉覆盖内。,,
 unit.strike_craft.name,鹤骑,,
-unit.strike_craft.description,骑仙鹤的空中骑手，可以离网 10 秒绕后，优先攻击星络节点和远程单位。,,
-unit.hive.name,墨祭坛,,
-unit.hive_node.name,墨碑,,
+unit.strike_craft.description,骑仙鹤的空中骑手，可以离开灵脉 10 秒绕后，优先攻击灵脉节点和远程单位。,,
+unit.hive.name,妖坛,,
+unit.hive_node.name,妖碑,,
 unit.ripper.name,小妖,,
 unit.crawler.name,熊妖,,
 unit.locust.name,阴风怪,,
 unit.acid_turret.name,妖烟炉,,
 unit.brood_mother.name,狮驼巨妖,,
-unit.wreck_fortress.name,黑风妖城,,
-skill.OrbitalStrike.name,星落,,
-skill.OrbitalStrike.description,选择落点，1 秒后对范围内敌人造成大量伤害,"Choose a point. After 1 second, enemies in the area take heavy damage.",
-skill.EmergencyShield.name,星盾,,
+unit.wreck_fortress.name,黑风洞,,
+skill.OrbitalStrike.name,天兵降临,,
+skill.OrbitalStrike.description,选择落点，1 秒后天兵从天而降，对范围内敌人造成大量伤害,,
+skill.EmergencyShield.name,护法金光,,
 skill.EmergencyShield.description,全体恢复一半护盾,Restores half of every ally's shield.,
 encounter.patrol.name,小妖巡逻队,,
-encounter.patrol.briefing,望星城外的第一颗星石被一小队小妖占着。把它们赶走。,,
+encounter.patrol.briefing,长安城外的第一块灵石被一小队小妖占着。把它们赶走。,,
 encounter.locust_raid.name,阴风怪袭扰,,
-encounter.locust_raid.briefing,阴风怪专门撕咬星络连线。看好你的星石。,,
+encounter.locust_raid.briefing,阴风怪专门撕咬灵脉连线。看好你的灵石。,,
 encounter.turret_line.name,妖烟炉阵地,,
-encounter.turret_line.briefing,妖魔在碎裂的星石上垒起了妖烟炉。它的灵力靠后方的墨碑补充。,,
+encounter.turret_line.briefing,妖魔在碎裂的灵石上垒起了妖烟炉。它的灵力靠后方的妖碑补充。,,
 encounter.crawler_wall.name,熊妖之墙,,
 encounter.crawler_wall.briefing,一排熊妖堵住了道路。它们又厚又沉，怕丹童和鹤骑。,,
-encounter.hive_outpost.name,黑风岭前哨,,
-encounter.hive_outpost.briefing,黑风妖城外围的前哨，三座墨碑连着妖烟炉。,,
+encounter.hive_outpost.name,黑风山前哨,,
+encounter.hive_outpost.briefing,黑风洞外围的前哨，三座妖碑连着妖烟炉。,,
 encounter.evolved_pack.name,饱食妖群,,
-encounter.evolved_pack.briefing,这群妖魔吸饱了星石里的灵力，比普通个体强得多（★2）。,,
+encounter.evolved_pack.briefing,这群妖魔吸饱了灵石里的灵力，比普通个体强得多（★2）。,,
 encounter.brood_patrol.name,精英战：狮驼巨妖巡游,,
-encounter.brood_patrol.briefing,一头狮驼巨妖带着护卫在星石间游荡。它每第 4 次攻击是一记重击。,,
+encounter.brood_patrol.briefing,一头狮驼巨妖带着护卫在灵石间游荡。它每第 4 次攻击是一记重击。,,
 encounter.wreck_ambush.name,精英战：古战场伏击,Elite: Ambush on the Old Battlefield,
 encounter.wreck_ambush.briefing,古战场的断墙后埋伏着一队妖魔，后方有狮驼巨妖压阵。,,
-encounter.wreck_fortress.name,Boss：黑风妖城,,
-encounter.wreck_fortress.briefing,妖魔占了一座陷落的城池，用碎星石和墨泥把它改成了妖城。黑风妖城不会移动，但妖炮覆盖我方前两排，每第 3 次攻击是一轮重炮齐射。,,
-act.act1.title,第一幕 · 边州,,
+encounter.wreck_fortress.name,Boss：黑风洞,,
+encounter.wreck_fortress.briefing,黑熊精占了黑风山的洞府，用碎灵石和妖泥把它垒成了妖洞。黑风洞不会移动，但妖炮覆盖我方前两排，每第 3 次攻击是一轮重炮齐射。,,
+act.act1.title,第一幕 · 师徒聚齐,,
 act.act1.intro_title,启程,Setting Out,
-act.act1.intro,"雷震：断线日之后，望星城的观星台是星线最末端还亮着的光。从这里往外，每一颗星石都被妖魔吸干了。
+act.act1.intro,"土地公：五行山下压着的那只猴子，今天总算出来了。往西去的路上，每一块灵石都被妖怪占了。
 
-持线人，远征军现在只有三个人。但每夺回一颗星石，就能把一座城池重新连回星线，也能招募那里的勇士。
+引路人，取经队现在只有师徒两个。每夺回一块灵石，就能多一条灵脉，也能结识路上的人和妖。
 
-黑风妖城在边州的尽头。拿下它，边州的星线就通了。",,
-act.act1.victory_title,边州 · 通关,,
-act.act1.victory,"阿织：黑风妖城的墨色散了。边州的星线……重新亮了起来。
+黑风山在前头。拿下黑风洞，这一段路就通了。",,
+act.act1.victory_title,师徒聚齐 · 通关,,
+act.act1.victory,"土地公：黑风洞的妖气散了。往西的路……又通了一段。
 
-雷震：干得漂亮，持线人。三座边城已经连回望星城。下一站是中原。
+唐僧：多谢诸位。阿弥陀佛，前面还有好长的路。
 
-（第二幕“中原”正在开发中）",,
-act.act1.defeat_title,远征失败,Expedition Failed,
-act.act1.defeat,雷震：远征军撤回望星城。星线还在那里，妖魔也还在那里。我们还会回去的。,,
-reward.relay,星石 +1,,
+（第二幕“西行路上”正在开发中）",,
+act.act1.defeat_title,西行受阻,,
+act.act1.defeat,土地公：先退回土地庙歇一歇。妖怪还在那里，路也还在那里，咱们还会再来的。,,
+reward.relay,灵石 +1,,
 reward.unit,{0} {1},{0} {1},{0} 角色名，{1} 星级（★）
-run.battle_lost,战斗失败，远征军耐久 −{0},Battle lost. Expedition Durability −{0},
-run.gain_relay,获得 星石（共 {0} 个）,,
-run.repaired,远征军休整完毕，耐久 {0} / {1},The expedition has rested. Durability {0} / {1},
+run.battle_lost,战斗失败，取经队耐久 −{0},,
+run.gain_relay,获得 灵石（共 {0} 个）,,
+run.repaired,取经队休整完毕，耐久 {0} / {1},,
 run.gain_unit,获得 {0} {1},Gained {0} {1},{0} 角色名，{1} 星级
 run.merged,3 名合成 → {0} {1},3 merged → {0} {1},{0} 角色名，{1} 合成后的星级
 run.auto_deployed,{0} 已自动上阵，可在布阵时调整,{0} was deployed automatically. You can rearrange before battle.,
 run.reserve,{0} 进入后备（指挥点不够或没有空位）,{0} went to the reserve (not enough Command Points or no free space),
 formation.bad_position,{0} 的位置无效或与其他单位重叠,{0} is in an invalid position or overlaps another unit,
-formation.one_source,需要且只能有 1 个星络源头,,
+formation.one_source,需要且只能有 1 个灵脉源头,,
 formation.no_combatant,至少需要上阵 1 名作战角色,Deploy at least 1 fighting hero,
 formation.over_command,指挥点超出上限（{0} / {1}）,Command Points over the cap ({0} / {1}),
 forecast.no_defeat,推演中没有出现败局，可以直接开战。,No defeats in the forecast. You're clear to fight.,
 forecast.unit_lost,{0} 被击败,{0} was defeated,
 forecast.unit_dry,{0} 灵力耗尽停手,,
-forecast.relay_lost,星络节点被摧毁,,
-forecast.unsupplied,角色长时间断开星络,,
+forecast.relay_lost,灵脉节点被摧毁,,
+forecast.unsupplied,角色长时间断开灵脉,,
 forecast.reason_share,{0}（{1}% 的败局）,{0} ({1}% of defeats),{0} 败因，{1} 百分比
-forecast.advice_dry,让 {0} 待在星络覆盖范围内，或者在它附近加一个星石。,,
-forecast.advice_relay_lost,在星石附近放一名弩手，挡住来切星络连线的阴风怪。,,
+forecast.advice_dry,让 {0} 待在灵脉覆盖范围内，或者在它附近加一块灵石。,,
+forecast.advice_relay_lost,在灵石附近放一名弩手，挡住来切灵脉连线的阴风怪。,,
 forecast.advice_unsupplied,检查红框的“未接入”角色，把它们移进绿色覆盖区。,"Check the heroes outlined in red as ""Unlinked"" and move them into the green coverage area.",
 forecast.advice_artillery,把 {0} 往后放，前面用天将或猴兵挡住突进的敌人。,,
 forecast.advice_craft,{0} 怕点防御，避开敌方点防御单位所在的一翼。,{0} is vulnerable to anti-air. Stay away from the flank with enemy anti-air units.,
@@ -93,41 +93,41 @@ tile.brush.name,灌木,,地块名
 tile.brush.description,低矮的灌木丛，挡住一部分箭矢和法术。受到的远程伤害 −20%。,,地块说明（布阵时显示）
 tile.brush.effect1,受到远程伤害 −20%,,地块第 1 条效果的简短说明
 tile.shallows.name,浅水,,地块名
-tile.shallows.description,没过脚踝的水。移速 −30%。立在水边交叉点上的星石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
+tile.shallows.description,没过脚踝的水。移速 −30%。立在水边交叉点上的灵石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
 tile.shallows.effect1,移速 −30%,,地块第 1 条效果的简短说明
 tile.deep_water.name,深水,,地块名
-tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的星石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
+tile.deep_water.description,不能布阵，涉水穿过时移速 −60%。立在水边交叉点上的灵石连线距离 +1 格（水面导灵）。,,地块说明（布阵时显示）
 tile.deep_water.effect1,移速 −60%,,地块第 1 条效果的简短说明
 tile.quicksand.name,流沙,,地块名
-tile.quicksand.description,陷脚的流沙。移速 −40%；熟悉荒野的花果山不受影响。,,地块说明（布阵时显示）
+tile.quicksand.description,陷脚的流沙。移速 −40%；人族走惯了山路，不受影响。,,地块说明（布阵时显示）
 tile.quicksand.effect1,移速 −40%,,地块第 1 条效果的简短说明
 tile.marsh.name,沼泽,,地块名
-tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；四海龙宫不受影响。,,地块说明（布阵时显示）
+tile.marsh.description,泥泞的沼泽。移速 −30%，攻击间隔 +10%；兽族不受影响。,,地块说明（布阵时显示）
 tile.marsh.effect1,移速 −30%,,地块第 1 条效果的简短说明
 tile.marsh.effect2,攻速 −10%,,地块第 2 条效果的简短说明
 tile.ice.name,冰面,,地块名
 tile.ice.description,光滑的冰面。移速 +25%，但站在上面不回复护盾。,,地块说明（布阵时显示）
 tile.ice.effect1,移速 +25%,,地块第 1 条效果的简短说明
 tile.ice.effect2,不回复护盾,,地块第 2 条效果的简短说明
-tile.bone_pile.name,墨泥,,地块名
-tile.bone_pile.description,永夜留下的墨泥。妖魔站在上面每秒回复 2% 生命。,,地块说明（布阵时显示）
-tile.bone_pile.effect1,妖魔每秒回复 2% 生命,,地块第 1 条效果的简短说明
+tile.bone_pile.name,妖泥,,地块名
+tile.bone_pile.description,妖气凝成的黑泥。魔族站在上面每秒回复 2% 生命。,,地块说明（布阵时显示）
+tile.bone_pile.effect1,魔族每秒回复 2% 生命,,地块第 1 条效果的简短说明
 tile.mana_spring.name,灵泉,,地块名
-tile.mana_spring.description,地脉涌出的灵泉。放在它角上交叉点的星石覆盖 +1 格。,,地块说明（布阵时显示）
+tile.mana_spring.description,地脉涌出的灵泉。放在它角上交叉点的灵石覆盖 +1 格。,,地块说明（布阵时显示）
 tile.drained.name,枯竭区,,地块名
-tile.drained.description,灵力被吸干的土地。站在上面不算接入星络，角上的交叉点不能放星石；妖魔不受影响。,,地块说明（布阵时显示）
-terrain.plains.name,城郊草原,,战场环境名
-terrain.plains.description,望星城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
+tile.drained.description,灵力被吸干的土地。站在上面不算接入灵脉，角上的交叉点不能放灵石；魔族不受影响。,,地块说明（布阵时显示）
+terrain.plains.name,长安郊外,,战场环境名
+terrain.plains.description,长安城外的草原和小河。没有环境效果，用来熟悉高地和浅水。,,战场环境说明（布阵时显示）
 terrain.forest.name,古木山林,,战场环境名
-terrain.forest.description,花果山守了多年的山林。树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
-terrain.forest.effect1,花果山、四海龙宫移速 +15%,,战场环境第 1 条效果的简短说明
+terrain.forest.description,深山老林，树冠遮住视线，重甲在林间转身不便。,,战场环境说明（布阵时显示）
+terrain.forest.effect1,人族、兽族移速 +15%,,战场环境第 1 条效果的简短说明
 terrain.forest.effect2,远程射程 −1 格（树冠遮挡）,,战场环境第 2 条效果的简短说明
 terrain.forest.effect3,重装移速 −10%,,战场环境第 3 条效果的简短说明
-terrain.desert.name,灰沙荒漠,,战场环境名
-terrain.desert.description,永夜吸干了城池的灵力，田野化成了灰沙。,,战场环境说明（布阵时显示）
-terrain.desert.effect1,地面部队移速 −10%（花果山不受影响）,,战场环境第 1 条效果的简短说明
-terrain.desert.effect2,灵力枯竭：接入星络时灵力恢复 −40%（妖魔不受影响）,,战场环境第 2 条效果的简短说明
-terrain.lake.name,湖心枢纽,,战场环境名
-terrain.lake.description,建在湖心的星石枢纽，夜色里只有星石在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
+terrain.desert.name,黄风沙地,,战场环境名
+terrain.desert.description,黄风岭吹来的黄沙盖住了田野，灵力也被吹散了。,,战场环境说明（布阵时显示）
+terrain.desert.effect1,地面部队移速 −10%（人族不受影响）,,战场环境第 1 条效果的简短说明
+terrain.desert.effect2,灵力枯竭：接入灵脉时灵力恢复 −40%（魔族不受影响）,,战场环境第 2 条效果的简短说明
+terrain.lake.name,通天河,,战场环境名
+terrain.lake.description,八百里通天河，夜里冰面上只有灵石在发光。飞骑掠过水面不受影响。,,战场环境说明（布阵时显示）
 terrain.lake.effect1,夜战：远程射程 −1 格,,战场环境第 1 条效果的简短说明
-terrain.lake.effect2,背水守护：天兵营护盾回复 +30%,,战场环境第 2 条效果的简短说明
+terrain.lake.effect2,背水守护：仙族护盾回复 +30%,,战场环境第 2 条效果的简短说明
