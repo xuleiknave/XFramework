@@ -145,7 +145,7 @@ section { padding: 96px 20px; }
 /* 五方 */
 .factions { background: var(--night); color: var(--paper); position: relative; overflow: hidden; }
 .factions .head p { color: rgba(243, 234, 216, .65); }
-.five { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
+.five { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .fac {
   border: 1px solid rgba(201, 161, 74, .35); padding: 26px 16px 24px; text-align: center;
   background: linear-gradient(180deg, rgba(35, 43, 64, .9), rgba(20, 26, 42, .9));
@@ -174,7 +174,6 @@ footer p { margin: 4px 0; }
 
 @media (max-width: 860px) {
   .five { grid-template-columns: repeat(2, 1fr); }
-  .five .fac:last-child { grid-column: span 2; }
   .loop { grid-template-columns: 1fr; gap: 28px; }
   .board { max-width: 320px; margin: 0 auto; }
   .grow { grid-template-columns: 1fr; gap: 20px; }
@@ -218,7 +217,7 @@ footer p { margin: 4px 0; }
   <ul>
     <li><a href="#story">故事</a></li>
     <li><a href="#play">玩法</a></li>
-    <li><a href="#factions">阵营</a></li>
+    <li><a href="#factions">四族</a></li>
     <li><a href="roster/">角色</a></li>
     <li><a href="design/">设计资料</a></li>
     <li><a href="chat/">留言板</a></li>
@@ -248,7 +247,7 @@ footer p { margin: 4px 0; }
       <div class="kicker">故 事</div>
       <h2>五百年后，再走一遍西天路</h2>
       <svg class="rule"><use href="#rule"/></svg>
-      <p>故事就是《西游记》原著。没有原创主角，你直接带着取经队，从花果山一路打到灵山。</p>
+      <p>故事就是《西游记》原著。没有原创主角。你是土地公请来的“引路人”，替师徒排兵布阵，从花果山一路打到灵山。</p>
     </div>
     <div class="scroll reveal">
       <p><em>序章 · 大闹天宫</em>　开局就用齐天大圣：打天兵、斗巨灵神、战哪吒，最后和二郎神打成平手，被压在五行山下。然后“五百年后”，从头开始养队伍。</p>
@@ -329,11 +328,11 @@ footer p { margin: 4px 0; }
     <div class="grow">
       <div class="reveal">
         <h3>两百多位原著人物</h3>
-        <p>师徒五人、天兵天将、二十八宿、四海龙王、各路妖王……刷关升级、攒碎片升星，每升一星换一身更华丽的装束。</p>
+        <p>师徒五人、天兵天将、二十八宿、四海龙王、各路妖王，分成人、仙、魔、兽四族。刷关升级、攒碎片升星，每升一星换一身更华丽的装束。</p>
       </div>
       <div class="reveal">
         <h3>组合技</h3>
-        <p>原著里有关系的人同时上阵就会触发：师徒同心、雷电交加、葫芦净瓶、狮驼三魔、火焰山一家，还有牛魔王和悟空“结义”互不攻击。</p>
+        <p>原著里有关系的人同时上阵就会触发：师徒同心、白龙护主、门神、雷电交加、葫芦净瓶、狮驼三魔、火焰山一家，还有牛魔王和悟空“结义”互不攻击。</p>
       </div>
       <div class="reveal">
         <h3>不打卡</h3>
@@ -346,49 +345,42 @@ footer p { margin: 4px 0; }
 <section class="factions" id="factions">
   <div class="wrap">
     <div class="head reveal">
-      <div class="kicker">阵 营</div>
-      <h2>按“是谁的人”分五方</h2>
+      <div class="kicker">四 族</div>
+      <h2>人、仙、魔、兽</h2>
       <svg class="rule"><use href="#rule"/></svg>
-      <p>原著里最有名的梗：有后台的妖怪被主人领回家，没后台的被打死。所以阵营不按人、仙、妖分，而是看他跟谁混。</p>
+      <p>两百多位原著人物分成四族，每族有自己的两个特色词条。悟空、八戒、沙僧有仙籍，算仙族；二十八宿现出本相出战，算兽族。</p>
     </div>
     <div class="five">
       <div class="fac reveal">
-        <div class="dot" style="background:#B07A2E;--glow:rgba(232,199,122,.6)">西</div>
-        <h3>西天路</h3>
-        <div class="dir">师徒和护法</div>
-        <p>师徒五人、暗中保护他们的护法，还有一路上遇到的凡人和地方神。</p>
-        <span class="line">护持 · 渡难</span>
+        <div class="dot" style="background:#B07A2E;--glow:rgba(232,199,122,.6)">人</div>
+        <h3>人族</h3>
+        <div class="dir">取经人和凡人</div>
+        <p>取经人唐僧、路上的凡人和门神。没有法力，靠的是人心。</p>
+        <span class="line">同心 · 香火</span>
       </div>
       <div class="fac reveal">
-        <div class="dot" style="background:#C8402F;--glow:rgba(240,138,75,.6)">凌</div>
-        <h3>凌霄殿</h3>
-        <div class="dir">天兵天将</div>
-        <p>天庭的神将和星官，悟空打不过时上天搬来的救兵。</p>
-        <span class="line">点将 · 天罗地网</span>
+        <div class="dot" style="background:#2E6E8E;--glow:rgba(159,216,208,.6)">仙</div>
+        <h3>仙族</h3>
+        <div class="dir">神将星官和仙人</div>
+        <p>天庭的神将星官、修道的仙人，还有悟空、八戒、沙僧这三位有仙籍的徒弟。</p>
+        <span class="line">腾云 · 仙籍</span>
       </div>
       <div class="fac reveal">
-        <div class="dot" style="background:#2E6E8E;--glow:rgba(159,216,208,.6)">水</div>
-        <h3>水晶宫</h3>
-        <div class="dir">龙王一家</div>
-        <p>四海龙宫和水里的亲戚，能把格子变成水。</p>
-        <span class="line">兴云布雨 · 潮汐</span>
+        <div class="dot" style="background:#4A4560;--glow:rgba(156,123,216,.65)">魔</div>
+        <h3>魔族</h3>
+        <div class="dir">人形的妖王</div>
+        <p>以人形出战的妖王和精怪。</p>
+        <span class="line">法宝 · 占山</span>
       </div>
       <div class="fac reveal">
-        <div class="dot" style="background:#5E9C6A;--glow:rgba(232,199,122,.5)">洞</div>
-        <h3>洞天府</h3>
-        <div class="dir">有后台的</div>
-        <p>神仙家里偷跑下界的童子、坐骑和宠物，手里都有主人家的法宝。</p>
-        <span class="line">法宝 · 靠山</span>
-      </div>
-      <div class="fac reveal">
-        <div class="dot" style="background:#4A4560;--glow:rgba(156,123,216,.65)">妖</div>
-        <h3>妖王寨</h3>
-        <div class="dir">没后台的</div>
-        <p>占山为王的妖王，悟空在花果山时代的兄弟和对手。</p>
-        <span class="line">占山 · 野性</span>
+        <div class="dot" style="background:#5E9C6A;--glow:rgba(232,199,122,.5)">兽</div>
+        <h3>兽族</h3>
+        <div class="dir">神兽、龙族和星宿</div>
+        <p>坐骑神兽、四海龙族和水族，还有现出本相出战的二十八宿。</p>
+        <span class="line">本相 · 四象</span>
       </div>
     </div>
-    <p class="more reveal"><a class="btn btn-ghost" href="roster/">查看全部角色</a>　<a class="btn btn-ghost" href="design/">阵营特色和组合技</a></p>
+    <p class="more reveal"><a class="btn btn-ghost" href="roster/">查看全部角色</a>　<a class="btn btn-ghost" href="design/">四族特色和组合技</a></p>
   </div>
 </section>
 

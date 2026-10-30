@@ -10,12 +10,11 @@ import pathlib
 HERE = pathlib.Path(__file__).resolve().parent
 
 FACTIONS = [
-    # 名字, 口语副标题, 颜色, 一句话, 特色词条
-    ("西天路", "师徒和护法", "#B07A2E", "师徒五人、暗中保护他们的护法，还有一路上遇到的凡人和地方神。", "护持 · 渡难"),
-    ("凌霄殿", "天兵天将", "#C8402F", "天庭的神将和星官，悟空打不过时上天搬来的救兵。", "点将 · 天罗地网"),
-    ("水晶宫", "龙王一家", "#2E6E8E", "四海龙宫和水里的亲戚。", "兴云布雨 · 潮汐"),
-    ("洞天府", "有后台的", "#5E9C6A", "神仙家里偷跑下界的童子、坐骑和宠物。", "法宝 · 靠山"),
-    ("妖王寨", "没后台的", "#4A4560", "占山为王的妖王，悟空在花果山时代的兄弟和对手。", "占山 · 野性"),
+    # 族名, 副标题, 颜色, 一句话, 特色词条
+    ("人族", "取经人和凡人", "#B07A2E", "取经人唐僧、路上的凡人和门神。没有法力，靠的是人心。", "同心 · 香火"),
+    ("仙族", "神将星官和仙人", "#2E6E8E", "天庭的神将星官、修道的仙人，还有悟空、八戒、沙僧这三位有仙籍的徒弟。", "腾云 · 仙籍"),
+    ("魔族", "人形的妖王", "#4A4560", "以人形出战的妖王和精怪。", "法宝 · 占山"),
+    ("兽族", "神兽、龙族和星宿", "#5E9C6A", "坐骑神兽、四海龙族和水族，还有现出本相出战的二十八宿。", "本相 · 四象"),
 ]
 ROLES = ["轻装", "重装", "远程", "支援", "对空", "飞骑"]
 
@@ -63,7 +62,7 @@ TEMPLATE = r"""<!doctype html>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>星线 · 角色名录</title>
-<meta name="description" content="《星线》的 __COUNT__ 位西游原著人物：西天路、凌霄殿、水晶宫、洞天府、妖王寨五个阵营。">
+<meta name="description" content="《星线》的 __COUNT__ 位西游原著人物：人族、仙族、魔族、兽族四族。">
 <meta name="theme-color" content="#141A2A">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <!-- 由 website/build_roster.py 生成，改名单请改 website/source/roster.json 后重新生成 -->
@@ -120,10 +119,10 @@ footer a { color: var(--gold-hi); }
 <nav class="nav"><a class="brand" href="../">← 星线</a><a href="../design/">设计资料</a><a href="../chat/">留言板</a></nav>
 <header class="top">
   <h1>角色名录</h1>
-  <p>__COUNT__ 位《西游记》原著人物，按“是谁的人”分成五个阵营。名单还是草案，开发中会增减；想看到谁，欢迎去留言板说。</p>
+  <p>__COUNT__ 位《西游记》原著人物，分成人、仙、魔、兽四族。名单还是草案，开发中会增减；想看到谁，欢迎去留言板说。</p>
 </header>
 <div class="bar">
-  <div class="row"><button data-f="" class="on">全部阵营</button>__FACBTN__</div>
+  <div class="row"><button data-f="" class="on">全部</button>__FACBTN__</div>
   <div class="row"><button data-r="" class="on">全部定位</button>__ROLEBTN__<input type="search" placeholder="搜名字或出处" aria-label="搜索角色"><span class="count"></span></div>
 </div>
 <main>
