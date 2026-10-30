@@ -2,9 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-# Starline（星线）
+# 取经棋局（代码名 Starline）
 
-《西游记》原著原班人马题材的战略游戏（人、仙、魔、兽四族，序章大闹天宫，正篇重走取经路，见决策 77），先做国内微信小游戏（广告变现、需联网登录，服务端在 UOS；Steam 买断版搁置，见 `docs/decisions.md` 决策 66~77）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
+《西游记》原著原班人马题材的战略游戏（人、仙、魔、兽四族，序章大闹天宫，正篇重走取经路，见决策 77；游戏名“取经棋局”见决策 78），先做国内微信小游戏（广告变现、需联网登录，服务端在 UOS；Steam 买断版搁置，见 `docs/decisions.md` 决策 66~78）。个人开发者与 Claude 合作开发。开发者用中文交流，回复请用中文。
 
 ## 先读这些
 
