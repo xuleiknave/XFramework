@@ -1,5 +1,9 @@
 # 服务端设计：必须联网登录，服务端为准
 
+> 2026-10-30（决策 76）：Steam 不做。本文里的 Steam 登录、Steam 票据、SteamID、已购内容（DLC）、海外 Steam 玩家延迟和商店页等内容都不再做，账号走微信小游戏登录（App 端以服务端设计为准）；正文暂时保留，改到相关部分时再删。
+
+抽卡（招贤榜，决策 74）的结果也由服务端生成，接口见第 7 节“养成”。
+
 开发者选定（决策 49）：**玩家必须连接服务器、登录后才能玩，养成数据全部以服务端为准。** 原来“不联网也能玩全部内容”的设定去掉了；决策 48 里“离线照常玩、联网后补交”的做法也随之作废。
 
 **服务端全部托管在 UOS**（团结引擎的云服务，决策 57，决策 50）：业务代码是 C# 云函数（Func Stateless），数据库起步用 CRUD Save（按用量计费的文档存储），玩家多了再换 CRUD Storage（托管 MySQL）。**只有云函数能读写数据库**，客户端不直接连。
@@ -195,6 +199,10 @@ server/
 | 方法 | 路径 | 用途 |
 |---|---|---|
 | POST | `/v1/saves/{id}/heroes/{hero}/recruit` | 碎片召唤 |
+| POST | `/v1/saves/{id}/gacha/{pool}/draw` | 抽卡（body 里是次数 1 或 10）：服务端用自己的随机数按 `gacha.json` 抽，扣招贤令，更新保底计数和招贤值，新角色入库、重复的换碎片或魂，每抽写一条 `economy_log`（决策 74） |
+| POST | `/v1/saves/{id}/gacha/spark` | 用 100 点招贤值换自选金卡或它的 30 个碎片 |
+| GET | `/v1/saves/{id}/gacha/history` | 抽卡记录（至少 90 天） |
+| POST | `/v1/saves/{id}/heroes/{hero}/ascend` | 花魂给白、绿角色进阶一档（最高到蓝） |
 | POST | `/v1/saves/{id}/heroes/{hero}/star-up` | 升星 |
 | PUT | `/v1/saves/{id}/heroes/{hero}/runes/{slot}` | 装符文（body 里是 `rune_uid`，空表示卸下） |
 | POST | `/v1/saves/{id}/shop/buy` | 商店购买 |
