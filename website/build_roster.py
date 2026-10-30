@@ -12,11 +12,11 @@ HERE = pathlib.Path(__file__).resolve().parent
 FACTIONS = [
     # 族名, 副标题, 颜色, 一句话, 特色词条
     ("人族", "取经人和凡人", "#B07A2E", "取经人唐僧、路上的凡人和门神。没有法力，靠的是人心。", "同心 · 香火"),
-    ("仙族", "神将星官和仙人", "#2E6E8E", "天庭的神将星官、修道的仙人，还有悟空、八戒、沙僧这三位有仙籍的徒弟。", "腾云 · 仙籍"),
-    ("魔族", "人形的妖王", "#4A4560", "以人形出战的妖王和精怪。", "法宝 · 占山"),
+    ("仙族", "尊神、神将和仙人", "#2E6E8E", "三清、佛门、天庭的尊神和神将星官，修道的仙人，有仙籍的悟空、八戒、沙僧，还有取经成功后成佛成正果的师徒。", "腾云 · 仙籍"),
+    ("魔族", "人形的妖王", "#4A4560", "以人形出战的妖王和精怪，还有大闹天宫时的齐天大圣。", "法宝 · 占山"),
     ("兽族", "神兽、龙族和星宿", "#5E9C6A", "坐骑神兽、四海龙族和水族，还有现出本相出战的二十八宿。", "本相 · 四象"),
 ]
-ROLES = ["轻装", "重装", "远程", "支援", "对空", "飞骑"]
+ROLES = ["轻装", "重装", "远程", "支援", "对空"]
 # 卡片颜色从高到低
 RARITIES = [("红", "#C8402F"), ("金", "#C9962A"), ("紫", "#8A5CC2"), ("蓝", "#3C7FC0"), ("绿", "#4E9A5A"), ("白", "#9A948A")]
 RARITY_COLOR = dict(RARITIES)
@@ -95,7 +95,7 @@ header.top p { opacity: .75; max-width: 620px; margin: 10px auto 0; font-size: 1
 .bar input { font: inherit; font-size: 14px; padding: 4px 12px; border: 1px solid rgba(30, 34, 48, .35); border-radius: 999px; background: #fff; min-width: 0; flex: 1 1 160px; max-width: 260px; }
 .bar .count { font-size: 13px; color: var(--muted); margin-left: auto; }
 main { max-width: 1080px; margin: 0 auto; padding: 8px 20px 72px; }
-.fac { padding-top: 36px; }
+.fac { padding-top: 36px; scroll-margin-top: 130px; }
 .fac header h3 { display: flex; align-items: center; gap: 10px; font-size: 26px; letter-spacing: .08em; }
 .fac header h3 i { width: 18px; height: 18px; border-radius: 50%; background: var(--fc); }
 .fac header h3 small { font-family: var(--sans); font-size: 13px; color: var(--muted); font-weight: 400; letter-spacing: .05em; }
