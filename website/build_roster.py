@@ -63,8 +63,8 @@ TEMPLATE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>星线 · 角色名录</title>
-<meta name="description" content="《星线》的 __COUNT__ 位西游原著人物：人族、仙族、魔族、兽族四族。">
+<title>取经棋局 · 角色名录</title>
+<meta name="description" content="《取经棋局》的 __COUNT__ 位西游原著人物：人族、仙族、魔族、兽族四族。">
 <meta name="theme-color" content="#141A2A">
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
 <!-- 由 website/build_roster.py 生成，改名单请改 website/source/roster.json 后重新生成 -->
@@ -122,7 +122,7 @@ footer a { color: var(--gold-hi); }
 </style>
 </head>
 <body>
-<nav class="nav"><a class="brand" href="../">← 星线</a><a href="../design/">设计资料</a><a href="../chat/">留言板</a></nav>
+<nav class="nav"><a class="brand" href="../">← 取经棋局</a><a href="../design/">设计资料</a><a href="../chat/">留言板</a></nav>
 <header class="top">
   <h1>角色名录</h1>
   <p>__COUNT__ 位《西游记》原著人物，分成人、仙、魔、兽四族，每族里按卡片颜色排列。名单还是草案，开发中会增减；想看到谁，欢迎去留言板说。</p>
@@ -137,7 +137,7 @@ __BLOCKS__
 <p class="empty hide">没有符合条件的角色。</p>
 <p class="note">名字都取自原著，造型和技能是我们自己设计的。</p>
 </main>
-<footer><p>© 星线 Starline · 独立游戏开发中 · 角色名单为开发中的草案</p><p><a href="../">返回首页</a></p></footer>
+<footer><p>© 取经棋局 · 独立游戏开发中 · 角色名单为开发中的草案</p><p><a href="../">返回首页</a></p></footer>
 <script>
 (function () {
   var f = '', r = '', k = '', q = '';
